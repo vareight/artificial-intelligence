@@ -27,6 +27,7 @@
                 <pathelement location="lib/commons-cli-1.4.jar"/>
                 <pathelement location="build"/>
             </classpath>
+        	<arg value="-g"/>
         </java>
     </target>
     <target name="randomwhite">
@@ -35,7 +36,7 @@
                 <pathelement location="lib/gson-2.2.2.jar"/>
                 <pathelement location="build"/>
             </classpath>
-        	<arg value="-g"/>
+        	
         </java>
     </target>
     <target name="randomblack">

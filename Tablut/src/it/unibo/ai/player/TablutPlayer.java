@@ -63,6 +63,12 @@ public class TablutPlayer extends TablutClient {
 		System.out.println("You are player " + this.getPlayer().toString() + "!");
 		
 		//TODO
+		/* 
+		 * AlphaBetaSearch(Game) -> tagli alfa beta
+		 * Game forse dobbiamo implementarla noi perchè la loro non va bene (interfaccia di aima)
+		 * 
+		 * 
+		 * */
 
 	}
 

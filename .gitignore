@@ -57,3 +57,5 @@ dkms.conf
 Tablut/JavaDoc/*
 Tablut/Executables/*
 Tablut/bin/*
+Tablut/garbage/*
+Tablut/logs/*
