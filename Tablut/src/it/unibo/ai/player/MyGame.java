@@ -221,8 +221,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 
 	@Override
 	public StateTablut getInitialState() {
-		// TODO Auto-generated method stub
-		return null;
+		return new StateTablut();
 	}
 
 
