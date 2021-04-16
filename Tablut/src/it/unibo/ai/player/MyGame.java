@@ -104,7 +104,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 				if(pawns[j]==val) break; //j è la posizione del piedino
 			}
 			indexPawns = j;
-			if( j<24 && pawns[j+1]!=-1) {
+			if( j<24 && pawns[j+1]!=-1) { 
 				indexPawns=j+1;
 			}
 
@@ -231,18 +231,163 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		// stato futuro in base all'attuale 
 		return null;
 	}
-
+	
 
 	@Override
 	public boolean isTerminal(StateTablut s) {
 		// TODO Auto-generated method stub
 		// situazione finale vittoria - sconfitta - pareggio
-		return false;
+		//white win 
+		int posKing = findKing(s);
+		boolean kingEscapes = kingEscapes(posKing);
+		
+		//black win
+		boolean kingCaptured= kingCaptured(posKing, s);
+		
+		//no moves avaible 
+		boolean noMoves=false;
+		if (getActions(s).isEmpty()) {
+			noMoves=true;
+		}
+		return kingEscapes || kingCaptured || noMoves; //manca caso pareggio = stato ripetuto
 	}
-
+	
+	
+	
+	private int findKing(StateTablut state) { //trova la posizione del re nella scacchiera
+		for(int i=0; i<9; i++) {
+			for(int j=0; j<9; j++) {
+				if(state.getPawn(i, j).equals(Pawn.KING)) {
+					return i*9 +j;	
+				}
+			}
+		}
+		return -1;
+	}
+	
+	private boolean kingEscapes(int posKing) { //il re raggiunge una posizione di salvataggio sul bordo
+		
+		List<Integer> escapeTiles = new ArrayList<Integer>();
+		
+		escapeTiles.add(1); //posizioni caselle blu per vincita re
+		escapeTiles.add(2);
+		escapeTiles.add(6);
+		escapeTiles.add(7);
+		escapeTiles.add(9);
+		escapeTiles.add(17);
+		escapeTiles.add(18);
+		escapeTiles.add(26);
+		escapeTiles.add(54);
+		escapeTiles.add(62);
+		escapeTiles.add(63);
+		escapeTiles.add(71);
+		escapeTiles.add(73);
+		escapeTiles.add(74);
+		escapeTiles.add(78);
+		escapeTiles.add(79);
+		if (escapeTiles.contains(posKing)) {
+			return true; //vittoria del re il re è scappato sul bordo
+		}else {
+			return false;
+		}
+		
+	}
+	
+	private boolean kingCaptured(int posKing, StateTablut state) { // il re viene catturato
+		int riga=posKing/9;
+		int col=posKing-(riga*9);
+		Pawn sopra ;
+		Pawn sotto ;
+		Pawn destra; 
+		Pawn sinistra; 
+		if( riga !=0) sopra=state.getPawn(riga-1, col);
+		else sopra =Pawn.EMPTY;
+		if( riga <9 ) sotto =state.getPawn(riga+1, col);
+		else sotto =Pawn.EMPTY;
+		if(col <9) destra =state.getPawn(riga, col+1); 
+		else destra =Pawn.EMPTY;
+		if(col !=0) sinistra =state.getPawn(riga, col-1);
+		else sinistra =Pawn.EMPTY;
+	
+		// il re si trova nel castello ed è circondato
+		if(posKing==40 && sopra.equals(Pawn.BLACK)
+				&& sotto.equals(Pawn.BLACK)
+				&& destra.equals(Pawn.BLACK)
+				&& sinistra.equals(Pawn.BLACK)) {
+			return true; 
+			
+		}
+		//il re si trova in una posizione adiacente al castello e vine catturato se circondato sui tre lati restanti
+		if(posKing==31 && sopra.equals(Pawn.BLACK)
+				&& destra.equals(Pawn.BLACK)
+				&& sinistra.equals(Pawn.BLACK)) {
+			return true; 
+			
+		}
+		if(posKing==39 && sopra.equals(Pawn.BLACK)
+				&& sotto.equals(Pawn.BLACK)
+				&& sinistra.equals(Pawn.BLACK)) {
+			return true; 
+			
+		}
+		if(posKing==41 && sopra.equals(Pawn.BLACK)
+				&& sotto.equals(Pawn.BLACK)
+				&& destra.equals(Pawn.BLACK)){
+			return true; 
+			
+		}
+		if(posKing==49 && sotto.equals(Pawn.BLACK)
+				&& destra.equals(Pawn.BLACK)
+				&& sinistra.equals(Pawn.BLACK)) {
+			return true; 
+			
+		}
+		//il re viene catturato in una qualunque altra posizione
+		return pawnCaptured(state, riga, col, sopra, sotto, destra, sinistra);
+				
+	}
+	//funzione generale per controllare se una pedina è stata catturata
+	
+	private boolean pawnCaptured(StateTablut state,int riga, int col, Pawn sopra, Pawn sotto, Pawn destra, Pawn sinistra) {
+		
+		Turn turnVittima = state.getTurn();
+		Pawn pawnPredatore = turnVittima.equals(Turn.WHITE) ? Pawn.BLACK : Pawn.WHITE ;
+		 sopra = sopra.equals(Pawn.KING) ? Pawn.WHITE : sopra;
+		 sotto = sotto.equals(Pawn.KING) ? Pawn.WHITE : sotto;
+		 destra = destra.equals(Pawn.KING) ? Pawn.WHITE : destra;
+		 sinistra = sinistra.equals(Pawn.KING) ? Pawn.WHITE : sinistra;
+		List<Integer> campo = new ArrayList<Integer>();
+		campo.add(3);
+		campo.add(4);
+		campo.add(5);
+		campo.add(13);
+		campo.add(27);
+		campo.add(36);
+		campo.add(37);
+		campo.add(45);
+		campo.add(35);
+		campo.add(43);
+		campo.add(44);
+		campo.add(53);
+		campo.add(67);
+		campo.add(75);
+		campo.add(76);
+		campo.add(77);
+		
+		if ((sopra.equals(pawnPredatore) || campo.contains(riga*9+col-9) || riga*9+col-9 ==40 ) && (sotto.equals(pawnPredatore) || campo.contains(riga*9+col+9) || riga*9+col+9 ==40)) {
+			return true;
+		}
+		if ((destra.equals(pawnPredatore) || campo.contains(riga*9+col +1) || riga*9+col+1 == 40) && (sinistra.equals(pawnPredatore) || campo.contains(riga*9+col-1) ||riga*9+col-1 ==40)) {
+			return true;
+		}
+		
+		return false; 
+	}
+	
 	@Override
 	public Turn getPlayer(StateTablut s) {
 		// TODO Auto-generated method stub
+
 		return null;
 	}
 
