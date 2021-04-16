@@ -41,9 +41,9 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	private int NUM_PAWNS = 25;
 	
 	private int king;
-	private int[] whitePawns;
-	private int[] blackPawns;
-	private int[] pawns;
+	private int[] whitePawns = new int[NUM_WHITE_PAWNS];
+	private int[] blackPawns = new int[NUM_BLACK_PAWNS];
+	private int[] pawns = new int[NUM_PAWNS];
 	
 	/*
 	 * Inizializzazione degli array delle verie pedine
@@ -63,7 +63,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	 */
 	private void populatePawnsArrays(StateTablut s) {
 		int indexWhite=0, indexBlack=0, indexPawns=0;
-		king=-1;
+		boolean kingfound=false;
 		
 		for(int i=0; i<DIM; i++) {
 			for(int j=0; j<DIM; j++) {
@@ -76,10 +76,11 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 				}
 				
 				// aggiunta del re
-				if(king!=-1 && s.getPawn(i, j).equals(Pawn.KING)) {
+				if(!kingfound && s.getPawn(i, j).equals(Pawn.KING)) {
 					pawns[indexPawns]=i*DIM+j;
 					indexPawns++;
 					king=i*DIM+j;
+					kingfound=true;
 				}
 				
 				//aggiunta pedine nere
@@ -188,7 +189,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 			// ***controlliamo la strada percorribile SOTTO alla pedina***
 			// ***************************************************************
 			for(int currentPawnValue=pawnValue+DIM; currentPawnValue<=DIM*(DIM-1)+column; currentPawnValue+=DIM) { //sotto
-				while(pawns[indexPawnToCheck]<currentPawnValue && pawns[indexPawnToCheck]!=-1) {
+				while(pawns[indexPawnToCheck]<currentPawnValue && pawns[indexPawnToCheck]!=-1 && indexPawnToCheck<NUM_PAWNS-1) {
 					indexPawnToCheck++;
 				}
 				if(pawns[indexPawnToCheck]==currentPawnValue){
@@ -227,7 +228,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 			// ***controlliamo la strada percorribile SOPRA alla pedina***
 			// ***************************************************************
 			for(int currentPawnValue=pawnValue-DIM; currentPawnValue>=column; currentPawnValue-=DIM) { //sopra
-				while(pawns[indexPawnToCheck]>currentPawnValue && pawns[indexPawnToCheck]!=-1) {
+				while(pawns[indexPawnToCheck]>currentPawnValue && pawns[indexPawnToCheck]!=-1 && indexPawnToCheck>0) {
 					indexPawnToCheck--;
 				}
 				if(pawns[indexPawnToCheck]==currentPawnValue){
