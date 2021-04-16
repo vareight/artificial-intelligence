@@ -254,44 +254,14 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	 * Funzione che stabilisce se l'azione dalla casella "from" alla casella "to" � lecita
 	 */
 	private boolean isPermitted(int from, int to, Turn t) {
-		int[] proibiteNere = {3,4,5,13,27,35,36,37,43,44,45,53,67,75,76,77};
-		List<Integer> campo1 = new ArrayList<Integer>();
-		List<Integer> campo2 = new ArrayList<Integer>();
-		List<Integer> campo3 = new ArrayList<Integer>();
-		List<Integer> campo4 = new ArrayList<Integer>();
-		
-		campo1.add(3);
-		campo1.add(4);
-		campo1.add(5);
-		campo1.add(13);
-		campo2.add(27);
-		campo2.add(36);
-		campo2.add(37);
-		campo2.add(45);
-		campo3.add(35);
-		campo3.add(43);
-		campo3.add(44);
-		campo3.add(53);
-		campo4.add(67);
-		campo4.add(75);
-		campo4.add(76);
-		campo4.add(77);
-		
-		int castello = 40;
-		
-		if (to == castello) return false;
+		if (to == BoardState.castle) return false;
 		
 		if(t.equals(Turn.WHITE)) {
-			 for(int casella : proibiteNere) {
-				 if(casella == to) return false;
-			 }
+			return !(BoardState.isCamp(to));
 		}else {
-			if(campo1.contains(to) && !(campo1.contains(from))) return false; 
-			if(campo2.contains(to) && !(campo2.contains(from))) return false; 
-			if(campo3.contains(to) && !(campo3.contains(from))) return false; 
-			if(campo4.contains(to) && !(campo4.contains(from))) return false; 
+			return BoardState.sameCampo(from, to);
 		}
-		return true;
+		
 	}
 	
 	/*
@@ -365,31 +335,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	 * @return true if the king escapes, false otherwise
 	 */
 	private boolean kingEscapes(int posKing) {
-		
-		List<Integer> escapeTiles = new ArrayList<Integer>();
-		
-		escapeTiles.add(1); //posizioni caselle blu per vincita re
-		escapeTiles.add(2);
-		escapeTiles.add(6);
-		escapeTiles.add(7);
-		escapeTiles.add(9);
-		escapeTiles.add(17);
-		escapeTiles.add(18);
-		escapeTiles.add(26);
-		escapeTiles.add(54);
-		escapeTiles.add(62);
-		escapeTiles.add(63);
-		escapeTiles.add(71);
-		escapeTiles.add(73);
-		escapeTiles.add(74);
-		escapeTiles.add(78);
-		escapeTiles.add(79);
-		if (escapeTiles.contains(posKing)) {
-			return true; //vittoria del re: scappato sul bordo
-		}else {
-			return false;
-		}
-		
+		return BoardState.isEscapeTile(posKing);
 	}
 	
 	/**
@@ -472,31 +418,13 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		 sotto = sotto.equals(Pawn.KING) ? Pawn.WHITE : sotto;
 		 destra = destra.equals(Pawn.KING) ? Pawn.WHITE : destra;
 		 sinistra = sinistra.equals(Pawn.KING) ? Pawn.WHITE : sinistra;
-		 
-		List<Integer> campo = new ArrayList<Integer>();
-		campo.add(3);
-		campo.add(4);
-		campo.add(5);
-		campo.add(13);
-		campo.add(27);
-		campo.add(36);
-		campo.add(37);
-		campo.add(45);
-		campo.add(35);
-		campo.add(43);
-		campo.add(44);
-		campo.add(53);
-		campo.add(67);
-		campo.add(75);
-		campo.add(76);
-		campo.add(77);
 		
-		if ((sopra.equals(pawnPredatore) || campo.contains(riga*DIM+col-DIM) || riga*DIM+col-DIM == BoardState.castle ) && 
-				(sotto.equals(pawnPredatore) || campo.contains(riga*DIM+col+DIM) || riga*DIM+col+DIM == BoardState.castle)) {
+		if ((sopra.equals(pawnPredatore) || BoardState.isCamp(riga*DIM+col-DIM) || riga*DIM+col-DIM == BoardState.castle ) && 
+				(sotto.equals(pawnPredatore) || BoardState.isCamp(riga*DIM+col+DIM) || riga*DIM+col+DIM == BoardState.castle)) {
 			return true;
 		}
-		if ((destra.equals(pawnPredatore) || campo.contains(riga*DIM+col +1) || riga*DIM+col+1 == BoardState.castle) && 
-				(sinistra.equals(pawnPredatore) || campo.contains(riga*DIM+col-1) ||riga*DIM+col-1 == BoardState.castle)) {
+		if ((destra.equals(pawnPredatore) || BoardState.isCamp(riga*DIM+col +1) || riga*DIM+col+1 == BoardState.castle) && 
+				(sinistra.equals(pawnPredatore) || BoardState.isCamp(riga*DIM+col-1) ||riga*DIM+col-1 == BoardState.castle)) {
 			return true;
 		}
 		return false; 

@@ -96,4 +96,15 @@ public class BoardState {
 		return getCampo(row*9+column);
 	}
 	
+	public static boolean isEscapeTile(int index) {
+		return escapeTiles.contains(index);
+	}
+	public static boolean isEscapeTile(int row, int column) {
+		return isEscapeTile(row*9+column);
+	}
+	
+	public static boolean sameCampo(int from, int to) {
+		return getCampo(from) == getCampo(to);
+	}
+	
 }
