@@ -7,6 +7,7 @@ import java.util.List;
 import aima.core.search.adversarial.Game;
 import it.unibo.ai.didattica.competition.tablut.domain.Action;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
+import it.unibo.ai.didattica.competition.tablut.domain.State.Pawn;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
 import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
 
@@ -42,18 +43,18 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		
 		for(int i=0; i<9; i++) {
 			for(int j=0; j<9; j++) {
-				if(indexWhite<8 && s.getPawn(i, j).name().equals("W")) {
+				if(indexWhite<8 && s.getPawn(i, j).equals(Pawn.WHITE)) {
 					whitePawns[indexWhite]=i*9+j;
 					indexWhite++;
 					pawns[indexPawns]=i*9+j;
 					indexPawns++;
 				}
-				if(king!=-1 && s.getPawn(i, j).name().equals("K")) {
+				if(king!=-1 && s.getPawn(i, j).equals(Pawn.KING)) {
 					pawns[indexPawns]=i*9+j;
 					indexPawns++;
 					king=i*9+j;
 				}
-				if(indexBlack<16 && s.getPawn(i, j).name().equals("B")) {
+				if(indexBlack<16 && s.getPawn(i, j).equals(Pawn.BLACK)) {
 					blackPawns[indexBlack]=i*9+j;
 					indexBlack++;
 					pawns[indexPawns]=i*9+j;
@@ -64,8 +65,8 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		
 		
 		
-		if (turn.name().equals("W")) return whiteActions(whitePawns, king, pawns);
-		if (turn.name().equals("B")) return blackActions(blackPawns, pawns);
+		if (turn.equals(Turn.WHITE)) return whiteActions(whitePawns, king, pawns);
+		if (turn.equals(Turn.BLACK)) return blackActions(blackPawns, pawns);
 		
 		return null; //TODO capire se restituire altro quando non è W o B
 	}
@@ -99,10 +100,16 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		int j, indexPawns;
 		try {
 			for(j=0; j<25; j++) {
+				
 				if(pawns[j]==val) break; //j è la posizione del piedino
 			}
-			indexPawns=j+1;
-			for(int k=val; k<=riga*9+8; k++) { //dx
+			indexPawns = j;
+			if( j<24 && pawns[j+1]!=-1) {
+				indexPawns=j+1;
+			}
+
+			for(int k=val+1; k<=riga*9+8 && k<81; k++) { //dx
+				
 				if(pawns[indexPawns]==k){
 					indexPawns++; //probabilmente non serve
 					break;
@@ -111,7 +118,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 					if(isPermitted(val, k, t)) azioni.add(a);
 				}
 			}
-			for(int k=val; k<=9*8+col; k+=9) { //sotto
+			for(int k=val+9; k<=9*8+col && k<81; k+=9) { //sotto
 				while(pawns[indexPawns]<k && pawns[indexPawns]!=-1) {
 					indexPawns++;
 				}
@@ -123,8 +130,12 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 					if(isPermitted(val, k, t)) azioni.add(a);
 				}
 			}
-			indexPawns=j-1;
-			for(int k=val; k>=riga*9; k--) { //sx
+		
+			if(j!=0) {
+				indexPawns=j-1;
+			}
+			for(int k=val-1; k>=riga*9 && k>=0; k--) { //sx
+
 				if(pawns[indexPawns]==k){
 					indexPawns--; //probabilmente non serve
 					break;
@@ -133,7 +144,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 					if(isPermitted(val, k, t)) azioni.add(a);
 				}
 			}
-			for(int k=val; k>=col; k-=9) { //sopra
+			for(int k=val-9; k>=col && k>=0; k-=9) { //sopra
 				while(pawns[indexPawns]>k && pawns[indexPawns]!=-1) {
 					indexPawns--;
 				}
