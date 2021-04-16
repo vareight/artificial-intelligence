@@ -343,19 +343,28 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	}
 	
 	
-	
-	private int findKing(StateTablut state) { //trova la posizione del re nella scacchiera
-		for(int i=0; i<9; i++) {
-			for(int j=0; j<9; j++) {
+	/**
+	 * Funzione che trova la posizione del re nella scacchiera
+	 * @param state
+	 * @return the position of the king, -1 if not found
+	 */
+	private int findKing(StateTablut state) {
+		for(int i=0; i<DIM; i++) {
+			for(int j=0; j<DIM; j++) {
 				if(state.getPawn(i, j).equals(Pawn.KING)) {
-					return i*9 +j;	
+					return i*DIM +j;	
 				}
 			}
 		}
 		return -1;
 	}
 	
-	private boolean kingEscapes(int posKing) { //il re raggiunge una posizione di salvataggio sul bordo
+	/**
+	 * Funzione che rileva se il re raggiunge una posizione di salvataggio sul bordo
+	 * @param posKing
+	 * @return true if the king escapes, false otherwise
+	 */
+	private boolean kingEscapes(int posKing) {
 		
 		List<Integer> escapeTiles = new ArrayList<Integer>();
 		
@@ -376,38 +385,45 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		escapeTiles.add(78);
 		escapeTiles.add(79);
 		if (escapeTiles.contains(posKing)) {
-			return true; //vittoria del re il re � scappato sul bordo
+			return true; //vittoria del re: scappato sul bordo
 		}else {
 			return false;
 		}
 		
 	}
 	
-	private boolean kingCaptured(int posKing, StateTablut state) { // il re viene catturato
-		int riga=posKing/9;
-		int col=posKing-(riga*9);
+	/**
+	 * Funzione che rileva se il re viene catturato
+	 * @param posKing
+	 * @param state
+	 * @return true if is captured, false otherwise
+	 */
+	private boolean kingCaptured(int posKing, StateTablut state) { // 
+		int riga=posKing/DIM;
+		int col=posKing-(riga*DIM);
 		Pawn sopra ;
 		Pawn sotto ;
 		Pawn destra; 
 		Pawn sinistra; 
 		if( riga !=0) sopra=state.getPawn(riga-1, col);
 		else sopra =Pawn.EMPTY;
-		if( riga <9 ) sotto =state.getPawn(riga+1, col);
+		if( riga <DIM ) sotto =state.getPawn(riga+1, col);
 		else sotto =Pawn.EMPTY;
-		if(col <9) destra =state.getPawn(riga, col+1); 
+		if(col <DIM) destra =state.getPawn(riga, col+1); 
 		else destra =Pawn.EMPTY;
 		if(col !=0) sinistra =state.getPawn(riga, col-1);
 		else sinistra =Pawn.EMPTY;
 	
 		// il re si trova nel castello ed � circondato
-		if(posKing==40 && sopra.equals(Pawn.BLACK)
+		if(posKing==BoardState.castle && sopra.equals(Pawn.BLACK)
 				&& sotto.equals(Pawn.BLACK)
 				&& destra.equals(Pawn.BLACK)
 				&& sinistra.equals(Pawn.BLACK)) {
 			return true; 
 			
 		}
-		//il re si trova in una posizione adiacente al castello e vine catturato se circondato sui tre lati restanti
+		// posizioni adiacenti al castello: [31,39,41,49]
+		// il re si trova in una posizione adiacente al castello e vine catturato se circondato sui tre lati restanti
 		if(posKing==31 && sopra.equals(Pawn.BLACK)
 				&& destra.equals(Pawn.BLACK)
 				&& sinistra.equals(Pawn.BLACK)) {
@@ -436,8 +452,18 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		return pawnCaptured(state, riga, col, sopra, sotto, destra, sinistra);
 				
 	}
-	//funzione generale per controllare se una pedina � stata catturata
 	
+	/**
+	 * Funzione generale per controllare se una pedina viene catturata
+	 * @param state
+	 * @param riga
+	 * @param col
+	 * @param sopra
+	 * @param sotto
+	 * @param destra
+	 * @param sinistra
+	 * @return true if the pawn is captured, false otherwise
+	 */
 	private boolean pawnCaptured(StateTablut state,int riga, int col, Pawn sopra, Pawn sotto, Pawn destra, Pawn sinistra) {
 		
 		Turn turnVittima = state.getTurn();
@@ -465,10 +491,12 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		campo.add(76);
 		campo.add(77);
 		
-		if ((sopra.equals(pawnPredatore) || campo.contains(riga*9+col-9) || riga*9+col-9 ==40 ) && (sotto.equals(pawnPredatore) || campo.contains(riga*9+col+9) || riga*9+col+9 ==40)) {
+		if ((sopra.equals(pawnPredatore) || campo.contains(riga*DIM+col-DIM) || riga*DIM+col-DIM == BoardState.castle ) && 
+				(sotto.equals(pawnPredatore) || campo.contains(riga*DIM+col+DIM) || riga*DIM+col+DIM == BoardState.castle)) {
 			return true;
 		}
-		if ((destra.equals(pawnPredatore) || campo.contains(riga*9+col +1) || riga*9+col+1 == 40) && (sinistra.equals(pawnPredatore) || campo.contains(riga*9+col-1) ||riga*9+col-1 ==40)) {
+		if ((destra.equals(pawnPredatore) || campo.contains(riga*DIM+col +1) || riga*DIM+col+1 == BoardState.castle) && 
+				(sinistra.equals(pawnPredatore) || campo.contains(riga*DIM+col-1) ||riga*DIM+col-1 == BoardState.castle)) {
 			return true;
 		}
 		return false; 
