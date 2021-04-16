@@ -48,15 +48,12 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	/*
 	 * Inizializzazione degli array delle verie pedine
 	 */
-	public void initializePawns() {
-		for(int i=0; i<NUM_WHITE_PAWNS; i++) {
-			whitePawns[i] = -1;
-		}
-		for(int i=0; i<NUM_BLACK_PAWNS; i++) {
-			blackPawns[i] = -1;
-		}
+	private void initializePawns() {
 		for(int i=0; i<NUM_PAWNS; i++) {
 			pawns[i] = -1;
+			if(i<NUM_WHITE_PAWNS) whitePawns[i] = -1;
+			if(i<NUM_BLACK_PAWNS) blackPawns[i] = -1;
+			
 		}
 		return;
 	}
@@ -64,7 +61,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	/*
 	 * Riempiamo gli array di pedine con i valori di dove si trovano
 	 */
-	public void populatePawnsArrays(StateTablut s) {
+	private void populatePawnsArrays(StateTablut s) {
 		int indexWhite=0, indexBlack=0, indexPawns=0;
 		king=-1;
 		
@@ -80,9 +77,9 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 				
 				// aggiunta del re
 				if(king!=-1 && s.getPawn(i, j).equals(Pawn.KING)) {
-					pawns[indexPawns]=i*9+j;
+					pawns[indexPawns]=i*DIM+j;
 					indexPawns++;
-					king=i*9+j;
+					king=i*DIM+j;
 				}
 				
 				//aggiunta pedine nere
@@ -100,12 +97,12 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	public List<Action> getActions(StateTablut s) {
 		Turn turn= s.getTurn();
 		
-		this.initializePawns();
+		initializePawns();
 		
 		populatePawnsArrays(s);
 		
-		if (turn.equals(Turn.WHITE)) return whiteActions(whitePawns, king, pawns);
-		if (turn.equals(Turn.BLACK)) return blackActions(blackPawns, pawns);
+		if (turn.equals(Turn.WHITE)) return whiteActions();
+		if (turn.equals(Turn.BLACK)) return blackActions();
 		
 		return null; //TODO capire se restituire altro quando non è W o B
 	}
@@ -113,18 +110,18 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	/*
 	 * Azioni possibili nel caso delle pedine bianche
 	 */
-	private List<Action> whiteActions(int[] whitePawns, int king, int[] pawns){
+	private List<Action> whiteActions(){
 		List<Action> azioni = new ArrayList<Action>();
 		
 			for(int i=0; i<NUM_WHITE_PAWNS; i++) {
-				if(whitePawns[i]!=-1) { // se vale -1, la pedina i-esima è stata mangiata(?)
+				if(whitePawns[i]!=-1) { // se vale -1, la pedina i-esima è stata mangiata
 					// aggiungiamo tutte le azioni possibili per la pedina i-esima
-					azioni.addAll(calculateActions(pawns, whitePawns[i], Turn.WHITE));
+					azioni.addAll(calculateActions(whitePawns[i], Turn.WHITE));
 				}else break;
 			}
 			
 			//aggiungiamo tutte le azioni possibili per il Re
-			azioni.addAll(calculateActions(pawns, king, Turn.WHITE));
+			azioni.addAll(calculateActions(king, Turn.WHITE));
 		
 		return azioni;
 	}
@@ -140,19 +137,22 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		return ret;
 	}
 	
-	/*
+	/**
 	 * Funzione che calcola le azioni possibili per la pedina presente in "boardValue".
 	 * @param pawns : tutte le pedine sulla scacchiera
 	 * @param boardValue: la pedina di cui si devono calcolare le azioni
 	 * @param t: turno corrente
 	 */
-	private List<Action> calculateActions( int[] pawns, int pawnValue, Turn t){
+	private List<Action> calculateActions(int pawnValue, Turn t){
 		int row= pawnValue/DIM;
 		int column= pawnValue-(row*DIM);
 		List<Action> azioni = new ArrayList<Action>();
+		
+		// pawnValueIndex: indica l'indice di pawnValue all'interno della scacchiera
+		// indexPawnsToCheck: indica l'indice di una pedina da controllare (su, giù, dx, sx)
 		int pawnValueIndex = -1, indexPawnToCheck;
 		try {
-			// cerchiamo l'indice j della pedina corrente (corrispondente a boardValue)
+			// cerchiamo l'indice j della pedina corrente (corrispondente a pawnValue)
 			for(int j=0; j<NUM_PAWNS; j++) {
 				if(pawns[j]==pawnValue) {
 					pawnValueIndex = j;
@@ -164,9 +164,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 			// ***controlliamo la strada percorribile a DESTRA della pedina***
 			// ***************************************************************
 			
-			//indexPawnToCheck = currentPawnIndex; //a che serve questo assegnamento?? Lo metto nell'else
-			
-			// se è l'ultimo indice (della pedina boardValue), non c'è una pedina più a destra
+			// se è l'ultimo indice (della pedina pawnValue), non c'è una pedina più a destra
 			if( pawnValueIndex<NUM_PAWNS-1 && pawns[pawnValueIndex+1]!=-1) {
 				indexPawnToCheck=pawnValueIndex+1;
 			}
@@ -174,7 +172,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 
 			// Partiamo dal valore della scacchiera successivo a quello corrente
 			// ed esploriamo fino alla fine della riga
-			for(int currentPawnValue=pawnValue+1; currentPawnValue<=(row+1)*DIM-1 && currentPawnValue<DIM*DIM; currentPawnValue++) {
+			for(int currentPawnValue=pawnValue+1; currentPawnValue<=(row+1)*DIM-1; currentPawnValue++) {
 				if(pawns[indexPawnToCheck]==currentPawnValue){
 					//indexPawnToCheck++; //probabilmente non serve
 					break;
@@ -189,7 +187,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 			// ***************************************************************
 			// ***controlliamo la strada percorribile SOTTO alla pedina***
 			// ***************************************************************
-			for(int currentPawnValue=pawnValue+DIM; currentPawnValue<=DIM*(DIM-1)+column && currentPawnValue<DIM*DIM; currentPawnValue+=DIM) { //sotto
+			for(int currentPawnValue=pawnValue+DIM; currentPawnValue<=DIM*(DIM-1)+column; currentPawnValue+=DIM) { //sotto
 				while(pawns[indexPawnToCheck]<currentPawnValue && pawns[indexPawnToCheck]!=-1) {
 					indexPawnToCheck++;
 				}
@@ -299,12 +297,12 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	/*
 	 * Azioni possibili nel caso di pedine nere
 	 */
-	private List<Action> blackActions(int[] blackPawns, int[] pawns){
+	private List<Action> blackActions(){
 		List<Action> azioni = new ArrayList<Action>();
 		
 		for(int i=0; i<NUM_BLACK_PAWNS; i++) {
 			if(blackPawns[i]!=-1) {
-				azioni.addAll(calculateActions(pawns, blackPawns[i], Turn.BLACK));
+				azioni.addAll(calculateActions(blackPawns[i], Turn.BLACK));
 			}else break;
 		}
 		
