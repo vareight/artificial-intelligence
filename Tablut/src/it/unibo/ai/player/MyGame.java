@@ -356,6 +356,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		 sotto = sotto.equals(Pawn.KING) ? Pawn.WHITE : sotto;
 		 destra = destra.equals(Pawn.KING) ? Pawn.WHITE : destra;
 		 sinistra = sinistra.equals(Pawn.KING) ? Pawn.WHITE : sinistra;
+		 
 		List<Integer> campo = new ArrayList<Integer>();
 		campo.add(3);
 		campo.add(4);
@@ -380,7 +381,6 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		if ((destra.equals(pawnPredatore) || campo.contains(riga*9+col +1) || riga*9+col+1 == 40) && (sinistra.equals(pawnPredatore) || campo.contains(riga*9+col-1) ||riga*9+col-1 ==40)) {
 			return true;
 		}
-		
 		return false; 
 	}
 	
