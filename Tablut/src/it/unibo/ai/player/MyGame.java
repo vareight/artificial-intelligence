@@ -33,59 +33,103 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	/**
 	 * in base allo stato attuale calcoliamo le azioni possibili
 	 */
-	@Override
-	public List<Action> getActions(StateTablut s) {
-		Turn turn= s.getTurn();
-		int[] whitePawns = {-1,-1,-1,-1,-1,-1,-1,-1};
-		int[] blackPawns = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
-		int[] pawns = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
-		int king=-1,indexWhite=0, indexBlack=0, indexPawns=0;
+	
+	
+	private final int DIM = 9;
+	private int NUM_WHITE_PAWNS = 8;
+	private int NUM_BLACK_PAWNS = 16;
+	private int NUM_PAWNS = 25;
+	
+	private int king;
+	private int[] whitePawns;
+	private int[] blackPawns;
+	private int[] pawns;
+	
+	/*
+	 * Inizializzazione degli array delle verie pedine
+	 */
+	private void initializePawns() {
+		for(int i=0; i<NUM_PAWNS; i++) {
+			pawns[i] = -1;
+			if(i<NUM_WHITE_PAWNS) whitePawns[i] = -1;
+			if(i<NUM_BLACK_PAWNS) blackPawns[i] = -1;
+			
+		}
+		return;
+	}
+	
+	/*
+	 * Riempiamo gli array di pedine con i valori di dove si trovano
+	 */
+	private void populatePawnsArrays(StateTablut s) {
+		int indexWhite=0, indexBlack=0, indexPawns=0;
+		king=-1;
 		
-		for(int i=0; i<9; i++) {
-			for(int j=0; j<9; j++) {
-				if(indexWhite<8 && s.getPawn(i, j).equals(Pawn.WHITE)) {
-					whitePawns[indexWhite]=i*9+j;
+		for(int i=0; i<DIM; i++) {
+			for(int j=0; j<DIM; j++) {
+				// aggiunta pedine bianche
+				if(indexWhite<NUM_WHITE_PAWNS && s.getPawn(i, j).equals(Pawn.WHITE)) {
+					whitePawns[indexWhite]=i*DIM+j;
 					indexWhite++;
-					pawns[indexPawns]=i*9+j;
+					pawns[indexPawns]=i*DIM+j;
 					indexPawns++;
 				}
+				
+				// aggiunta del re
 				if(king!=-1 && s.getPawn(i, j).equals(Pawn.KING)) {
-					pawns[indexPawns]=i*9+j;
+					pawns[indexPawns]=i*DIM+j;
 					indexPawns++;
-					king=i*9+j;
+					king=i*DIM+j;
 				}
-				if(indexBlack<16 && s.getPawn(i, j).equals(Pawn.BLACK)) {
-					blackPawns[indexBlack]=i*9+j;
+				
+				//aggiunta pedine nere
+				if(indexBlack<NUM_BLACK_PAWNS && s.getPawn(i, j).equals(Pawn.BLACK)) {
+					blackPawns[indexBlack]=i*DIM+j;
 					indexBlack++;
-					pawns[indexPawns]=i*9+j;
+					pawns[indexPawns]=i*DIM+j;
 					indexPawns++;
 				} //decidere se mettere break raggiunto il numero
 			}
 		}
-		
-		
-		
-		if (turn.equals(Turn.WHITE)) return whiteActions(whitePawns, king, pawns);
-		if (turn.equals(Turn.BLACK)) return blackActions(blackPawns, pawns);
-		
-		return null; //TODO capire se restituire altro quando non è W o B
 	}
 	
-	private List<Action> whiteActions(int[] whitePawns, int king, int[] pawns){
+	@Override
+	public List<Action> getActions(StateTablut s) {
+		Turn turn= s.getTurn();
+		
+		initializePawns();
+		
+		populatePawnsArrays(s);
+		
+		if (turn.equals(Turn.WHITE)) return whiteActions();
+		if (turn.equals(Turn.BLACK)) return blackActions();
+		
+		return null; //TODO capire se restituire altro quando non ï¿½ W o B
+	}
+	
+	/*
+	 * Azioni possibili nel caso delle pedine bianche
+	 */
+	private List<Action> whiteActions(){
 		List<Action> azioni = new ArrayList<Action>();
 		
-			for(int i=0; i<8; i++) {
-				if(whitePawns[i]!=-1) {
-					azioni.addAll(calculateActions(pawns, whitePawns[i], Turn.WHITE));
+			for(int i=0; i<NUM_WHITE_PAWNS; i++) {
+				if(whitePawns[i]!=-1) { // se vale -1, la pedina i-esima ï¿½ stata mangiata
+					// aggiungiamo tutte le azioni possibili per la pedina i-esima
+					azioni.addAll(calculateActions(whitePawns[i], Turn.WHITE));
 				}else break;
 			}
 			
-			azioni.addAll(calculateActions(pawns, king, Turn.WHITE));
-			
+			//aggiungiamo tutte le azioni possibili per il Re
+			azioni.addAll(calculateActions(king, Turn.WHITE));
 		
 		return azioni;
 	}
 	
+	/*
+	 * Data una riga e una colonna, restituisce la corrispondente stringa della scacchiera
+	 * Es: (0,0) -> A1
+	 */
 	private String getBox(int row, int column) {
 		String ret;
 		char col = (char) (column + 97);
@@ -93,67 +137,107 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		return ret;
 	}
 	
-	private List<Action> calculateActions( int[] pawns, int val, Turn t){
-		int riga= val/9;
-		int col= val-(riga*9);
+	/**
+	 * Funzione che calcola le azioni possibili per la pedina presente in "boardValue".
+	 * @param pawns : tutte le pedine sulla scacchiera
+	 * @param boardValue: la pedina di cui si devono calcolare le azioni
+	 * @param t: turno corrente
+	 */
+	private List<Action> calculateActions(int pawnValue, Turn t){
+		int row= pawnValue/DIM;
+		int column= pawnValue-(row*DIM);
 		List<Action> azioni = new ArrayList<Action>();
-		int j, indexPawns;
+		
+		// pawnValueIndex: indica l'indice di pawnValue all'interno della scacchiera
+		// indexPawnsToCheck: indica l'indice di una pedina da controllare (su, giï¿½, dx, sx)
+		int pawnValueIndex = -1, indexPawnToCheck;
 		try {
-			for(j=0; j<25; j++) {
-				
-				if(pawns[j]==val) break; //j è la posizione del piedino
+			// cerchiamo l'indice j della pedina corrente (corrispondente a pawnValue)
+			for(int j=0; j<NUM_PAWNS; j++) {
+				if(pawns[j]==pawnValue) {
+					pawnValueIndex = j;
+					break; //j ï¿½ la posizione del piedino
+				}
 			}
-			indexPawns = j;
-			if( j<24 && pawns[j+1]!=-1) { 
-				indexPawns=j+1;
+			
+			// ***************************************************************
+			// ***controlliamo la strada percorribile a DESTRA della pedina***
+			// ***************************************************************
+			
+			// se ï¿½ l'ultimo indice (della pedina pawnValue), non c'ï¿½ una pedina piï¿½ a destra
+			if( pawnValueIndex<NUM_PAWNS-1 && pawns[pawnValueIndex+1]!=-1) {
+				indexPawnToCheck=pawnValueIndex+1;
 			}
+			else indexPawnToCheck = pawnValueIndex; //ï¿½ l'ultima pedina
 
-			for(int k=val+1; k<=riga*9+8 && k<81; k++) { //dx
-				
-				if(pawns[indexPawns]==k){
-					indexPawns++; //probabilmente non serve
+			// Partiamo dal valore della scacchiera successivo a quello corrente
+			// ed esploriamo fino alla fine della riga
+			for(int currentPawnValue=pawnValue+1; currentPawnValue<=(row+1)*DIM-1; currentPawnValue++) {
+				if(pawns[indexPawnToCheck]==currentPawnValue){
+					//indexPawnToCheck++; //probabilmente non serve
 					break;
 				}else {
-					Action a = new Action(getBox(riga,col), getBox(k/9, k-(k/9*9)), t);
-					if(isPermitted(val, k, t)) azioni.add(a);
+					int newRow = currentPawnValue/DIM;
+					int newColumn = currentPawnValue-(newRow*DIM);
+					Action action = new Action(getBox(row,column), getBox(newRow, newColumn), t);
+					if(isPermitted(pawnValue, currentPawnValue, t)) azioni.add(action);
 				}
 			}
-			for(int k=val+9; k<=9*8+col && k<81; k+=9) { //sotto
-				while(pawns[indexPawns]<k && pawns[indexPawns]!=-1) {
-					indexPawns++;
+			
+			// ***************************************************************
+			// ***controlliamo la strada percorribile SOTTO alla pedina***
+			// ***************************************************************
+			for(int currentPawnValue=pawnValue+DIM; currentPawnValue<=DIM*(DIM-1)+column; currentPawnValue+=DIM) { //sotto
+				while(pawns[indexPawnToCheck]<currentPawnValue && pawns[indexPawnToCheck]!=-1) {
+					indexPawnToCheck++;
 				}
-				if(pawns[indexPawns]==k){
-					indexPawns++; //probabilmente non serve
+				if(pawns[indexPawnToCheck]==currentPawnValue){
+					//indexPawnToCheck++; //probabilmente non serve
 					break;
 				}else {
-					Action a = new Action(getBox(riga,col), getBox(k/9, k-(k/9)*9), t);
-					if(isPermitted(val, k, t)) azioni.add(a);
+					int newRow = currentPawnValue/DIM;
+					int newColumn = currentPawnValue-(newRow*DIM);
+					Action action = new Action(getBox(row,column), getBox(newRow, newColumn), t);
+					if(isPermitted(pawnValue, currentPawnValue, t)) azioni.add(action);
 				}
 			}
 		
-			if(j!=0) {
-				indexPawns=j-1;
+			// ***************************************************************
+			// ***controlliamo la strada percorribile a SINISTRA della pedina***
+			// ***************************************************************
+			if(pawnValueIndex!=0) { // se ï¿½ il primo indice, non c'ï¿½ una pedina piï¿½ a sinistra
+				indexPawnToCheck=pawnValueIndex-1;
 			}
-			for(int k=val-1; k>=riga*9 && k>=0; k--) { //sx
-
-				if(pawns[indexPawns]==k){
-					indexPawns--; //probabilmente non serve
+			else indexPawnToCheck=pawnValueIndex;
+			
+			for(int currentPawnValue=pawnValue-1; currentPawnValue>=row*DIM; currentPawnValue--) { //sx
+				if(pawns[indexPawnToCheck]==currentPawnValue){
+					//indexPawnToCheck--; //probabilmente non serve
 					break;
 				}else {
-					Action a = new Action(getBox(riga,col), getBox(k/9, k-(k/9)*9), t);
-					if(isPermitted(val, k, t)) azioni.add(a);
+					int newRow = currentPawnValue/DIM;
+					int newColumn = currentPawnValue-(newRow*DIM);
+					Action action = new Action(getBox(row,column), getBox(newRow, newColumn), t);
+					if(isPermitted(pawnValue, currentPawnValue, t)) azioni.add(action);
 				}
 			}
-			for(int k=val-9; k>=col && k>=0; k-=9) { //sopra
-				while(pawns[indexPawns]>k && pawns[indexPawns]!=-1) {
-					indexPawns--;
+			
+			
+			// ***************************************************************
+			// ***controlliamo la strada percorribile SOPRA alla pedina***
+			// ***************************************************************
+			for(int currentPawnValue=pawnValue-DIM; currentPawnValue>=column; currentPawnValue-=DIM) { //sopra
+				while(pawns[indexPawnToCheck]>currentPawnValue && pawns[indexPawnToCheck]!=-1) {
+					indexPawnToCheck--;
 				}
-				if(pawns[indexPawns]==k){
-					indexPawns--; //probabilmente non serve
+				if(pawns[indexPawnToCheck]==currentPawnValue){
+					//indexPawnToCheck--; //probabilmente non serve
 					break;
 				}else {
-					Action a = new Action(getBox(riga,col), getBox(k/9, k-(k/9)*9), t);
-					if(isPermitted(val, k, t)) azioni.add(a);
+					int newRow = currentPawnValue/DIM;
+					int newColumn = currentPawnValue-(newRow*DIM);
+					Action action = new Action(getBox(row,column), getBox(newRow, newColumn), t);
+					if(isPermitted(pawnValue, currentPawnValue, t)) azioni.add(action);
 				}
 		
 			}
@@ -165,6 +249,10 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		return azioni;
 	}
 	
+	
+	/*
+	 * Funzione che stabilisce se l'azione dalla casella "from" alla casella "to" ï¿½ lecita
+	 */
 	private boolean isPermitted(int from, int to, Turn t) {
 		int[] proibiteNere = {3,4,5,13,27,35,36,37,43,44,45,53,67,75,76,77};
 		List<Integer> campo1 = new ArrayList<Integer>();
@@ -206,13 +294,15 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		return true;
 	}
 	
-	
-	private List<Action> blackActions(int[] blackPawns, int[] pawns){
+	/*
+	 * Azioni possibili nel caso di pedine nere
+	 */
+	private List<Action> blackActions(){
 		List<Action> azioni = new ArrayList<Action>();
 		
-		for(int i=0; i<16; i++) {
+		for(int i=0; i<NUM_BLACK_PAWNS; i++) {
 			if(blackPawns[i]!=-1) {
-				azioni.addAll(calculateActions(pawns, blackPawns[i], Turn.BLACK));
+				azioni.addAll(calculateActions(blackPawns[i], Turn.BLACK));
 			}else break;
 		}
 		
@@ -286,7 +376,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		escapeTiles.add(78);
 		escapeTiles.add(79);
 		if (escapeTiles.contains(posKing)) {
-			return true; //vittoria del re il re è scappato sul bordo
+			return true; //vittoria del re il re ï¿½ scappato sul bordo
 		}else {
 			return false;
 		}
@@ -309,7 +399,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		if(col !=0) sinistra =state.getPawn(riga, col-1);
 		else sinistra =Pawn.EMPTY;
 	
-		// il re si trova nel castello ed è circondato
+		// il re si trova nel castello ed ï¿½ circondato
 		if(posKing==40 && sopra.equals(Pawn.BLACK)
 				&& sotto.equals(Pawn.BLACK)
 				&& destra.equals(Pawn.BLACK)
@@ -346,7 +436,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		return pawnCaptured(state, riga, col, sopra, sotto, destra, sinistra);
 				
 	}
-	//funzione generale per controllare se una pedina è stata catturata
+	//funzione generale per controllare se una pedina ï¿½ stata catturata
 	
 	private boolean pawnCaptured(StateTablut state,int riga, int col, Pawn sopra, Pawn sotto, Pawn destra, Pawn sinistra) {
 		
@@ -400,7 +490,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	@Override
 	public double getUtility(StateTablut s, Turn arg1) {
 		// TODO Auto-generated method stub
-		//EURISTICA (dovrebbe essere meglio il valore più grande)
+		//EURISTICA (dovrebbe essere meglio il valore piï¿½ grande)
 		return 0;
 	}
 
