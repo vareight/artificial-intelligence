@@ -6,10 +6,19 @@ import java.util.List;
 
 import aima.core.search.adversarial.Game;
 import it.unibo.ai.didattica.competition.tablut.domain.Action;
+import it.unibo.ai.didattica.competition.tablut.domain.GameTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Pawn;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
 import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
+import it.unibo.ai.didattica.competition.tablut.exceptions.ActionException;
+import it.unibo.ai.didattica.competition.tablut.exceptions.BoardException;
+import it.unibo.ai.didattica.competition.tablut.exceptions.ClimbingException;
+import it.unibo.ai.didattica.competition.tablut.exceptions.DiagonalException;
+import it.unibo.ai.didattica.competition.tablut.exceptions.OccupitedException;
+import it.unibo.ai.didattica.competition.tablut.exceptions.PawnException;
+import it.unibo.ai.didattica.competition.tablut.exceptions.StopException;
+import it.unibo.ai.didattica.competition.tablut.exceptions.ThroneException;
 
 public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	//Da capire se ci va il turn o il player
@@ -288,15 +297,45 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 
 	@Override
 	public StateTablut getResult(StateTablut s, Action a) {
-		// TODO Auto-generated method stub
-		// stato futuro in base all'attuale 
-		return null;
+		GameTablut g = new GameTablut();
+		StateTablut newState = null;
+		try {
+			newState= (StateTablut) g.checkMove(s, a);
+		} catch (BoardException e) {
+			System.out.print("ECCEZIONE");
+			e.printStackTrace();
+		} catch (ActionException e) {
+			System.out.print("ECCEZIONE");
+			e.printStackTrace();
+		} catch (StopException e) {
+			System.out.print("ECCEZIONE");
+			e.printStackTrace();
+		} catch (PawnException e) {
+			System.out.print("ECCEZIONE");
+			e.printStackTrace();
+		} catch (DiagonalException e) {
+			System.out.print("ECCEZIONE");
+			e.printStackTrace();
+		} catch (ClimbingException e) {
+			System.out.print("ECCEZIONE");
+			e.printStackTrace();
+		} catch (ThroneException e) {
+			System.out.print("ECCEZIONE");
+			e.printStackTrace();
+		} catch (OccupitedException e) {
+			System.out.print("ECCEZIONE");
+			e.printStackTrace();
+		}
+		return newState;
 	}
 	
 
 	@Override
 	public boolean isTerminal(StateTablut s) {
-		// TODO Auto-generated method stub
+		
+		Turn t= s.getTurn();
+		return t.equals(Turn.BLACKWIN) || t.equals(Turn.WHITEWIN) || t.equals(Turn.DRAW);
+		/*
 		// situazione finale vittoria - sconfitta - pareggio
 		//white win 
 		int posKing = findKing(s);
@@ -311,6 +350,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 			noMoves=true;
 		}
 		return kingEscapes || kingCaptured || noMoves; //manca caso pareggio = stato ripetuto
+		*/
 	}
 	
 	
@@ -433,24 +473,48 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	
 	@Override
 	public Turn getPlayer(StateTablut s) {
-		// TODO Auto-generated method stub
-
-		return null;
+		return s.getTurn();
 	}
 
 	@Override
 	public Turn[] getPlayers() {
-		// TODO Auto-generated method stub
-		return null;
+		Turn[] turns = {Turn.BLACK, Turn.WHITE};
+		return turns;
 	}
 
 	@Override
-	public double getUtility(StateTablut s, Turn arg1) {
-		// TODO Auto-generated method stub
+	public double getUtility(StateTablut s, Turn t) {
+		double punteggio = 0;
+		if(t.equals(Turn.BLACK)) {
+			switch(s.getTurn()) {
+			case DRAW : punteggio=0; break;
+			case WHITEWIN : punteggio=Double.MIN_VALUE; break;
+			case BLACKWIN : punteggio=Double.MAX_VALUE;; break;
+			default : punteggio=euristicaBlack();
+			}
+			
+		}
+		if(t.equals(Turn.WHITE)) {
+			switch(s.getTurn()) {
+			case DRAW : punteggio=0; break;
+			case WHITEWIN : punteggio=Double.MAX_VALUE; break;
+			case BLACKWIN : punteggio=Double.MIN_VALUE;; break;
+			default : punteggio=euristicaWhite();
+			}
+		}
 		//EURISTICA (dovrebbe essere meglio il valore pi� grande)
+		return punteggio;
+	}
+	
+	private double euristicaBlack() {
+		// TODO
 		return 0;
 	}
-
+	
+	private double euristicaWhite() {
+		// TODO
+		return 0;
+	}
 	
 
 }
