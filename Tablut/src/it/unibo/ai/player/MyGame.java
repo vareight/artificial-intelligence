@@ -144,7 +144,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	 * @param boardValue: la pedina di cui si devono calcolare le azioni
 	 * @param t: turno corrente
 	 */
-	private List<Action> calculateActions(int pawnValue, Turn t){
+	public List<Action> calculateActions(int pawnValue, Turn t){
 		int row= pawnValue/DIM;
 		int column= pawnValue-(row*DIM);
 		List<Action> azioni = new ArrayList<Action>();

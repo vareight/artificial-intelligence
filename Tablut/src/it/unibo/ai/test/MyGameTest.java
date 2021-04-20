@@ -224,12 +224,12 @@ class MyGameTest {
 	    	actions.add( new Action(getBox(4,6), getBox(8,6), turn));
 	    	
 	   	 	//pedone bianco posizione 54
-	    	actions.add( new Action(getBox(5,4), getBox(3,1), turn));
-	    	actions.add( new Action(getBox(5,4), getBox(3,2), turn));
-	    	actions.add( new Action(getBox(5,4), getBox(3,3), turn));
-	    	actions.add( new Action(getBox(5,4), getBox(3,5), turn));
-	    	actions.add( new Action(getBox(5,4), getBox(3,6), turn));
-	    	actions.add( new Action(getBox(5,4), getBox(3,7), turn));
+	    	actions.add( new Action(getBox(5,4), getBox(5,1), turn));
+	    	actions.add( new Action(getBox(5,4), getBox(5,2), turn));
+	    	actions.add( new Action(getBox(5,4), getBox(5,3), turn));
+	    	actions.add( new Action(getBox(5,4), getBox(5,5), turn));
+	    	actions.add( new Action(getBox(5,4), getBox(5,6), turn));
+	    	actions.add( new Action(getBox(5,4), getBox(5,7), turn));
 	    	
 	    	 //pedone bianco posizione 64
 	    	actions.add( new Action(getBox(6,4), getBox(6,0), turn));
@@ -242,15 +242,18 @@ class MyGameTest {
 	    	actions.add( new Action(getBox(6,4), getBox(6,8), turn));
 	    	
 	   
-	    	
-	        assertEquals(56, mygame.getActions(state).size(), "Numer of initial moves avaible for white paws should be 56");     
+	    	List <Action> calculatedactions= mygame.getActions(state);
+	        assertEquals(56, calculatedactions.size(), "Numer of initial moves avaible for white paws should be 56");     
 	        //assertEquals(actions, mygame.getActions(state), "Initial moves for white pawns");
-	        List <Action> calculatedactions= mygame.getActions(state);
 	        
 	        for(Action a : actions) {
+	        	if(!calculatedactions.contains(a)) {
+	        		System.out.println(a.toString());
+	        	}
 	        	 assertTrue(calculatedactions.contains(a));
 	        }
 	        
 	    }
+	    
 
 }
