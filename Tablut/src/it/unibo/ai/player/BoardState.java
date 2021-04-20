@@ -105,7 +105,7 @@ public class BoardState {
 	}
 	
 	public  boolean sameCampo(int from, int to) {
-		return getCampo(from) == getCampo(to) && getCampo(from)!=-1;
+		return getCampo(from) == getCampo(to) && getCampo(to)!=-1;
 	}
 
 

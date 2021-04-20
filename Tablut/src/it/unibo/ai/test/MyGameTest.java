@@ -29,7 +29,8 @@ class MyGameTest {
 	   
 	    @BeforeEach                                         
 	    public void setUp() throws Exception {
-	        this.mygame = new MyGame();
+	    	
+	        this.mygame = new MyGame(null);
 	        this.state = new StateTablut();
 	    }
 

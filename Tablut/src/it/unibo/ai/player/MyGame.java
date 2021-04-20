@@ -6,6 +6,7 @@ import java.util.List;
 
 import aima.core.search.adversarial.Game;
 import it.unibo.ai.didattica.competition.tablut.domain.Action;
+import it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.GameTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Pawn;
@@ -13,6 +14,8 @@ import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
 import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
 import it.unibo.ai.didattica.competition.tablut.exceptions.ActionException;
 import it.unibo.ai.didattica.competition.tablut.exceptions.BoardException;
+import it.unibo.ai.didattica.competition.tablut.exceptions.CitadelException;
+import it.unibo.ai.didattica.competition.tablut.exceptions.ClimbingCitadelException;
 import it.unibo.ai.didattica.competition.tablut.exceptions.ClimbingException;
 import it.unibo.ai.didattica.competition.tablut.exceptions.DiagonalException;
 import it.unibo.ai.didattica.competition.tablut.exceptions.OccupitedException;
@@ -54,7 +57,15 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	private int[] blackPawns = new int[NUM_BLACK_PAWNS];
 	private int[] pawns = new int[NUM_PAWNS];
 	private BoardState board= new BoardState();
+	private GameAshtonTablut game;
 	
+	
+	
+	public MyGame(GameAshtonTablut game) {
+		super();
+		this.game = game;
+	}
+
 	/*
 	 * Inizializzazione degli array delle verie pedine
 	 */
@@ -184,7 +195,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 			// Partiamo dal valore della scacchiera successivo a quello corrente
 			// ed esploriamo fino alla fine della riga
 			for(int currentPawnValue=pawnValue+1; currentPawnValue<=(row+1)*DIM-1; currentPawnValue++) {
-				if(pawns[indexPawnToCheck]==currentPawnValue || !(board.sameCampo(currentPawnValue,pawnValue)) || board.getCastle()==currentPawnValue){
+				if(pawns[indexPawnToCheck]==currentPawnValue || !(board.sameCampo(pawnValue,currentPawnValue)) || board.getCastle()==currentPawnValue){
 					//indexPawnToCheck++; //probabilmente non serve
 					break;
 				}else {
@@ -202,7 +213,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 				while(pawns[indexPawnToCheck]<currentPawnValue && pawns[indexPawnToCheck]!=-1 && indexPawnToCheck<NUM_PAWNS-1) {
 					indexPawnToCheck++;
 				}
-				if(pawns[indexPawnToCheck]==currentPawnValue|| !(board.sameCampo(currentPawnValue,pawnValue)) || board.getCastle()==currentPawnValue){
+				if(pawns[indexPawnToCheck]==currentPawnValue|| !(board.sameCampo(pawnValue,currentPawnValue)) || board.getCastle()==currentPawnValue){
 					//indexPawnToCheck++; //probabilmente non serve
 					break;
 				}else {
@@ -222,7 +233,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 			else indexPawnToCheck=pawnValueIndex;
 			
 			for(int currentPawnValue=pawnValue-1; currentPawnValue>=row*DIM; currentPawnValue--) { //sx
-				if(pawns[indexPawnToCheck]==currentPawnValue || !(board.sameCampo(currentPawnValue,pawnValue)) || board.getCastle()==currentPawnValue){
+				if(pawns[indexPawnToCheck]==currentPawnValue || !(board.sameCampo(pawnValue,currentPawnValue)) || board.getCastle()==currentPawnValue){
 					//indexPawnToCheck--; //probabilmente non serve
 					break;
 				}else {
@@ -241,7 +252,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 				while(pawns[indexPawnToCheck]>currentPawnValue && pawns[indexPawnToCheck]!=-1 && indexPawnToCheck>0) {
 					indexPawnToCheck--;
 				}
-				if(pawns[indexPawnToCheck]==currentPawnValue ||!(board.sameCampo(currentPawnValue,pawnValue)) || board.getCastle()==currentPawnValue){
+				if(pawns[indexPawnToCheck]==currentPawnValue ||!(board.sameCampo(pawnValue,currentPawnValue)) || board.getCastle()==currentPawnValue){
 					//indexPawnToCheck--; //probabilmente non serve
 					break;
 				}else {
@@ -298,35 +309,17 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 
 	@Override
 	public StateTablut getResult(StateTablut s, Action a) {
-		GameTablut g = new GameTablut();
 		StateTablut newState = null;
-		try {
-			newState= (StateTablut) g.checkMove(s, a);
-		} catch (BoardException e) {
-			System.out.print("ECCEZIONE");
-			e.printStackTrace();
-		} catch (ActionException e) {
-			System.out.print("ECCEZIONE");
-			e.printStackTrace();
-		} catch (StopException e) {
-			System.out.print("ECCEZIONE");
-			e.printStackTrace();
-		} catch (PawnException e) {
-			System.out.print("ECCEZIONE");
-			e.printStackTrace();
-		} catch (DiagonalException e) {
-			System.out.print("ECCEZIONE");
-			e.printStackTrace();
-		} catch (ClimbingException e) {
-			System.out.print("ECCEZIONE");
-			e.printStackTrace();
-		} catch (ThroneException e) {
-			System.out.print("ECCEZIONE");
-			e.printStackTrace();
-		} catch (OccupitedException e) {
-			System.out.print("ECCEZIONE");
-			e.printStackTrace();
-		}
+		
+			try {
+				newState= (StateTablut) game.checkMove(s, a);
+			} catch (BoardException | ActionException | StopException | PawnException | DiagonalException
+					| ClimbingException | ThroneException | OccupitedException | ClimbingCitadelException
+					| CitadelException e) {
+				System.out.println("PROBLEMINIII");
+				e.printStackTrace();
+			}
+		
 		return newState;
 	}
 	
@@ -496,7 +489,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 			case DRAW : punteggio=0; break;
 			case WHITEWIN : punteggio=Double.MIN_VALUE; break;
 			case BLACKWIN : punteggio=Double.MAX_VALUE; break;
-			default : punteggio=euristicaBlack();
+			default : punteggio=euristicaBlack(s);
 			}
 			
 		}
@@ -505,24 +498,113 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 			case DRAW : punteggio=0; break;
 			case WHITEWIN : punteggio=Double.MAX_VALUE; break;
 			case BLACKWIN : punteggio=Double.MIN_VALUE;; break;
-			default : punteggio=euristicaWhite();
+			default : punteggio=euristicaWhite(s);
 			}
 		}
 		//EURISTICA (dovrebbe essere meglio il valore pi� grande)
 		return punteggio;
 	}
 	
-	private double euristicaBlack() {
-		// TODO
-		//accerchiamento
-		//scacco al re
+	private double euristicaBlack(StateTablut s) {
+		
+		double bounusAccerchiamento=1/accerchiamento(s);
 		return 0;
 	}
 	
-	private double euristicaWhite() {
+	private double euristicaWhite(StateTablut s) {
 		// TODO
 		return 0;
 	}
+	
+	/**
+	 * Per ogni pedina bianca quanto si avvicina il nero
+	 * @param s
+	 * @return
+	 */
+	private double accerchiamento(StateTablut s) {
+		double distanzaTot=0;
+		double bonusKing=3;
+		
+		for(int i=0; i<NUM_WHITE_PAWNS; i++) {
+			int pawnValue=whitePawns[i];
+			if(pawnValue==-1) break;
+			
+			distanzaTot+=calcolaDistanza(pawnValue, s);
+			
+		}
+		distanzaTot+=calcolaDistanza(king, s)*bonusKing;
+		
+		return distanzaTot;
+	}
+	
+	private int calcolaDistanza(int pawnValue, StateTablut s) {
+		int row= pawnValue/DIM;
+		int column= pawnValue-(row*DIM);
+		int distanza=0;
+		// ***************************************************************
+		// ***controlliamo la strada percorribile a DESTRA della pedina***
+		// ***************************************************************
+
+		for(int currentPawnValue=pawnValue+1; currentPawnValue<=(row+1)*DIM-1; currentPawnValue++) {
+			int newRow = currentPawnValue/DIM;
+			int newColumn = currentPawnValue-(newRow*DIM);
+			if(s.getPawn(newRow, newColumn).equals(Pawn.BLACK)){
+				//indexPawnToCheck++; //probabilmente non serve
+				break;
+			}else {
+				distanza++;
+				
+			}
+		}
+		
+		// ***************************************************************
+		// ***controlliamo la strada percorribile SOTTO alla pedina***
+		// ***************************************************************
+		for(int currentPawnValue=pawnValue+DIM; currentPawnValue<=DIM*(DIM-1)+column; currentPawnValue+=DIM) { //sotto
+			int newRow = currentPawnValue/DIM;
+			int newColumn = currentPawnValue-(newRow*DIM);
+			if(s.getPawn(newRow, newColumn).equals(Pawn.BLACK)){
+				//indexPawnToCheck++; //probabilmente non serve
+				break;
+			}else {
+				distanza++;
+			}
+		}
+	
+		// ***************************************************************
+		// ***controlliamo la strada percorribile a SINISTRA della pedina***
+		// ***************************************************************
+		for(int currentPawnValue=pawnValue-1; currentPawnValue>=row*DIM; currentPawnValue--) { //sx
+			int newRow = currentPawnValue/DIM;
+			int newColumn = currentPawnValue-(newRow*DIM);
+			if(s.getPawn(newRow, newColumn).equals(Pawn.BLACK)){
+				//indexPawnToCheck++; //probabilmente non serve
+				break;
+			}else {
+				distanza++;
+				
+			}
+		}
+		
+		
+		// ***************************************************************
+		// ***controlliamo la strada percorribile SOPRA alla pedina***
+		// ***************************************************************
+		for(int currentPawnValue=pawnValue-DIM; currentPawnValue>=column; currentPawnValue-=DIM) { //sopra
+			int newRow = currentPawnValue/DIM;
+			int newColumn = currentPawnValue-(newRow*DIM);
+			if(s.getPawn(newRow, newColumn).equals(Pawn.BLACK)){
+				//indexPawnToCheck++; //probabilmente non serve
+				break;
+			}else {
+				distanza++;
+				
+			}
+	
+		}
+		return distanza;
+	}
+	
 	
 	//lasciare riga vuota
 	
