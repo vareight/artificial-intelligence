@@ -6,11 +6,12 @@ import java.util.List;
 public class BoardState {
 	
 	public final static List<Integer> escapeTiles = new ArrayList<Integer>();
-	public final static int castle=40;
+	public final int castle=40;
 	public final static  List<Integer> campo1 = new ArrayList<Integer>();
 	public final static List<Integer> campo2 = new ArrayList<Integer>();
 	public final static List<Integer> campo3 = new ArrayList<Integer>();
 	public final static List<Integer> campo4 = new ArrayList<Integer>();
+	public final static int DIM =9;
 	
 	
 	public BoardState() {
@@ -50,14 +51,14 @@ public class BoardState {
 	}
 	
 	
-	public static boolean isCamp(int row, int column) {
-		return escapeTiles.contains(row*9+column);
+	public  boolean isCamp(int row, int column) {
+		return escapeTiles.contains(row*DIM+column);
 	}
-	public static boolean isCamp(int index ) {
+	public  boolean isCamp(int index ) {
 		return escapeTiles.contains(index);
 	}
 	
-	public static boolean inCampo(int index, int campo) {
+	public  boolean inCampo(int index, int campo) {
 		if (campo ==1 && campo1.contains(index)) {
 			return true;
 		}
@@ -73,11 +74,11 @@ public class BoardState {
 		return false;
 	}
 
-	public static boolean inCampo(int row, int column, int campo) {
-		return inCampo(row*9+column, campo);
+	public  boolean inCampo(int row, int column, int campo) {
+		return inCampo(row*DIM+column, campo);
 	}
 
-	public static int getCampo(int index) {
+	public  int getCampo(int index) {
 		if (campo1.contains(index)){
 			return 1;
 		}
@@ -92,19 +93,26 @@ public class BoardState {
 		}
 		return -1;
 	}
-	public static int getCampo(int row, int column) {
+	public  int getCampo(int row, int column) {
 		return getCampo(row*9+column);
 	}
 	
-	public static boolean isEscapeTile(int index) {
+	public  boolean isEscapeTile(int index) {
 		return escapeTiles.contains(index);
 	}
-	public static boolean isEscapeTile(int row, int column) {
+	public  boolean isEscapeTile(int row, int column) {
 		return isEscapeTile(row*9+column);
 	}
 	
-	public static boolean sameCampo(int from, int to) {
-		return getCampo(from) == getCampo(to);
+	public  boolean sameCampo(int from, int to) {
+		return getCampo(from) == getCampo(to) && getCampo(from)!=-1;
 	}
+
+
+	public int getCastle() {
+		return castle;
+	}
+	
+	
 	
 }

@@ -53,6 +53,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	private int[] whitePawns = new int[NUM_WHITE_PAWNS];
 	private int[] blackPawns = new int[NUM_BLACK_PAWNS];
 	private int[] pawns = new int[NUM_PAWNS];
+	private BoardState board= new BoardState();
 	
 	/*
 	 * Inizializzazione degli array delle verie pedine
@@ -183,7 +184,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 			// Partiamo dal valore della scacchiera successivo a quello corrente
 			// ed esploriamo fino alla fine della riga
 			for(int currentPawnValue=pawnValue+1; currentPawnValue<=(row+1)*DIM-1; currentPawnValue++) {
-				if(pawns[indexPawnToCheck]==currentPawnValue){
+				if(pawns[indexPawnToCheck]==currentPawnValue || !(board.sameCampo(currentPawnValue,pawnValue)) || board.getCastle()==currentPawnValue){
 					//indexPawnToCheck++; //probabilmente non serve
 					break;
 				}else {
@@ -201,7 +202,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 				while(pawns[indexPawnToCheck]<currentPawnValue && pawns[indexPawnToCheck]!=-1 && indexPawnToCheck<NUM_PAWNS-1) {
 					indexPawnToCheck++;
 				}
-				if(pawns[indexPawnToCheck]==currentPawnValue){
+				if(pawns[indexPawnToCheck]==currentPawnValue|| !(board.sameCampo(currentPawnValue,pawnValue)) || board.getCastle()==currentPawnValue){
 					//indexPawnToCheck++; //probabilmente non serve
 					break;
 				}else {
@@ -221,7 +222,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 			else indexPawnToCheck=pawnValueIndex;
 			
 			for(int currentPawnValue=pawnValue-1; currentPawnValue>=row*DIM; currentPawnValue--) { //sx
-				if(pawns[indexPawnToCheck]==currentPawnValue){
+				if(pawns[indexPawnToCheck]==currentPawnValue || !(board.sameCampo(currentPawnValue,pawnValue)) || board.getCastle()==currentPawnValue){
 					//indexPawnToCheck--; //probabilmente non serve
 					break;
 				}else {
@@ -240,7 +241,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 				while(pawns[indexPawnToCheck]>currentPawnValue && pawns[indexPawnToCheck]!=-1 && indexPawnToCheck>0) {
 					indexPawnToCheck--;
 				}
-				if(pawns[indexPawnToCheck]==currentPawnValue){
+				if(pawns[indexPawnToCheck]==currentPawnValue ||!(board.sameCampo(currentPawnValue,pawnValue)) || board.getCastle()==currentPawnValue){
 					//indexPawnToCheck--; //probabilmente non serve
 					break;
 				}else {
@@ -264,12 +265,12 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	 * Funzione che stabilisce se l'azione dalla casella "from" alla casella "to" � lecita
 	 */
 	private boolean isPermitted(int from, int to, Turn t) {
-		if (to == BoardState.castle) return false;
+		if (to == board.getCastle()) return false;
 		
 		if(t.equals(Turn.WHITE)) {
-			return !(BoardState.isCamp(to));
+			return !(board.isCamp(to));
 		}else {
-			return BoardState.sameCampo(from, to);
+			return board.sameCampo(from, to);
 		}
 		
 	}
@@ -334,7 +335,12 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	public boolean isTerminal(StateTablut s) {
 		
 		Turn t= s.getTurn();
-		return t.equals(Turn.BLACKWIN) || t.equals(Turn.WHITEWIN) || t.equals(Turn.DRAW);
+		boolean finishTurn = t.equals(Turn.BLACKWIN) || t.equals(Turn.WHITEWIN) || t.equals(Turn.DRAW);
+		boolean noMoves=false;
+		if (getActions(s).isEmpty()) {
+			noMoves=true;
+		}
+		return finishTurn || noMoves;
 		/*
 		// situazione finale vittoria - sconfitta - pareggio
 		//white win 
@@ -349,7 +355,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		if (getActions(s).isEmpty()) {
 			noMoves=true;
 		}
-		return kingEscapes || kingCaptured || noMoves; //manca caso pareggio = stato ripetuto
+		return kingEscapes || kingCaptured ; //manca caso pareggio = stato ripetuto
 		*/
 	}
 	
@@ -376,7 +382,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	 * @return true if the king escapes, false otherwise
 	 */
 	private boolean kingEscapes(int posKing) {
-		return BoardState.isEscapeTile(posKing);
+		return board.isEscapeTile(posKing);
 	}
 	
 	/**
@@ -402,7 +408,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		else sinistra =Pawn.EMPTY;
 	
 		// il re si trova nel castello ed � circondato
-		if(posKing==BoardState.castle && sopra.equals(Pawn.BLACK)
+		if(posKing==board.getCastle() && sopra.equals(Pawn.BLACK)
 				&& sotto.equals(Pawn.BLACK)
 				&& destra.equals(Pawn.BLACK)
 				&& sinistra.equals(Pawn.BLACK)) {
@@ -460,12 +466,12 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		 destra = destra.equals(Pawn.KING) ? Pawn.WHITE : destra;
 		 sinistra = sinistra.equals(Pawn.KING) ? Pawn.WHITE : sinistra;
 		
-		if ((sopra.equals(pawnPredatore) || BoardState.isCamp(riga*DIM+col-DIM) || riga*DIM+col-DIM == BoardState.castle ) && 
-				(sotto.equals(pawnPredatore) || BoardState.isCamp(riga*DIM+col+DIM) || riga*DIM+col+DIM == BoardState.castle)) {
+		if ((sopra.equals(pawnPredatore) || board.isCamp(riga*DIM+col-DIM) || riga*DIM+col-DIM == board.castle ) && 
+				(sotto.equals(pawnPredatore) || board.isCamp(riga*DIM+col+DIM) || riga*DIM+col+DIM == board.castle)) {
 			return true;
 		}
-		if ((destra.equals(pawnPredatore) || BoardState.isCamp(riga*DIM+col +1) || riga*DIM+col+1 == BoardState.castle) && 
-				(sinistra.equals(pawnPredatore) || BoardState.isCamp(riga*DIM+col-1) ||riga*DIM+col-1 == BoardState.castle)) {
+		if ((destra.equals(pawnPredatore) || board.isCamp(riga*DIM+col +1) || riga*DIM+col+1 == board.castle) && 
+				(sinistra.equals(pawnPredatore) || board.isCamp(riga*DIM+col-1) ||riga*DIM+col-1 == board.castle)) {
 			return true;
 		}
 		return false; 
@@ -489,7 +495,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 			switch(s.getTurn()) {
 			case DRAW : punteggio=0; break;
 			case WHITEWIN : punteggio=Double.MIN_VALUE; break;
-			case BLACKWIN : punteggio=Double.MAX_VALUE;; break;
+			case BLACKWIN : punteggio=Double.MAX_VALUE; break;
 			default : punteggio=euristicaBlack();
 			}
 			
@@ -508,6 +514,8 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	
 	private double euristicaBlack() {
 		// TODO
+		//accerchiamento
+		//scacco al re
 		return 0;
 	}
 	
@@ -516,5 +524,8 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		return 0;
 	}
 	
+	//lasciare riga vuota
+	
+	//scacco al re
 
 }
