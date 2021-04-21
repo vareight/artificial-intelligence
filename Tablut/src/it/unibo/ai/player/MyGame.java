@@ -58,11 +58,13 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	private int[] pawns = new int[NUM_PAWNS];
 	private BoardState board= new BoardState();
 	private GameAshtonTablut game;
+	private StateTablut initialState;
 	
 	
 	
-	public MyGame(GameAshtonTablut game) {
+	public MyGame(StateTablut initialState, GameAshtonTablut game) {
 		super();
+		this.initialState = initialState;
 		this.game = game;
 	}
 
@@ -275,18 +277,18 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	/*
 	 * Funzione che stabilisce se l'azione dalla casella "from" alla casella "to" � lecita
 	 */
-	private boolean isPermitted(int from, int to, Turn t) {
-		if (to == board.getCastle()) return false;
-		
-		if(board.isCamp(to)) {
-			if(t.equals(Turn.WHITE)) {
-				return !(board.isCamp(to));
-			}else {
-				return board.sameCampo(from, to);
-			}
-		}return true;
-
-	}
+//	private boolean isPermitted(int from, int to, Turn t) {
+//		if (to == board.getCastle()) return false;
+//		
+//		if(board.isCamp(to)) {
+//			if(t.equals(Turn.WHITE)) {
+//				return !(board.isCamp(to));
+//			}else {
+//				return board.sameCampo(from, to);
+//			}
+//		}return true;
+//
+//	}
 	
 	/*
 	 * Azioni possibili nel caso di pedine nere
@@ -305,7 +307,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 
 	@Override
 	public StateTablut getInitialState() {
-		return new StateTablut();
+		return this.initialState;
 	}
 
 
@@ -515,7 +517,8 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	
 	private double euristicaWhite(StateTablut s) {
 		// TODO
-		return 0;
+		double bonusAccerchiamento=accerchiamento(s);
+		return bonusAccerchiamento;
 	}
 	
 	/**

@@ -34,7 +34,7 @@ class MyGameTest {
 	    @BeforeEach                                         
 	    public void setUp() throws Exception {
 	    	rules = new GameAshtonTablut(99, 0, "garbage", "fake", "fake");
-	        this.mygame = new MyGame(rules);
+	        this.mygame = new MyGame(new StateTablut(), rules);
 	        this.state = new StateTablut();
 	    }
 

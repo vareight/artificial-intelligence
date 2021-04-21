@@ -13,8 +13,8 @@ public class BestMoveFinder {
 	private AlphaBetaSearch<StateTablut, Action, State.Turn> alphabeta;
 
 	public BestMoveFinder(StateTablut state, GameAshtonTablut rules) {
-		//game = new MyGame(state, rules); costruttore con state è necessario?
-		game = new MyGame(rules);
+		game = new MyGame(state, rules);
+		//game = new MyGame(rules);
 		alphabeta = AlphaBetaSearch.createFor(game);
 	}
 
