@@ -195,14 +195,14 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 			// Partiamo dal valore della scacchiera successivo a quello corrente
 			// ed esploriamo fino alla fine della riga
 			for(int currentPawnValue=pawnValue+1; currentPawnValue<=(row+1)*DIM-1; currentPawnValue++) {
-				if(pawns[indexPawnToCheck]==currentPawnValue || !(board.sameCampo(pawnValue,currentPawnValue)) || board.getCastle()==currentPawnValue){
+				if(pawns[indexPawnToCheck]==currentPawnValue || board.breakCampoOrCastle(pawnValue,currentPawnValue)){
 					//indexPawnToCheck++; //probabilmente non serve
 					break;
 				}else {
 					int newRow = currentPawnValue/DIM;
 					int newColumn = currentPawnValue-(newRow*DIM);
 					Action action = new Action(getBox(row,column), getBox(newRow, newColumn), t);
-					if(isPermitted(pawnValue, currentPawnValue, t)) azioni.add(action);
+					azioni.add(action);
 				}
 			}
 			
@@ -213,14 +213,14 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 				while(pawns[indexPawnToCheck]<currentPawnValue && pawns[indexPawnToCheck]!=-1 && indexPawnToCheck<NUM_PAWNS-1) {
 					indexPawnToCheck++;
 				}
-				if(pawns[indexPawnToCheck]==currentPawnValue|| !(board.sameCampo(pawnValue,currentPawnValue)) || board.getCastle()==currentPawnValue){
+				if(pawns[indexPawnToCheck]==currentPawnValue||  board.breakCampoOrCastle(pawnValue,currentPawnValue)){
 					//indexPawnToCheck++; //probabilmente non serve
 					break;
 				}else {
 					int newRow = currentPawnValue/DIM;
 					int newColumn = currentPawnValue-(newRow*DIM);
 					Action action = new Action(getBox(row,column), getBox(newRow, newColumn), t);
-					if(isPermitted(pawnValue, currentPawnValue, t)) azioni.add(action);
+					azioni.add(action);
 				}
 			}
 		
@@ -233,14 +233,14 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 			else indexPawnToCheck=pawnValueIndex;
 			
 			for(int currentPawnValue=pawnValue-1; currentPawnValue>=row*DIM; currentPawnValue--) { //sx
-				if(pawns[indexPawnToCheck]==currentPawnValue || !(board.sameCampo(pawnValue,currentPawnValue)) || board.getCastle()==currentPawnValue){
+				if(pawns[indexPawnToCheck]==currentPawnValue || board.breakCampoOrCastle(pawnValue,currentPawnValue)){
 					//indexPawnToCheck--; //probabilmente non serve
 					break;
 				}else {
 					int newRow = currentPawnValue/DIM;
 					int newColumn = currentPawnValue-(newRow*DIM);
 					Action action = new Action(getBox(row,column), getBox(newRow, newColumn), t);
-					if(isPermitted(pawnValue, currentPawnValue, t)) azioni.add(action);
+					azioni.add(action);
 				}
 			}
 			
@@ -252,14 +252,14 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 				while(pawns[indexPawnToCheck]>currentPawnValue && pawns[indexPawnToCheck]!=-1 && indexPawnToCheck>0) {
 					indexPawnToCheck--;
 				}
-				if(pawns[indexPawnToCheck]==currentPawnValue ||!(board.sameCampo(pawnValue,currentPawnValue)) || board.getCastle()==currentPawnValue){
+				if(pawns[indexPawnToCheck]==currentPawnValue || board.breakCampoOrCastle(pawnValue,currentPawnValue)){
 					//indexPawnToCheck--; //probabilmente non serve
 					break;
 				}else {
 					int newRow = currentPawnValue/DIM;
 					int newColumn = currentPawnValue-(newRow*DIM);
 					Action action = new Action(getBox(row,column), getBox(newRow, newColumn), t);
-					if(isPermitted(pawnValue, currentPawnValue, t)) azioni.add(action);
+					azioni.add(action);
 				}
 		
 			}
@@ -278,12 +278,14 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	private boolean isPermitted(int from, int to, Turn t) {
 		if (to == board.getCastle()) return false;
 		
-		if(t.equals(Turn.WHITE)) {
-			return !(board.isCamp(to));
-		}else {
-			return board.sameCampo(from, to);
-		}
-		
+		if(board.isCamp(to)) {
+			if(t.equals(Turn.WHITE)) {
+				return !(board.isCamp(to));
+			}else {
+				return board.sameCampo(from, to);
+			}
+		}return true;
+
 	}
 	
 	/*

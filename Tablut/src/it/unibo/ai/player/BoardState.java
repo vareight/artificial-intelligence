@@ -52,10 +52,10 @@ public class BoardState {
 	
 	
 	public  boolean isCamp(int row, int column) {
-		return escapeTiles.contains(row*DIM+column);
+		return isCamp(row*DIM+column);
 	}
 	public  boolean isCamp(int index ) {
-		return escapeTiles.contains(index);
+		return campo1.contains(index) ||  campo2.contains(index) || campo3.contains(index)|| campo4.contains(index);
 	}
 	
 	public  boolean inCampo(int index, int campo) {
@@ -94,18 +94,18 @@ public class BoardState {
 		return -1;
 	}
 	public  int getCampo(int row, int column) {
-		return getCampo(row*9+column);
+		return getCampo(row*DIM+column);
 	}
 	
 	public  boolean isEscapeTile(int index) {
 		return escapeTiles.contains(index);
 	}
 	public  boolean isEscapeTile(int row, int column) {
-		return isEscapeTile(row*9+column);
+		return isEscapeTile(row*DIM+column);
 	}
 	
 	public  boolean sameCampo(int from, int to) {
-		return getCampo(from) == getCampo(to) && getCampo(to)!=-1;
+		return getCampo(from) == getCampo(to);
 	}
 
 
@@ -113,6 +113,14 @@ public class BoardState {
 		return castle;
 	}
 	
-	
+	public boolean breakCampoOrCastle(int from, int to) {
+		if (to == castle) return true;
+		
+		if(isCamp(to)) {
+			if(isCamp(from)) return !(sameCampo(from,to));
+			else return true;
+		}else return false;
+		
+	}
 	
 }
