@@ -84,7 +84,7 @@ public class TablutAIClient extends TablutClient {
 			System.out.println(state.toString());
 			
 			if (this.getPlayer().equals(Turn.WHITE)) {
-				// Mio turno
+				// Mio turno WHITE
 				if (this.getCurrentState().getTurn().equals(StateTablut.Turn.WHITE)) {
 					BestMoveFinder finder= new BestMoveFinder(state, rules);
 					Action action =finder.findBestAction(state);
@@ -122,7 +122,7 @@ public class TablutAIClient extends TablutClient {
 
 			} else {
 
-				// Mio turno
+				// Mio turno BLACK
 				if (this.getCurrentState().getTurn().equals(StateTablut.Turn.BLACK)) {
 					BestMoveFinder finder= new BestMoveFinder(state, rules);
 					Action action =finder.findBestAction(state);
