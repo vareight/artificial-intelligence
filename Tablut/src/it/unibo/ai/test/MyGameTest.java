@@ -148,11 +148,12 @@ class MyGameTest {
 	    	actions.add( new Action(getBox(8,5), getBox(6,5), turn));
 	    	actions.add( new Action(getBox(8,5), getBox(5,5), turn));
 	    	
-	    	
-	        assertEquals(80, mygame.getActions(state).size(), "Numer of initial moves avaible for black paws should be 80");     
+	    	 List <Action> calculatedactions= mygame.getActions(state);
+	    	 
+	        assertEquals(80, calculatedactions.size(), "Numer of initial moves avaible for black paws should be 80");     
 	       // assertEquals(actions, mygame.getActions(state), "Initial moves for black pawns"); // funziona se non sono ordinate uguali le due liste ?
 	       
-	        List <Action> calculatedactions= mygame.getActions(state);
+	       
 	        
 	        for(Action a : actions) {
 	        	 assertTrue(calculatedactions.contains(a));
@@ -251,7 +252,7 @@ class MyGameTest {
 	        	if(!calculatedactions.contains(a)) {
 	        		System.out.println(a.toString());
 	        	}
-	        	 assertTrue(calculatedactions.contains(a));
+	       	 assertTrue(calculatedactions.contains(a));
 	        }
 	        
 	    }
