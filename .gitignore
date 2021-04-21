@@ -60,5 +60,3 @@ Tablut/bin/*
 Tablut/garbage/*
 Tablut/logs/*
 Tablut/build/*
-*.class
-*.class
