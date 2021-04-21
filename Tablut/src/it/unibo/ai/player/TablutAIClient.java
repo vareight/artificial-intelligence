@@ -83,15 +83,20 @@ public class TablutAIClient extends TablutClient {
 			state = (StateTablut) this.getCurrentState(); //non sono sicura del casting
 			System.out.println(state.toString());
 			
+			try { //TODO vedere se serve questa sleep
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+			}
+			
 			if (this.getPlayer().equals(Turn.WHITE)) {
 				// Mio turno WHITE
 				if (this.getCurrentState().getTurn().equals(StateTablut.Turn.WHITE)) {
 					BestMoveFinder finder= new BestMoveFinder(state, rules);
 					Action action =finder.findBestAction(state);
-					if(action == null) {
-						State stateProva = this.getCurrentState();
-						Action action2 = finder.findBestAction(state);
-					}
+//					if(action == null) { // a che servono? non li uso mai questi due..
+//						State stateProva = this.getCurrentState();
+//						Action action2 = finder.findBestAction(state);
+//					}
 					System.out.println("Mossa scelta: " + action.toString());
 				
 					try {
@@ -126,11 +131,11 @@ public class TablutAIClient extends TablutClient {
 				if (this.getCurrentState().getTurn().equals(StateTablut.Turn.BLACK)) {
 					BestMoveFinder finder= new BestMoveFinder(state, rules);
 					Action action =finder.findBestAction(state);
-					if(action == null) {
-						State stateProva = this.getCurrentState();
-						Action action2 = finder.findBestAction(state);
-					}
-					System.out.println("Mossa scelta: " + action.toString());
+//					if(action == null) { // come sopra, a che serve?
+//						State stateProva = this.getCurrentState();
+//						Action action2 = finder.findBestAction(state);
+//					}
+					System.out.println("***Mossa scelta: " + action.toString());
 				
 					try {
 						this.write(action);

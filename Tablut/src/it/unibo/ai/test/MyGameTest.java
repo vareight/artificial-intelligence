@@ -11,13 +11,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import it.unibo.ai.didattica.competition.tablut.domain.Action;
+import it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
 import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
+import it.unibo.ai.player.BestMoveFinder;
 import it.unibo.ai.player.MyGame;
 
 class MyGameTest {
 	   private MyGame mygame;
 	   private StateTablut state;
+	   
+	   private GameAshtonTablut rules;
 	   
 	   private String getBox(int row, int column) {
 			String ret;
@@ -29,8 +33,8 @@ class MyGameTest {
 	   
 	    @BeforeEach                                         
 	    public void setUp() throws Exception {
-	    	
-	        this.mygame = new MyGame(null);
+	    	rules = new GameAshtonTablut(99, 0, "garbage", "fake", "fake");
+	        this.mygame = new MyGame(rules);
 	        this.state = new StateTablut();
 	    }
 
@@ -256,6 +260,102 @@ class MyGameTest {
 	        }
 	        
 	    }
+	  
+	    @Test  
+	    public void testAlphaBeta() throws IOException {
+	    	Turn turn = Turn.BLACK;
+	    	List <Action> actions = new ArrayList<>();
+	    	state.setTurn(turn);
+	    	
+	    	 //pedone bianco posizione 24
+	    	actions.add( new Action(getBox(2,4), getBox(2,0), turn));
+	    	actions.add( new Action(getBox(2,4), getBox(2,1), turn));
+	    	actions.add( new Action(getBox(2,4), getBox(2,2), turn));
+	    	actions.add( new Action(getBox(2,4), getBox(2,3), turn));
+	    	actions.add( new Action(getBox(2,4), getBox(2,5), turn));
+	    	actions.add( new Action(getBox(2,4), getBox(2,6), turn));
+	    	actions.add( new Action(getBox(2,4), getBox(2,7), turn));
+	    	actions.add( new Action(getBox(2,4), getBox(2,8), turn));
+	    	
+	    	 //pedone bianco posizione 34
+	    	actions.add( new Action(getBox(3,4), getBox(3,1), turn));
+	    	actions.add( new Action(getBox(3,4), getBox(3,2), turn));
+	    	actions.add( new Action(getBox(3,4), getBox(3,3), turn));
+	    	actions.add( new Action(getBox(3,4), getBox(3,5), turn));
+	    	actions.add( new Action(getBox(3,4), getBox(3,6), turn));
+	    	actions.add( new Action(getBox(3,4), getBox(3,7), turn));
 	    
+	    	 
+	    	 //pedone bianco posizione 42
+	    	actions.add( new Action(getBox(4,2), getBox(0,2), turn));
+	    	actions.add( new Action(getBox(4,2), getBox(1,2), turn));
+	    	actions.add( new Action(getBox(4,2), getBox(2,2), turn));
+	    	actions.add( new Action(getBox(4,2), getBox(3,2), turn));
+	    	actions.add( new Action(getBox(4,2), getBox(5,2), turn));
+	    	actions.add( new Action(getBox(4,2), getBox(6,2), turn));
+	    	actions.add( new Action(getBox(4,2), getBox(7,2), turn));
+	    	actions.add( new Action(getBox(4,2), getBox(8,2), turn));
+	    	
+	    	 //pedone bianco posizione 43
+	    	actions.add( new Action(getBox(4,3), getBox(1,3), turn));
+	    	actions.add( new Action(getBox(4,3), getBox(2,3), turn));
+	    	actions.add( new Action(getBox(4,3), getBox(3,3), turn));
+	    	actions.add( new Action(getBox(4,3), getBox(5,3), turn));
+	    	actions.add( new Action(getBox(4,3), getBox(6,3), turn));
+	    	actions.add( new Action(getBox(4,3), getBox(7,3), turn));
+	    	
+	    	
+	    	 //pedone bianco posizione 45
+	    	actions.add( new Action(getBox(4,5), getBox(1,5), turn));
+	    	actions.add( new Action(getBox(4,5), getBox(2,5), turn));
+	    	actions.add( new Action(getBox(4,5), getBox(3,5), turn));
+	    	actions.add( new Action(getBox(4,5), getBox(5,5), turn));
+	    	actions.add( new Action(getBox(4,5), getBox(6,5), turn));
+	    	actions.add( new Action(getBox(4,5), getBox(7,5), turn));
+	    	
+	    	//pedone bianco posizione 46
+	    	actions.add( new Action(getBox(4,6), getBox(0,6), turn));
+	    	actions.add( new Action(getBox(4,6), getBox(1,6), turn));
+	    	actions.add( new Action(getBox(4,6), getBox(2,6), turn));
+	    	actions.add( new Action(getBox(4,6), getBox(3,6), turn));
+	    	actions.add( new Action(getBox(4,6), getBox(5,6), turn));
+	    	actions.add( new Action(getBox(4,6), getBox(6,6), turn));
+	    	actions.add( new Action(getBox(4,6), getBox(7,6), turn));
+	    	actions.add( new Action(getBox(4,6), getBox(8,6), turn));
+	    	
+	   	 	//pedone bianco posizione 54
+	    	actions.add( new Action(getBox(5,4), getBox(5,1), turn));
+	    	actions.add( new Action(getBox(5,4), getBox(5,2), turn));
+	    	actions.add( new Action(getBox(5,4), getBox(5,3), turn));
+	    	actions.add( new Action(getBox(5,4), getBox(5,5), turn));
+	    	actions.add( new Action(getBox(5,4), getBox(5,6), turn));
+	    	actions.add( new Action(getBox(5,4), getBox(5,7), turn));
+	    	
+	    	 //pedone bianco posizione 64
+	    	actions.add( new Action(getBox(6,4), getBox(6,0), turn));
+	    	actions.add( new Action(getBox(6,4), getBox(6,1), turn));
+	    	actions.add( new Action(getBox(6,4), getBox(6,2), turn));
+	    	actions.add( new Action(getBox(6,4), getBox(6,3), turn));
+	    	actions.add( new Action(getBox(6,4), getBox(6,5), turn));
+	    	actions.add( new Action(getBox(6,4), getBox(6,6), turn));
+	    	actions.add( new Action(getBox(6,4), getBox(6,7), turn));
+	    	actions.add( new Action(getBox(6,4), getBox(6,8), turn));
+	    
+	   
+//	    	List <Action> calculatedactions= mygame.getActions(state);
+//	        assertEquals(56, calculatedactions.size(), "Numer of initial moves avaible for white paws should be 56");     
+//	        //assertEquals(actions, mygame.getActions(state), "Initial moves for white pawns");
+//	        
+//	        for(Action a : actions) {
+//	        	if(!calculatedactions.contains(a)) {
+//	        		System.out.println(a.toString());
+//	        	}
+//	       	 assertTrue(calculatedactions.contains(a));
+//	        }
+	    	
+	    	BestMoveFinder finder= new BestMoveFinder(state, rules);
+			Action action =finder.findBestAction(state);
+			System.out.println("Mossa scelta: " + action.toString());
+	    }
 
 }

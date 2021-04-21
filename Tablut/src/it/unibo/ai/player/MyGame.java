@@ -509,8 +509,8 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	
 	private double euristicaBlack(StateTablut s) {
 		
-		double bounusAccerchiamento=1/accerchiamento(s);
-		return 0;
+		double bonusAccerchiamento=1/accerchiamento(s);
+		return bonusAccerchiamento;
 	}
 	
 	private double euristicaWhite(StateTablut s) {
