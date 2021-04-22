@@ -688,7 +688,8 @@ public class GameAshtonTablut implements Game {
 		return state;
 	}
 
-	private State movePawn(State state, Action a) {
+	//TODO mettere private
+	public State movePawn(State state, Action a) {
 		State.Pawn pawn = state.getPawn(a.getRowFrom(), a.getColumnFrom());
 		State.Pawn[][] newBoard = state.getBoard();
 		// State newState = new State();

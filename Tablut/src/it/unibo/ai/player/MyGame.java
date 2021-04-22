@@ -60,6 +60,8 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	private GameAshtonTablut game;
 	private StateTablut initialState;
 	
+	private int countTurn = 0;
+	
 	
 	
 	public MyGame(StateTablut initialState, GameAshtonTablut game) {
@@ -315,14 +317,16 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	public StateTablut getResult(StateTablut s, Action a) {
 		StateTablut newState = null;
 		
-			try {
-				newState= (StateTablut) game.checkMove(s, a);
-			} catch (BoardException | ActionException | StopException | PawnException | DiagonalException
-					| ClimbingException | ThroneException | OccupitedException | ClimbingCitadelException
-					| CitadelException e) {
-				System.out.println("PROBLEMINIII");
-				e.printStackTrace();
-			}
+//			try {
+//				//TODO cambiare checkMove
+//				//newState= (StateTablut) game.checkMove(s, a);
+				newState = (StateTablut) game.movePawn(s, a);
+//			} catch (BoardException | ActionException | StopException | PawnException | DiagonalException
+//					| ClimbingException | ThroneException | OccupitedException | ClimbingCitadelException
+//					| CitadelException e) {
+//				System.out.println("PROBLEMINIII");
+//				e.printStackTrace();
+//			}
 		
 		return newState;
 	}
@@ -330,14 +334,19 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 
 	@Override
 	public boolean isTerminal(StateTablut s) {
-		
+				
 		Turn t= s.getTurn();
 		boolean finishTurn = t.equals(Turn.BLACKWIN) || t.equals(Turn.WHITEWIN) || t.equals(Turn.DRAW);
 		boolean noMoves=false;
 		if (getActions(s).isEmpty()) {
 			noMoves=true;
 		}
-		return finishTurn || noMoves;
+		
+		return true; // TODO modificare
+//		return finishTurn || noMoves;
+		
+
+		
 		/*
 		// situazione finale vittoria - sconfitta - pareggio
 		//white win 
@@ -513,12 +522,14 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		
 		double bonusAccerchiamento=1/accerchiamento(s);
 		return bonusAccerchiamento;
+		//return Math.random();
 	}
 	
 	private double euristicaWhite(StateTablut s) {
 		// TODO
 		double bonusAccerchiamento=accerchiamento(s);
 		return bonusAccerchiamento;
+//		return Math.random();
 	}
 	
 	/**
