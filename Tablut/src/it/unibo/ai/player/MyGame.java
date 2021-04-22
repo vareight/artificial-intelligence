@@ -622,6 +622,39 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	}
 	
 	
+	
+	
+	private double blackpawnInTrouble(StateTablut state, Turn turn) {
+		int whiteRemoved= NUM_WHITE_PAWNS - state.getNumberOf(Pawn.WHITE);
+		int blackRemoved= NUM_BLACK_PAWNS - state.getNumberOf(Pawn.BLACK);
+		int oddsBlackWhite = blackRemoved-whiteRemoved;
+
+		if(oddsBlackWhite >=2 && oddsBlackWhite<8) {
+			//black in serious trouble
+			if(turn.equals(Turn.BLACK)) 
+				return (-1)/(8 - oddsBlackWhite); 
+			else 
+				return 1/(8 - oddsBlackWhite);
+		}
+		if(oddsBlackWhite >=0 && oddsBlackWhite < 2) {
+			//black in trouble
+			if(turn.equals(Turn.BLACK)) 
+				return (0.5)*(-1)/(8 - oddsBlackWhite); 
+			else 
+				return 1/(8 - oddsBlackWhite);
+		}
+		if(oddsBlackWhite < 0 ) {
+			//black in advantage
+			if(turn.equals(Turn.BLACK)) 
+				return 1/(8 - oddsBlackWhite); 
+			else 
+				return 2*(-1)/(8 + oddsBlackWhite); //negativo oddsBalckWhite
+			
+		}
+		
+		return 0.0;
+	}
+	
 	//lasciare riga vuota
 	
 	//scacco al re
