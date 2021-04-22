@@ -158,44 +158,65 @@ public class EuristicaUtils {
 		
 		if(t.equals(Turn.BLACK)) {
 			if(onlyKing>=1) return -1; 
-			return (vuote/18 + onlyWhite/18)*-1;
+			return (vuote/18 + onlyWhite/18)*-1; 
 		}else { //WHITE
 			if(onlyKing>=1) return 1; 
 			return (vuote/18 + onlyWhite/18);
 		}
+//		capire se utilizzare anche onlyBlack oppure inutile
 		
 	}
 	
-	
+	//pensare se può avere meno peso visto che questa euristica toglie punti a chi è in svantaggio e moltiplicare tutto per 1/2 per esempio
 	private double blackpawnInTrouble(StateTablut state, Turn turn) {
 		int whiteRemoved= NUM_WHITE_PAWNS - state.getNumberOf(Pawn.WHITE);
 		int blackRemoved= NUM_BLACK_PAWNS - state.getNumberOf(Pawn.BLACK);
 		int oddsBlackWhite = blackRemoved-whiteRemoved;
-
-		if(oddsBlackWhite >=2 && oddsBlackWhite<8) {
-			//black in serious trouble
-			if(turn.equals(Turn.BLACK)) 
-				return (-1)/(8 - oddsBlackWhite); 
-			else 
-				return 1/(8 - oddsBlackWhite);
-		}
-		if(oddsBlackWhite >=0 && oddsBlackWhite < 2) {
-			//black in trouble
-			if(turn.equals(Turn.BLACK)) 
-				return (0.5)*(-1)/(8 - oddsBlackWhite); 
-			else 
-				return 1/(8 - oddsBlackWhite);
-		}
-		if(oddsBlackWhite < 0 ) {
-			//black in advantage
-			if(turn.equals(Turn.BLACK)) 
-				return 1/(8 - oddsBlackWhite); 
-			else 
-				return 2*(-1)/(8 + oddsBlackWhite); //negativo oddsBalckWhite
+		
+		if( oddsBlackWhite ==0 ) 
+			//same number of pawn deleted
+			return 0;
+		else
+			{
+			int resultBlackInTrouble= 1 - (1/oddsBlackWhite);
+			int resultNormalSituationBlack= 1/(NUM_WHITE_PAWNS-oddsBlackWhite);
+			int resultNormalSituationWhite= 1/(NUM_WHITE_PAWNS+oddsBlackWhite);
+			int resultWhiteInTrouble= 1 + (1/oddsBlackWhite); //oddsblackWhite negativo 
 			
+			if(oddsBlackWhite >=2 ) {
+				//black in serious trouble
+				if(turn.equals(Turn.BLACK)) 			
+					return -resultBlackInTrouble;      		 //toglie all'euristica nera valori -1/2 -2/3 -3/4 -4/5 -5/6... se in svantaggio
+				else 
+					return resultBlackInTrouble;			 //toglie all'euristica bianca valori 1/2 2/3 3/4 4/5 5/6... se in vantaggio
+			}
+			if( oddsBlackWhite ==1 ) { 
+				//black in trouble
+				if(turn.equals(Turn.BLACK)) 
+					return -resultNormalSituationBlack;  	// toglie all'euristica nera -1/7 o -1/8
+				else 
+					return resultNormalSituationBlack; 		//aggiunge all'euristica bianca un vantaggio di 1/7 o 1/8
+			}
+			
+			if(oddsBlackWhite ==-1 ) {
+				//white in trouble
+				if(turn.equals(Turn.BLACK)) 
+					return resultNormalSituationWhite; 		//aggiunge all'euristica nera un vantaggio di 1/7 o 1/8
+				else 
+					return -resultNormalSituationWhite;		// toglie all'euristica  bianca -1/7 o -1/8
+			}
+			
+			if(oddsBlackWhite < -1 ) {
+				//black in advantage
+				if(turn.equals(Turn.BLACK)) 
+					return resultWhiteInTrouble; 
+				else 
+					return -resultWhiteInTrouble; 
+				
+			}
 		}
 		
-		return 0.0;
+		return 0;
 	}
 
 }

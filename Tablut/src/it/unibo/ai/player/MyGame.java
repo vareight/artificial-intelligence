@@ -1,7 +1,5 @@
 package it.unibo.ai.player;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import aima.core.search.adversarial.Game;
