@@ -711,7 +711,7 @@ public class GameAshtonTablut implements Game {
 		} else {
 			state.setTurn(State.Turn.WHITE);
 		}
-
+		
 		return state;
 	}
 

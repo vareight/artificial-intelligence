@@ -60,10 +60,9 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	private GameAshtonTablut game;
 	private StateTablut initialState;
 	
-	private int countTurn = 0;
+		
 	
-	
-	
+
 	public MyGame(StateTablut initialState, GameAshtonTablut game) {
 		super();
 		this.initialState = initialState;
@@ -323,6 +322,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 //				//newState= (StateTablut) game.checkMove(s, a);
 				
 				newState = (StateTablut) game.movePawn(clonedState, a);
+				newState.setTurnCount(newState.getTurnCount()+1);
 //			} catch (BoardException | ActionException | StopException | PawnException | DiagonalException
 //					| ClimbingException | ThroneException | OccupitedException | ClimbingCitadelException
 //					| CitadelException e) {
@@ -502,8 +502,8 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		if(t.equals(Turn.BLACK)) {
 			switch(s.getTurn()) {
 			case DRAW : punteggio=0; break;
-			case WHITEWIN : punteggio=Double.MIN_VALUE; break;
-			case BLACKWIN : punteggio=Double.MAX_VALUE; break;
+			case WHITEWIN : punteggio=-10000; break;
+			case BLACKWIN : punteggio=10000; break;
 			default : punteggio=euristicaBlack(s);
 			}
 			
@@ -511,8 +511,8 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		if(t.equals(Turn.WHITE)) {
 			switch(s.getTurn()) {
 			case DRAW : punteggio=0; break;
-			case WHITEWIN : punteggio=Double.MAX_VALUE; break;
-			case BLACKWIN : punteggio=Double.MIN_VALUE;; break;
+			case WHITEWIN : punteggio=10000; break;
+			case BLACKWIN : punteggio=-10000; break;
 			default : punteggio=euristicaWhite(s);
 			}
 		}
@@ -521,8 +521,9 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	}
 	
 	private double euristicaBlack(StateTablut s) {
-		
+//		double lateGame = this.getTurnCount();
 		double bonusAccerchiamento=1/accerchiamento(s);
+		
 		return bonusAccerchiamento;
 		//return Math.random();
 	}
@@ -542,6 +543,9 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	private double accerchiamento(StateTablut s) {
 		double distanzaTot=0;
 		double bonusKing=3;
+		
+		if(s.getTurnCount() > 5) bonusKing = Math.pow(s.getTurnCount(), 2);
+		System.out.println("******BONUS KING= "+bonusKing+" ********");
 		
 		for(int i=0; i<NUM_WHITE_PAWNS; i++) {
 			int pawnValue=whitePawns[i];
