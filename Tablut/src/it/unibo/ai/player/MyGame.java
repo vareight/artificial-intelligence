@@ -523,14 +523,16 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	private double euristicaBlack(StateTablut s) {
 		
 		double bonusAccerchiamento=1/accerchiamento(s);
-		return bonusAccerchiamento;
+		double bonusVuote=this.righeColonne(s, Turn.BLACK);
+		return bonusAccerchiamento + bonusVuote;
 		//return Math.random();
 	}
 	
 	private double euristicaWhite(StateTablut s) {
 		// TODO
 		double bonusAccerchiamento=accerchiamento(s);
-		return bonusAccerchiamento;
+		double bonusVuote=this.righeColonne(s, Turn.WHITE);
+		return bonusAccerchiamento + bonusVuote;
 //		return Math.random();
 	}
 	
