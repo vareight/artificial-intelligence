@@ -13,10 +13,21 @@ import java.io.Serializable;
 public class StateTablut extends State implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+	
+	private int turnCount;
+
+	public int getTurnCount() {
+		return turnCount;
+	}
+
+	public void setTurnCount(int turnCount) {
+		this.turnCount = turnCount;
+	}
 
 	public StateTablut() {
 		super();
 		this.board = new Pawn[9][9];
+		this.setTurnCount(0);
 
 		for (int i = 0; i < 9; i++) {
 			for (int j = 0; j < 9; j++) {
