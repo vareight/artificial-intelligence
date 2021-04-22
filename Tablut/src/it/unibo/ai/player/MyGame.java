@@ -316,11 +316,13 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	@Override
 	public StateTablut getResult(StateTablut s, Action a) {
 		StateTablut newState = null;
+		StateTablut clonedState = s.clone();
 		
 //			try {
 //				//TODO cambiare checkMove
 //				//newState= (StateTablut) game.checkMove(s, a);
-				newState = (StateTablut) game.movePawn(s, a);
+				
+				newState = (StateTablut) game.movePawn(clonedState, a);
 //			} catch (BoardException | ActionException | StopException | PawnException | DiagonalException
 //					| ClimbingException | ThroneException | OccupitedException | ClimbingCitadelException
 //					| CitadelException e) {
