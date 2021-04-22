@@ -621,6 +621,48 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		return distanza;
 	}
 	
+	private double righeColonne(StateTablut s, Turn t) {
+		double onlyBlack=0;
+		double onlyWhite=0;
+		double onlyKing=0;
+		double vuote=0;
+		int numBlackR, numWhiteR,numBlackC, numWhiteC;
+		boolean kingR,kingC;
+		
+		for(int i=0; i<DIM; i++) {
+			numBlackR=0;
+			numWhiteR=0;
+			numBlackC=0;
+			numWhiteC=0;
+			kingR=false;
+			kingC=false;
+			for(int j=0; j<DIM;j++) {
+				if(s.getPawn(i, j).equals(Pawn.BLACK)) numBlackR++;
+				if(s.getPawn(i, j).equals(Pawn.WHITE)) numWhiteR++;
+				if(s.getPawn(i, j).equals(Pawn.KING)) kingR=true;
+				if(s.getPawn(j, i).equals(Pawn.BLACK)) numBlackC++;
+				if(s.getPawn(j, i).equals(Pawn.WHITE)) numWhiteC++;
+				if(s.getPawn(j, i).equals(Pawn.KING)) kingC=true;
+			}
+			if(numBlackR==0 && numWhiteR==0 && !kingR) vuote++;
+			if(numBlackR==1 && numWhiteR==0 && !kingR) onlyBlack++;
+			if(numBlackR==0 && numWhiteR==1 && !kingR) onlyWhite++;
+			if(numBlackR==0 && numWhiteR==0 && kingR) onlyKing=1;
+			if(numBlackC==0 && numWhiteC==0 && !kingC) vuote++;
+			if(numBlackC==1 && numWhiteC==0 && !kingC) onlyBlack++;
+			if(numBlackC==0 && numWhiteC==1 && !kingC) onlyWhite++;
+			if(numBlackC==0 && numWhiteC==0 && kingC) onlyKing=1;
+		}
+		
+		if(t.equals(Turn.BLACK)) {
+			if(onlyKing>=1) return -1; 
+			return (vuote/18 + onlyWhite/18)*-1;
+		}else { //WHITE
+			if(onlyKing>=1) return 1; 
+			return (vuote/18 + onlyWhite/18);
+		}
+		
+	}
 	
 	//lasciare riga vuota
 	
