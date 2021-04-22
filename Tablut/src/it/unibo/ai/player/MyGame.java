@@ -7,24 +7,13 @@ import java.util.List;
 import aima.core.search.adversarial.Game;
 import it.unibo.ai.didattica.competition.tablut.domain.Action;
 import it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut;
-import it.unibo.ai.didattica.competition.tablut.domain.GameTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Pawn;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
 import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
-import it.unibo.ai.didattica.competition.tablut.exceptions.ActionException;
-import it.unibo.ai.didattica.competition.tablut.exceptions.BoardException;
-import it.unibo.ai.didattica.competition.tablut.exceptions.CitadelException;
-import it.unibo.ai.didattica.competition.tablut.exceptions.ClimbingCitadelException;
-import it.unibo.ai.didattica.competition.tablut.exceptions.ClimbingException;
-import it.unibo.ai.didattica.competition.tablut.exceptions.DiagonalException;
-import it.unibo.ai.didattica.competition.tablut.exceptions.OccupitedException;
-import it.unibo.ai.didattica.competition.tablut.exceptions.PawnException;
-import it.unibo.ai.didattica.competition.tablut.exceptions.StopException;
-import it.unibo.ai.didattica.competition.tablut.exceptions.ThroneException;
+
 
 public class MyGame implements Game<StateTablut, Action, State.Turn> {
-	//Da capire se ci va il turn o il player
 	
 	/*
 	 * A game can be formally defined as a kind of search problem with the following elements:
@@ -59,17 +48,19 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	private BoardState board= new BoardState();
 	private GameAshtonTablut game;
 	private StateTablut initialState;
+	private MoveResult moveResult;
+	private ActionsUtils actions;
+
 	
 		
-	
-
 	public MyGame(StateTablut initialState, GameAshtonTablut game) {
 		super();
 		this.initialState = initialState;
-		this.game = game;
+		this.game=game;
+		this.moveResult = new MoveResult( game.getRepeated_moves_allowed(), game.getCache_size());
 	}
 
-	/*
+	/**
 	 * Inizializzazione degli array delle verie pedine
 	 */
 	private void initializePawns() {
@@ -82,7 +73,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		return;
 	}
 	
-	/*
+	/**
 	 * Riempiamo gli array di pedine con i valori di dove si trovano
 	 */
 	private void populatePawnsArrays(StateTablut s) {
@@ -125,186 +116,14 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		initializePawns();
 		
 		populatePawnsArrays(s);
+		actions = new ActionsUtils(king, whitePawns, blackPawns, pawns);
 		
-		if (turn.equals(Turn.WHITE)) return whiteActions();
-		if (turn.equals(Turn.BLACK)) return blackActions();
+		if (turn.equals(Turn.WHITE)) return actions.whiteActions();
+		if (turn.equals(Turn.BLACK)) return actions.blackActions();
 		
 		return null; //TODO capire se restituire altro quando non � W o B
 	}
 	
-	/*
-	 * Azioni possibili nel caso delle pedine bianche
-	 */
-	private List<Action> whiteActions(){
-		List<Action> azioni = new ArrayList<Action>();
-		
-			for(int i=0; i<NUM_WHITE_PAWNS; i++) {
-				if(whitePawns[i]!=-1) { // se vale -1, la pedina i-esima � stata mangiata
-					// aggiungiamo tutte le azioni possibili per la pedina i-esima
-					azioni.addAll(calculateActions(whitePawns[i], Turn.WHITE));
-				}else break;
-			}
-			
-			//aggiungiamo tutte le azioni possibili per il Re
-			azioni.addAll(calculateActions(king, Turn.WHITE));
-		
-		return azioni;
-	}
-	
-	/*
-	 * Data una riga e una colonna, restituisce la corrispondente stringa della scacchiera
-	 * Es: (0,0) -> A1
-	 */
-	private String getBox(int row, int column) {
-		String ret;
-		char col = (char) (column + 97);
-		ret = col + "" + (row + 1);
-		return ret;
-	}
-	
-	/**
-	 * Funzione che calcola le azioni possibili per la pedina presente in "boardValue".
-	 * @param pawns : tutte le pedine sulla scacchiera
-	 * @param boardValue: la pedina di cui si devono calcolare le azioni
-	 * @param t: turno corrente
-	 */
-	public List<Action> calculateActions(int pawnValue, Turn t){
-		int row= pawnValue/DIM;
-		int column= pawnValue-(row*DIM);
-		List<Action> azioni = new ArrayList<Action>();
-		
-		// pawnValueIndex: indica l'indice di pawnValue all'interno della scacchiera
-		// indexPawnsToCheck: indica l'indice di una pedina da controllare (su, gi�, dx, sx)
-		int pawnValueIndex = -1, indexPawnToCheck;
-		try {
-			// cerchiamo l'indice j della pedina corrente (corrispondente a pawnValue)
-			for(int j=0; j<NUM_PAWNS; j++) {
-				if(pawns[j]==pawnValue) {
-					pawnValueIndex = j;
-					break; //j � la posizione del piedino
-				}
-			}
-			
-			// ***************************************************************
-			// ***controlliamo la strada percorribile a DESTRA della pedina***
-			// ***************************************************************
-			
-			// se � l'ultimo indice (della pedina pawnValue), non c'� una pedina pi� a destra
-			if( pawnValueIndex<NUM_PAWNS-1 && pawns[pawnValueIndex+1]!=-1) {
-				indexPawnToCheck=pawnValueIndex+1;
-			}
-			else indexPawnToCheck = pawnValueIndex; //� l'ultima pedina
-
-			// Partiamo dal valore della scacchiera successivo a quello corrente
-			// ed esploriamo fino alla fine della riga
-			for(int currentPawnValue=pawnValue+1; currentPawnValue<=(row+1)*DIM-1; currentPawnValue++) {
-				if(pawns[indexPawnToCheck]==currentPawnValue || board.breakCampoOrCastle(pawnValue,currentPawnValue)){
-					//indexPawnToCheck++; //probabilmente non serve
-					break;
-				}else {
-					int newRow = currentPawnValue/DIM;
-					int newColumn = currentPawnValue-(newRow*DIM);
-					Action action = new Action(getBox(row,column), getBox(newRow, newColumn), t);
-					azioni.add(action);
-				}
-			}
-			
-			// ***************************************************************
-			// ***controlliamo la strada percorribile SOTTO alla pedina***
-			// ***************************************************************
-			for(int currentPawnValue=pawnValue+DIM; currentPawnValue<=DIM*(DIM-1)+column; currentPawnValue+=DIM) { //sotto
-				while(pawns[indexPawnToCheck]<currentPawnValue && pawns[indexPawnToCheck]!=-1 && indexPawnToCheck<NUM_PAWNS-1) {
-					indexPawnToCheck++;
-				}
-				if(pawns[indexPawnToCheck]==currentPawnValue||  board.breakCampoOrCastle(pawnValue,currentPawnValue)){
-					//indexPawnToCheck++; //probabilmente non serve
-					break;
-				}else {
-					int newRow = currentPawnValue/DIM;
-					int newColumn = currentPawnValue-(newRow*DIM);
-					Action action = new Action(getBox(row,column), getBox(newRow, newColumn), t);
-					azioni.add(action);
-				}
-			}
-		
-			// ***************************************************************
-			// ***controlliamo la strada percorribile a SINISTRA della pedina***
-			// ***************************************************************
-			if(pawnValueIndex!=0) { // se � il primo indice, non c'� una pedina pi� a sinistra
-				indexPawnToCheck=pawnValueIndex-1;
-			}
-			else indexPawnToCheck=pawnValueIndex;
-			
-			for(int currentPawnValue=pawnValue-1; currentPawnValue>=row*DIM; currentPawnValue--) { //sx
-				if(pawns[indexPawnToCheck]==currentPawnValue || board.breakCampoOrCastle(pawnValue,currentPawnValue)){
-					//indexPawnToCheck--; //probabilmente non serve
-					break;
-				}else {
-					int newRow = currentPawnValue/DIM;
-					int newColumn = currentPawnValue-(newRow*DIM);
-					Action action = new Action(getBox(row,column), getBox(newRow, newColumn), t);
-					azioni.add(action);
-				}
-			}
-			
-			
-			// ***************************************************************
-			// ***controlliamo la strada percorribile SOPRA alla pedina***
-			// ***************************************************************
-			for(int currentPawnValue=pawnValue-DIM; currentPawnValue>=column; currentPawnValue-=DIM) { //sopra
-				while(pawns[indexPawnToCheck]>currentPawnValue && pawns[indexPawnToCheck]!=-1 && indexPawnToCheck>0) {
-					indexPawnToCheck--;
-				}
-				if(pawns[indexPawnToCheck]==currentPawnValue || board.breakCampoOrCastle(pawnValue,currentPawnValue)){
-					//indexPawnToCheck--; //probabilmente non serve
-					break;
-				}else {
-					int newRow = currentPawnValue/DIM;
-					int newColumn = currentPawnValue-(newRow*DIM);
-					Action action = new Action(getBox(row,column), getBox(newRow, newColumn), t);
-					azioni.add(action);
-				}
-		
-			}
-
-		} catch (IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-		}
-		return azioni;
-	}
-	
-	
-	/*
-	 * Funzione che stabilisce se l'azione dalla casella "from" alla casella "to" � lecita
-	 */
-//	private boolean isPermitted(int from, int to, Turn t) {
-//		if (to == board.getCastle()) return false;
-//		
-//		if(board.isCamp(to)) {
-//			if(t.equals(Turn.WHITE)) {
-//				return !(board.isCamp(to));
-//			}else {
-//				return board.sameCampo(from, to);
-//			}
-//		}return true;
-//
-//	}
-	
-	/*
-	 * Azioni possibili nel caso di pedine nere
-	 */
-	private List<Action> blackActions(){
-		List<Action> azioni = new ArrayList<Action>();
-		
-		for(int i=0; i<NUM_BLACK_PAWNS; i++) {
-			if(blackPawns[i]!=-1) {
-				azioni.addAll(calculateActions(blackPawns[i], Turn.BLACK));
-			}else break;
-		}
-		
-		return azioni;
-	}
 
 	@Override
 	public StateTablut getInitialState() {
@@ -316,19 +135,10 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	public StateTablut getResult(StateTablut s, Action a) {
 		StateTablut newState = null;
 		StateTablut clonedState = s.clone();
-		
-//			try {
-//				//TODO cambiare checkMove
-//				//newState= (StateTablut) game.checkMove(s, a);
-				
-				newState = (StateTablut) game.movePawn(clonedState, a);
-				newState.setTurnCount(newState.getTurnCount()+1);
-//			} catch (BoardException | ActionException | StopException | PawnException | DiagonalException
-//					| ClimbingException | ThroneException | OccupitedException | ClimbingCitadelException
-//					| CitadelException e) {
-//				System.out.println("PROBLEMINIII");
-//				e.printStackTrace();
-//			}
+		newState= (StateTablut) game.movePawn(clonedState, a);
+		//newState= moveResult.makeMove(clonedState, a);
+		newState.setTurnCount(newState.getTurnCount()+1);
+			
 		
 		return newState;
 	}
@@ -367,6 +177,43 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		*/
 	}
 	
+	@Override
+	public Turn getPlayer(StateTablut s) {
+		return s.getTurn();
+	}
+
+	@Override
+	public Turn[] getPlayers() {
+		Turn[] turns = {Turn.BLACK, Turn.WHITE};
+		return turns;
+	}
+
+	@Override
+	public double getUtility(StateTablut s, Turn t) {
+		EuristicaUtils euristica= new EuristicaUtils();
+		double punteggio = 0;
+		if(t.equals(Turn.BLACK)) {
+			switch(s.getTurn()) {
+			case DRAW : punteggio=0; break;
+			case WHITEWIN : punteggio=-10000; break;
+			case BLACKWIN : punteggio=10000; break;
+			default : punteggio=euristica.euristicaBlack(s, whitePawns,king);
+			}
+			
+		}
+		if(t.equals(Turn.WHITE)) {
+			switch(s.getTurn()) {
+			case DRAW : punteggio=0; break;
+			case WHITEWIN : punteggio=10000; break;
+			case BLACKWIN : punteggio=-10000; break;
+			default : punteggio=euristica.euristicaWhite(s, whitePawns,king);
+			}
+		}
+		//EURISTICA (dovrebbe essere meglio il valore pi� grande)
+		return punteggio;
+	}
+	
+/*---------------------------------FUNZIONI DA SPOSTARE o ELIMINARE-------------------------------------------------------- 	
 	
 	/**
 	 * Funzione che trova la posizione del re nella scacchiera
@@ -485,229 +332,9 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		return false; 
 	}
 	
-	@Override
-	public Turn getPlayer(StateTablut s) {
-		return s.getTurn();
-	}
-
-	@Override
-	public Turn[] getPlayers() {
-		Turn[] turns = {Turn.BLACK, Turn.WHITE};
-		return turns;
-	}
-
-	@Override
-	public double getUtility(StateTablut s, Turn t) {
-		double punteggio = 0;
-		if(t.equals(Turn.BLACK)) {
-			switch(s.getTurn()) {
-			case DRAW : punteggio=0; break;
-			case WHITEWIN : punteggio=-10000; break;
-			case BLACKWIN : punteggio=10000; break;
-			default : punteggio=euristicaBlack(s);
-			}
-			
-		}
-		if(t.equals(Turn.WHITE)) {
-			switch(s.getTurn()) {
-			case DRAW : punteggio=0; break;
-			case WHITEWIN : punteggio=10000; break;
-			case BLACKWIN : punteggio=-10000; break;
-			default : punteggio=euristicaWhite(s);
-			}
-		}
-		//EURISTICA (dovrebbe essere meglio il valore pi� grande)
-		return punteggio;
-	}
-	
-	private double euristicaBlack(StateTablut s) {
-//		double lateGame = this.getTurnCount();
-		double bonusAccerchiamento=1/accerchiamento(s);
-		double bonusVuote=this.righeColonne(s, Turn.BLACK);
-		double bonusNumPawn= blackpawnInTrouble(s,Turn.BLACK);
-		return bonusAccerchiamento + bonusVuote + bonusNumPawn;
-		//return Math.random();
-	}
-	
-	private double euristicaWhite(StateTablut s) {
-		// TODO
-		double bonusAccerchiamento=accerchiamento(s);
-		double bonusVuote=this.righeColonne(s, Turn.WHITE);
-		double bonusNumPawn= blackpawnInTrouble(s,Turn.WHITE);
-		return bonusAccerchiamento + bonusVuote + bonusNumPawn;
-//		return Math.random();
-	}
-	
-	/**
-	 * Per ogni pedina bianca quanto si avvicina il nero
-	 * @param s
-	 * @return
-	 */
-	private double accerchiamento(StateTablut s) {
-		double distanzaTot=0;
-		double bonusKing=3;
-		
-		if(s.getTurnCount() > 5) bonusKing = Math.pow(s.getTurnCount(), 2);
-		System.out.println("******BONUS KING= "+bonusKing+" ********");
-		
-		for(int i=0; i<NUM_WHITE_PAWNS; i++) {
-			int pawnValue=whitePawns[i];
-			if(pawnValue==-1) break;
-			
-			distanzaTot+=calcolaDistanza(pawnValue, s);
-			
-		}
-		distanzaTot+=calcolaDistanza(king, s)*bonusKing;
-		
-		return distanzaTot;
-	}
-	
-	private int calcolaDistanza(int pawnValue, StateTablut s) {
-		int row= pawnValue/DIM;
-		int column= pawnValue-(row*DIM);
-		int distanza=0;
-		// ***************************************************************
-		// ***controlliamo la strada percorribile a DESTRA della pedina***
-		// ***************************************************************
-
-		for(int currentPawnValue=pawnValue+1; currentPawnValue<=(row+1)*DIM-1; currentPawnValue++) {
-			int newRow = currentPawnValue/DIM;
-			int newColumn = currentPawnValue-(newRow*DIM);
-			if(s.getPawn(newRow, newColumn).equals(Pawn.BLACK)){
-				//indexPawnToCheck++; //probabilmente non serve
-				break;
-			}else {
-				distanza++;
-				
-			}
-		}
-		
-		// ***************************************************************
-		// ***controlliamo la strada percorribile SOTTO alla pedina***
-		// ***************************************************************
-		for(int currentPawnValue=pawnValue+DIM; currentPawnValue<=DIM*(DIM-1)+column; currentPawnValue+=DIM) { //sotto
-			int newRow = currentPawnValue/DIM;
-			int newColumn = currentPawnValue-(newRow*DIM);
-			if(s.getPawn(newRow, newColumn).equals(Pawn.BLACK)){
-				//indexPawnToCheck++; //probabilmente non serve
-				break;
-			}else {
-				distanza++;
-			}
-		}
-	
-		// ***************************************************************
-		// ***controlliamo la strada percorribile a SINISTRA della pedina***
-		// ***************************************************************
-		for(int currentPawnValue=pawnValue-1; currentPawnValue>=row*DIM; currentPawnValue--) { //sx
-			int newRow = currentPawnValue/DIM;
-			int newColumn = currentPawnValue-(newRow*DIM);
-			if(s.getPawn(newRow, newColumn).equals(Pawn.BLACK)){
-				//indexPawnToCheck++; //probabilmente non serve
-				break;
-			}else {
-				distanza++;
-				
-			}
-		}
-		
-		
-		// ***************************************************************
-		// ***controlliamo la strada percorribile SOPRA alla pedina***
-		// ***************************************************************
-		for(int currentPawnValue=pawnValue-DIM; currentPawnValue>=column; currentPawnValue-=DIM) { //sopra
-			int newRow = currentPawnValue/DIM;
-			int newColumn = currentPawnValue-(newRow*DIM);
-			if(s.getPawn(newRow, newColumn).equals(Pawn.BLACK)){
-				//indexPawnToCheck++; //probabilmente non serve
-				break;
-			}else {
-				distanza++;
-				
-			}
-	
-		}
-		return distanza;
-	}
-	
-	private double righeColonne(StateTablut s, Turn t) {
-		double onlyBlack=0;
-		double onlyWhite=0;
-		double onlyKing=0;
-		double vuote=0;
-		int numBlackR, numWhiteR,numBlackC, numWhiteC;
-		boolean kingR,kingC;
-		
-		for(int i=0; i<DIM; i++) {
-			numBlackR=0;
-			numWhiteR=0;
-			numBlackC=0;
-			numWhiteC=0;
-			kingR=false;
-			kingC=false;
-			for(int j=0; j<DIM;j++) {
-				if(s.getPawn(i, j).equals(Pawn.BLACK)) numBlackR++;
-				if(s.getPawn(i, j).equals(Pawn.WHITE)) numWhiteR++;
-				if(s.getPawn(i, j).equals(Pawn.KING)) kingR=true;
-				if(s.getPawn(j, i).equals(Pawn.BLACK)) numBlackC++;
-				if(s.getPawn(j, i).equals(Pawn.WHITE)) numWhiteC++;
-				if(s.getPawn(j, i).equals(Pawn.KING)) kingC=true;
-			}
-			if(numBlackR==0 && numWhiteR==0 && !kingR) vuote++;
-			if(numBlackR==1 && numWhiteR==0 && !kingR) onlyBlack++;
-			if(numBlackR==0 && numWhiteR==1 && !kingR) onlyWhite++;
-			if(numBlackR==0 && numWhiteR==0 && kingR) onlyKing=1;
-			if(numBlackC==0 && numWhiteC==0 && !kingC) vuote++;
-			if(numBlackC==1 && numWhiteC==0 && !kingC) onlyBlack++;
-			if(numBlackC==0 && numWhiteC==1 && !kingC) onlyWhite++;
-			if(numBlackC==0 && numWhiteC==0 && kingC) onlyKing=1;
-		}
-		
-		if(t.equals(Turn.BLACK)) {
-			if(onlyKing>=1) return -1; 
-			return (vuote/18 + onlyWhite/18)*-1;
-		}else { //WHITE
-			if(onlyKing>=1) return 1; 
-			return (vuote/18 + onlyWhite/18);
-		}
-		
-	}
 	
 	
 	
-	private double blackpawnInTrouble(StateTablut state, Turn turn) {
-		int whiteRemoved= NUM_WHITE_PAWNS - state.getNumberOf(Pawn.WHITE);
-		int blackRemoved= NUM_BLACK_PAWNS - state.getNumberOf(Pawn.BLACK);
-		int oddsBlackWhite = blackRemoved-whiteRemoved;
-
-		if(oddsBlackWhite >=2 && oddsBlackWhite<8) {
-			//black in serious trouble
-			if(turn.equals(Turn.BLACK)) 
-				return (-1)/(8 - oddsBlackWhite); 
-			else 
-				return 1/(8 - oddsBlackWhite);
-		}
-		if(oddsBlackWhite >=0 && oddsBlackWhite < 2) {
-			//black in trouble
-			if(turn.equals(Turn.BLACK)) 
-				return (0.5)*(-1)/(8 - oddsBlackWhite); 
-			else 
-				return 1/(8 - oddsBlackWhite);
-		}
-		if(oddsBlackWhite < 0 ) {
-			//black in advantage
-			if(turn.equals(Turn.BLACK)) 
-				return 1/(8 - oddsBlackWhite); 
-			else 
-				return 2*(-1)/(8 + oddsBlackWhite); //negativo oddsBalckWhite
-			
-		}
-		
-		return 0.0;
-	}
 	
-	//lasciare riga vuota
-	
-	//scacco al re
 
 }
