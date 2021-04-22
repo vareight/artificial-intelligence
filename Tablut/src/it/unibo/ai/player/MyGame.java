@@ -524,7 +524,8 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 //		double lateGame = this.getTurnCount();
 		double bonusAccerchiamento=1/accerchiamento(s);
 		double bonusVuote=this.righeColonne(s, Turn.BLACK);
-		return bonusAccerchiamento + bonusVuote;
+		double bonusNumPawn= blackpawnInTrouble(s,Turn.BLACK);
+		return bonusAccerchiamento + bonusVuote + bonusNumPawn;
 		//return Math.random();
 	}
 	
@@ -532,7 +533,8 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		// TODO
 		double bonusAccerchiamento=accerchiamento(s);
 		double bonusVuote=this.righeColonne(s, Turn.WHITE);
-		return bonusAccerchiamento + bonusVuote;
+		double bonusNumPawn= blackpawnInTrouble(s,Turn.WHITE);
+		return bonusAccerchiamento + bonusVuote + bonusNumPawn;
 //		return Math.random();
 	}
 	
