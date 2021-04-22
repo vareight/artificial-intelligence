@@ -57,7 +57,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		super();
 		this.initialState = initialState;
 		this.game=game;
-		this.moveResult = new MoveResult( game.getRepeated_moves_allowed(), game.getCache_size());
+		this.moveResult = new MoveResult(game.getRepeated_moves_allowed(), game.getCache_size());
 	}
 
 	/**
@@ -121,7 +121,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		if (turn.equals(Turn.WHITE)) return actions.whiteActions();
 		if (turn.equals(Turn.BLACK)) return actions.blackActions();
 		
-		return null; //TODO capire se restituire altro quando non � W o B
+		return List.of(); //TODO capire se restituire altro quando non � W o B
 	}
 	
 
@@ -135,8 +135,8 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	public StateTablut getResult(StateTablut s, Action a) {
 		StateTablut newState = null;
 		StateTablut clonedState = s.clone();
-		newState= (StateTablut) game.movePawn(clonedState, a);
-		//newState= moveResult.makeMove(clonedState, a);
+		//newState= (StateTablut) game.movePawn(clonedState, a);
+		newState= moveResult.makeMove(clonedState, a);
 		newState.setTurnCount(newState.getTurnCount()+1);
 			
 		
