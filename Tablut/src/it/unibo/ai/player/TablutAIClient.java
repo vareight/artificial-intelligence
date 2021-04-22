@@ -60,8 +60,9 @@ public class TablutAIClient extends TablutClient {
 		state.setTurn(State.Turn.WHITE);
 		GameAshtonTablut rules = new GameAshtonTablut(99, 0, "garbage", "fake", "fake");
 		System.out.println("Ashton Tablut game");
-	
-	
+		
+		TurnNumberSingleton turn= TurnNumberSingleton.getIstance();
+		
 
 		System.out.println("You are player " + this.getPlayer().toString() + "!");
 
@@ -86,6 +87,8 @@ public class TablutAIClient extends TablutClient {
 				if (this.getCurrentState().getTurn().equals(StateTablut.Turn.WHITE)) {
 					BestMoveFinder finder= new BestMoveFinder(state, rules);
 					Action action =finder.findBestAction(state);
+					turn.newTurn();
+					System.out.println("***Turno " + turn.getTurn());
 //					if(action == null) { // a che servono? non li uso mai questi due..
 //						State stateProva = this.getCurrentState();
 //						Action action2 = finder.findBestAction(state);
@@ -124,6 +127,8 @@ public class TablutAIClient extends TablutClient {
 				if (this.getCurrentState().getTurn().equals(StateTablut.Turn.BLACK)) {
 					BestMoveFinder finder= new BestMoveFinder(state, rules);
 					Action action =finder.findBestAction(state);
+					turn.newTurn();
+					System.out.println("***Turno " + turn.getTurn());
 //					if(action == null) { // come sopra, a che serve?
 //						State stateProva = this.getCurrentState();
 //						Action action2 = finder.findBestAction(state);
@@ -132,6 +137,7 @@ public class TablutAIClient extends TablutClient {
 				
 					try {
 						this.write(action);
+						turn.newTurn();
 					} catch (ClassNotFoundException | IOException e) {
 						e.printStackTrace();
 					}			

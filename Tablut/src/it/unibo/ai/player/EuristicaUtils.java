@@ -9,8 +9,10 @@ public class EuristicaUtils {
 	private int NUM_WHITE_PAWNS = 8;
 	private int NUM_BLACK_PAWNS = 16;
 	private int NUM_PAWNS = 25;
+	private static TurnNumberSingleton turn; 
 	
 	public EuristicaUtils() {
+		turn= TurnNumberSingleton.getIstance();
 	}
 
 	public double euristicaBlack(StateTablut s,int[] whitePawns, int king) {
@@ -24,11 +26,15 @@ public class EuristicaUtils {
 	
 	public double euristicaWhite(StateTablut s,int[] whitePawns, int king) {
 		// TODO
+		//double bonusAccerchiamento=1-1/accerchiamento(s, whitePawns, king);   
+		//secondo me solo con accerchiamento riceveva un valore altissimo e  non confrontabile con gli altri valori dell'euristica
+		//facendo 1-1/accerchiamento dovremmo avere un valore complementare rispetto a quello del black
+		//se il ragionamento è corretto cambiatelo
+		
 		double bonusAccerchiamento=accerchiamento(s, whitePawns, king);
 		double bonusVuote=this.righeColonne(s, Turn.WHITE);
 		double bonusNumPawn= blackpawnInTrouble(s,Turn.WHITE);
 		return bonusAccerchiamento + bonusVuote + bonusNumPawn;
-//		return Math.random();
 	}
 	
 
@@ -41,7 +47,9 @@ public class EuristicaUtils {
 		double distanzaTot=0;
 		double bonusKing=3;
 		
-		if(s.getTurnCount() > 5) bonusKing = Math.pow(s.getTurnCount(), 2);
+		if(turn.getTurn() > 5) 
+			//bonusKing = Math.pow(turn.getTurn(), 2);
+			bonusKing*=turn.getTurn();
 		System.out.println("******BONUS KING= "+bonusKing+" ********");
 		
 		for(int i=0; i<NUM_WHITE_PAWNS; i++) {
