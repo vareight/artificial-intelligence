@@ -8,7 +8,8 @@ public class EuristicaUtils {
 	private final int DIM = 9;
 	private int NUM_WHITE_PAWNS = 8;
 	private int NUM_BLACK_PAWNS = 16;
-	private int NUM_PAWNS = 25;
+//	private int NUM_PAWNS = 25;
+	private BoardState board= BoardState.getIstance();
 	private static TurnNumberSingleton turn; 
 	
 	public EuristicaUtils() {
@@ -17,11 +18,16 @@ public class EuristicaUtils {
 
 	public double euristicaBlack(StateTablut s,int[] whitePawns, int king) {
 //		double lateGame = this.getTurnCount();
-		double bonusAccerchiamento=1/accerchiamento(s, whitePawns, king);
+		double bonusAccerchiamento=-accerchiamento(s, whitePawns, king)/100;
+		System.out.println("Bonus accerchiamento "+bonusAccerchiamento);
 		double bonusVuote=this.righeColonne(s, Turn.BLACK);
+		System.out.println("Bonus vuote "+bonusVuote);
 		double bonusNumPawn= blackpawnInTrouble(s,Turn.BLACK);
-		return bonusAccerchiamento + bonusVuote + bonusNumPawn;
-		//return Math.random();
+		System.out.println("Bonus numero pedoni "+bonusNumPawn);
+		double bonusStradeLibere= - kingOpenRoads(s);
+		System.out.println("Bonus strade libere re "+bonusStradeLibere);
+		return bonusAccerchiamento + bonusVuote + bonusNumPawn + bonusStradeLibere;
+
 	}
 	
 	public double euristicaWhite(StateTablut s,int[] whitePawns, int king) {
@@ -31,10 +37,15 @@ public class EuristicaUtils {
 		//facendo 1-1/accerchiamento dovremmo avere un valore complementare rispetto a quello del black
 		//se il ragionamento è corretto cambiatelo
 		
-		double bonusAccerchiamento=accerchiamento(s, whitePawns, king);
+		double bonusAccerchiamento=+accerchiamento(s, whitePawns, king)/100;
+		System.out.println("Bonus accerchiamento "+bonusAccerchiamento);
 		double bonusVuote=this.righeColonne(s, Turn.WHITE);
+		System.out.println("Bonus vuote "+bonusVuote);
 		double bonusNumPawn= blackpawnInTrouble(s,Turn.WHITE);
-		return bonusAccerchiamento + bonusVuote + bonusNumPawn;
+		System.out.println("Bonus numero pedoni "+bonusNumPawn);
+		double bonusStradeLibere= kingOpenRoads(s);
+		System.out.println("Bonus strade libere re "+bonusStradeLibere);
+		return bonusAccerchiamento + bonusVuote + bonusNumPawn+ bonusStradeLibere;
 	}
 	
 
@@ -170,7 +181,7 @@ public class EuristicaUtils {
 		}else { //WHITE
 			if(onlyKing>=1) return 1; 
 			return (vuote/18 + onlyWhite/18);
-		}
+		}	
 //		capire se utilizzare anche onlyBlack oppure inutile
 		
 	}
@@ -226,5 +237,86 @@ public class EuristicaUtils {
 		
 		return 0;
 	}
+	
 
+	/**
+	 * Funzione che trova la posizione del re nella scacchiera
+	 * @param state
+	 * @return the position of the king, -1 if not found
+	 */
+	private int findKing(StateTablut state) {
+		for(int i=0; i<DIM; i++) {
+			for(int j=0; j<DIM; j++) {
+				if(state.getPawn(i, j).equals(Pawn.KING)) {
+					return i*DIM +j;	
+				}
+			}
+		}
+		return -1;
+	}
+	
+	//scritta per far si che se ci sono due strade libere l'euristica si rafforzi
+	private double kingOpenRoads(StateTablut state) {
+		int posKing=findKing(state);
+		int weight=5;
+		boolean closeRoadSx=false, closeRoadTop=false ;
+		boolean closeRoadDx=false, closeRoadBottom=false ;
+		int openRoads=0; 
+		if(posKing!=-1) { //controllo che la posizione del re sia valida
+			int riga=posKing/DIM;
+			int col=posKing-(riga*DIM);
+			if(board.isEscapeTile(riga, 0)) {							//controlla escape tile a sinistra del re
+				for(int i=col-1; i>=0 && closeRoadSx==false; i--) {		//se trova un pedone in mezzo esce subito dal ciclo per non perdere tempo
+					if(state.getPawn(riga, i)!= null) {
+						closeRoadSx=true;
+					}
+				}
+				if(closeRoadSx==false) {								//se la strada non è chiusa incrementa openRoads
+					//return 10;
+					openRoads+=weight;
+				}
+			}
+			
+			if(board.isEscapeTile(0, col)) {							//controlla escape tile sopra al re
+				for(int i=riga-1; i>=0 && closeRoadTop==false; i--) {
+					if(state.getPawn(i, col)!= null) {
+						closeRoadTop=true;
+					}
+				}
+				if(closeRoadTop==false) {								
+					//return 10;
+					openRoads+=weight;
+				}
+			}
+			if(board.isEscapeTile(riga, DIM)) {							//controlla escape tile a destra del re
+				for(int i=col+1; i<DIM && closeRoadDx==false; i++) {	
+					if(state.getPawn(riga, i)!= null) {
+						closeRoadDx=true;
+					}
+				}
+				if(closeRoadDx==false) {								
+					//return 10;
+					openRoads+=weight;
+				}
+			}
+			
+			if(board.isEscapeTile(DIM, col)) {							//controlla escape tile sotto al re
+				for(int i=riga+1; i<DIM && closeRoadBottom==false; i++) {
+					if(state.getPawn(i, col)!= null) {
+						closeRoadBottom=true;
+					}
+				}
+				if(closeRoadBottom==false) {		
+					//return 10;
+					openRoads+=weight;
+				}
+			}
+		}
+		if(openRoads >=10) {											//restituisce un valore molto alto se ci sono due o più strade libere 
+			return openRoads;											//in modo che il re sia avvantaggiato a scappare
+		}else {															//sotto la soglia 2 non restituisce nulla
+			return 0; 
+		}
+		
+	}
 }

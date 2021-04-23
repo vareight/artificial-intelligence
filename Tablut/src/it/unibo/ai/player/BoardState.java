@@ -12,9 +12,10 @@ public class BoardState {
 	public final static List<Integer> campo3 = new ArrayList<Integer>();
 	public final static List<Integer> campo4 = new ArrayList<Integer>();
 	public final static int DIM =9;
+	private static BoardState boardState= null;
 	
 	
-	public BoardState() {
+	private BoardState() {
 		escapeTiles.add(1); 
 		escapeTiles.add(2);
 		escapeTiles.add(6);
@@ -50,15 +51,20 @@ public class BoardState {
 		campo4.add(77);
 	}
 	
+	public static BoardState getIstance() {
+	    if(boardState==null)
+	    	boardState = new BoardState();
+	    return boardState;
+	  }
 	
-	public  boolean isCamp(int row, int column) {
+	public boolean isCamp(int row, int column) {
 		return isCamp(row*DIM+column);
 	}
-	public  boolean isCamp(int index ) {
+	public boolean isCamp(int index ) {
 		return campo1.contains(index) ||  campo2.contains(index) || campo3.contains(index)|| campo4.contains(index);
 	}
 	
-	public  boolean inCampo(int index, int campo) {
+	public boolean inCampo(int index, int campo) {
 		if (campo ==1 && campo1.contains(index)) {
 			return true;
 		}
@@ -74,11 +80,11 @@ public class BoardState {
 		return false;
 	}
 
-	public  boolean inCampo(int row, int column, int campo) {
+	public boolean inCampo(int row, int column, int campo) {
 		return inCampo(row*DIM+column, campo);
 	}
 
-	public  int getCampo(int index) {
+	public int getCampo(int index) {
 		if (campo1.contains(index)){
 			return 1;
 		}
@@ -93,18 +99,18 @@ public class BoardState {
 		}
 		return -1;
 	}
-	public  int getCampo(int row, int column) {
+	public int getCampo(int row, int column) {
 		return getCampo(row*DIM+column);
 	}
 	
-	public  boolean isEscapeTile(int index) {
+	public boolean isEscapeTile(int index) {
 		return escapeTiles.contains(index);
 	}
-	public  boolean isEscapeTile(int row, int column) {
+	public boolean isEscapeTile(int row, int column) {
 		return isEscapeTile(row*DIM+column);
 	}
 	
-	public  boolean sameCampo(int from, int to) {
+	public boolean sameCampo(int from, int to) {
 		return getCampo(from) == getCampo(to);
 	}
 

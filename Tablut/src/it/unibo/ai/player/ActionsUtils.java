@@ -17,7 +17,7 @@ public class ActionsUtils {
 	private int[] whitePawns = new int[NUM_WHITE_PAWNS];
 	private int[] blackPawns = new int[NUM_BLACK_PAWNS];
 	private int[] pawns = new int[NUM_PAWNS];
-	private BoardState board = new BoardState();
+	private BoardState board = BoardState.getIstance();
 	
 	
 	

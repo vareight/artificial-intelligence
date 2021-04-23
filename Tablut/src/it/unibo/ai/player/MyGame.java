@@ -43,7 +43,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	private int[] whitePawns = new int[NUM_WHITE_PAWNS];
 	private int[] blackPawns = new int[NUM_BLACK_PAWNS];
 	private int[] pawns = new int[NUM_PAWNS];
-	private BoardState board= new BoardState();
+	private BoardState board= BoardState.getIstance();
 	private GameAshtonTablut game;
 	private StateTablut initialState;
 	private MoveResult moveResult;
