@@ -67,7 +67,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		if (turn.equals(Turn.WHITE)) return actions.whiteActions();
 		if (turn.equals(Turn.BLACK)) return actions.blackActions();
 		
-		return List.of(); //TODO capire se restituire altro quando non � W o B
+		return null; //TODO capire se restituire altro quando non � W o B
 	}
 	
 
