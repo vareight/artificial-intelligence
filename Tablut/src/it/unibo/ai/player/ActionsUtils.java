@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import it.unibo.ai.didattica.competition.tablut.domain.Action;
+import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
+import it.unibo.ai.didattica.competition.tablut.domain.State.Pawn;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
 
 public class ActionsUtils {
@@ -21,13 +23,61 @@ public class ActionsUtils {
 	
 	
 	
-	public ActionsUtils(int king, int[] whitePawns, int[] blackPawns, int[] pawns) {
+	public ActionsUtils(StateTablut s) {
 		super();
-		this.king = king;
-		this.whitePawns = whitePawns;
-		this.blackPawns = blackPawns;
-		this.pawns = pawns;
+		initializePawns();
+		populatePawnsArrays(s);
 	}
+	
+	/**
+	 * Inizializzazione degli array delle verie pedine
+	 */
+	private void initializePawns() {
+		for(int i=0; i<NUM_PAWNS; i++) {
+			pawns[i] = -1;
+			if(i<NUM_WHITE_PAWNS) whitePawns[i] = -1;
+			if(i<NUM_BLACK_PAWNS) blackPawns[i] = -1;
+			
+		}
+		return;
+	}
+	
+	/**
+	 * Riempiamo gli array di pedine con i valori di dove si trovano
+	 */
+	private void populatePawnsArrays(StateTablut s) {
+		int indexWhite=0, indexBlack=0, indexPawns=0;
+		boolean kingfound=false;
+		
+		for(int i=0; i<DIM; i++) {
+			for(int j=0; j<DIM; j++) {
+				// aggiunta pedine bianche
+				if(indexWhite<NUM_WHITE_PAWNS && s.getPawn(i, j).equals(Pawn.WHITE)) {
+					whitePawns[indexWhite]=i*DIM+j;
+					indexWhite++;
+					pawns[indexPawns]=i*DIM+j;
+					indexPawns++;
+				}
+				
+				// aggiunta del re
+				if(!kingfound && s.getPawn(i, j).equals(Pawn.KING)) {
+					pawns[indexPawns]=i*DIM+j;
+					indexPawns++;
+					king=i*DIM+j;
+					kingfound=true;
+				}
+				
+				//aggiunta pedine nere
+				if(indexBlack<NUM_BLACK_PAWNS && s.getPawn(i, j).equals(Pawn.BLACK)) {
+					blackPawns[indexBlack]=i*DIM+j;
+					indexBlack++;
+					pawns[indexPawns]=i*DIM+j;
+					indexPawns++;
+				} //decidere se mettere break raggiunto il numero
+			}
+		}
+	}
+	
 
 	/*
 	 * Azioni possibili nel caso di pedine nere
@@ -184,6 +234,22 @@ public class ActionsUtils {
 		e.printStackTrace();
 		}
 		return azioni;
+	}
+
+	public int getKing() {
+		return king;
+	}
+
+	public int[] getWhitePawns() {
+		return whitePawns;
+	}
+
+	public int[] getBlackPawns() {
+		return blackPawns;
+	}
+
+	public int[] getPawns() {
+		return pawns;
 	}
 	
 	

@@ -39,12 +39,12 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	private int NUM_BLACK_PAWNS = 16;
 	private int NUM_PAWNS = 25;
 	
-	private int king;
-	private int[] whitePawns = new int[NUM_WHITE_PAWNS];
-	private int[] blackPawns = new int[NUM_BLACK_PAWNS];
-	private int[] pawns = new int[NUM_PAWNS];
+	//private int king;
+	//private int[] whitePawns = new int[NUM_WHITE_PAWNS];
+	//private int[] blackPawns = new int[NUM_BLACK_PAWNS];
+	//private int[] pawns = new int[NUM_PAWNS];
 	private BoardState board= BoardState.getIstance();
-	private GameAshtonTablut game;
+	//private GameAshtonTablut game;
 	private StateTablut initialState;
 	private MoveResult moveResult;
 	private ActionsUtils actions;
@@ -54,68 +54,16 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	public MyGame(StateTablut initialState, GameAshtonTablut game) {
 		super();
 		this.initialState = initialState;
-		this.game=game;
+		//this.game=game;
+		this.actions = new ActionsUtils(initialState);
 		this.moveResult = new MoveResult(game.getRepeated_moves_allowed(), game.getCache_size());
 	}
 
-	/**
-	 * Inizializzazione degli array delle verie pedine
-	 */
-	private void initializePawns() {
-		for(int i=0; i<NUM_PAWNS; i++) {
-			pawns[i] = -1;
-			if(i<NUM_WHITE_PAWNS) whitePawns[i] = -1;
-			if(i<NUM_BLACK_PAWNS) blackPawns[i] = -1;
-			
-		}
-		return;
-	}
-	
-	/**
-	 * Riempiamo gli array di pedine con i valori di dove si trovano
-	 */
-	private void populatePawnsArrays(StateTablut s) {
-		int indexWhite=0, indexBlack=0, indexPawns=0;
-		boolean kingfound=false;
-		
-		for(int i=0; i<DIM; i++) {
-			for(int j=0; j<DIM; j++) {
-				// aggiunta pedine bianche
-				if(indexWhite<NUM_WHITE_PAWNS && s.getPawn(i, j).equals(Pawn.WHITE)) {
-					whitePawns[indexWhite]=i*DIM+j;
-					indexWhite++;
-					pawns[indexPawns]=i*DIM+j;
-					indexPawns++;
-				}
-				
-				// aggiunta del re
-				if(!kingfound && s.getPawn(i, j).equals(Pawn.KING)) {
-					pawns[indexPawns]=i*DIM+j;
-					indexPawns++;
-					king=i*DIM+j;
-					kingfound=true;
-				}
-				
-				//aggiunta pedine nere
-				if(indexBlack<NUM_BLACK_PAWNS && s.getPawn(i, j).equals(Pawn.BLACK)) {
-					blackPawns[indexBlack]=i*DIM+j;
-					indexBlack++;
-					pawns[indexPawns]=i*DIM+j;
-					indexPawns++;
-				} //decidere se mettere break raggiunto il numero
-			}
-		}
-	}
 	
 	@Override
 	public List<Action> getActions(StateTablut s) {
 		Turn turn= s.getTurn();
-		
-		initializePawns();
-		
-		populatePawnsArrays(s);
-		actions = new ActionsUtils(king, whitePawns, blackPawns, pawns);
-		
+		this.actions = new ActionsUtils(s);
 		if (turn.equals(Turn.WHITE)) return actions.whiteActions();
 		if (turn.equals(Turn.BLACK)) return actions.blackActions();
 		
@@ -188,14 +136,16 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 
 	@Override
 	public double getUtility(StateTablut s, Turn t) {
+		this.actions = new ActionsUtils(s);
 		EuristicaUtils euristica= new EuristicaUtils();
+		
 		double punteggio = 0;
 		if(t.equals(Turn.BLACK)) {
 			switch(s.getTurn()) {
 			case DRAW : punteggio=0; break;
 			case WHITEWIN : punteggio=-10000; break;
 			case BLACKWIN : punteggio=10000; break;
-			default : punteggio=euristica.euristicaBlack(s, whitePawns,king);
+			default : punteggio=euristica.euristicaBlack(s, actions.getWhitePawns(),actions.getKing());
 			}
 			
 		}
@@ -204,7 +154,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 			case DRAW : punteggio=0; break;
 			case WHITEWIN : punteggio=10000; break;
 			case BLACKWIN : punteggio=-10000; break;
-			default : punteggio=euristica.euristicaWhite(s, whitePawns,king);
+			default : punteggio=euristica.euristicaWhite(s, actions.getWhitePawns(),actions.getKing());
 			}
 		}
 		//EURISTICA (dovrebbe essere meglio il valore pi� grande)
