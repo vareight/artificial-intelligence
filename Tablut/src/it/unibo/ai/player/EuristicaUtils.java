@@ -303,7 +303,7 @@ public class EuristicaUtils {
 				}
 				if(closeRoadSx==false) {								//se la strada non è chiusa incrementa openRoads
 					//return 10;
-					openRoads+=weight;
+					openRoads++;
 				}
 			}
 			
@@ -315,7 +315,7 @@ public class EuristicaUtils {
 				}
 				if(closeRoadTop==false) {								
 					//return 10;
-					openRoads+=weight;
+					openRoads++;
 				}
 			}
 			if(board.isEscapeTile(riga, DIM)) {							//controlla escape tile a destra del re
@@ -326,7 +326,7 @@ public class EuristicaUtils {
 				}
 				if(closeRoadDx==false) {								
 					//return 10;
-					openRoads+=weight;
+					openRoads++;
 				}
 			}
 			
@@ -338,14 +338,14 @@ public class EuristicaUtils {
 				}
 				if(closeRoadBottom==false) {		
 					//return 10;
-					openRoads+=weight;
+					openRoads++;
 				}
 			}
 		}
-//		if(openRoads >=10) {											//restituisce un valore molto alto se ci sono due o più strade libere 
-			return openRoads;											//in modo che il re sia avvantaggiato a scappare
+//		if(openRoads > 1) {											//restituisce un valore molto alto se ci sono due o più strade libere 
+//			return openRoads*weight;											//in modo che il re sia avvantaggiato a scappare
 //		}else {															//sotto la soglia 2 non restituisce nulla
-//			return 0; 
+			return openRoads*weight; 
 //		}
 		
 	}
