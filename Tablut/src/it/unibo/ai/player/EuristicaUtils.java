@@ -24,7 +24,7 @@ public class EuristicaUtils {
 	public double euristicaBlack(StateTablut s,int[] whitePawns, int king) {
 //		double lateGame = this.getTurnCount();
 		System.out.println("*****BLACK*****");
-		double bonusAccerchiamento=accerchiamento(s, whitePawns, king)/50;
+		double bonusAccerchiamento=1/accerchiamento(s, whitePawns, king);
 		System.out.println("Bonus accerchiamento "+bonusAccerchiamento);
 		double bonusVuote=this.righeColonne(s, Turn.BLACK);
 		System.out.println("Bonus vuote "+bonusVuote);
