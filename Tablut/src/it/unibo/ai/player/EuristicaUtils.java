@@ -38,7 +38,7 @@ public class EuristicaUtils {
 		double bonusVeggente = kingGoing;
 		System.out.println("Going BIANCHE-NERE-KING: "+biancheGoing+"|"+nereGoing+"|"+kingGoing);
 		System.out.println("*****FINE BLACK*****");
-		return bonusAccerchiamento + bonusVuote + bonusNumPawn + bonusStradeLibere+bonusVeggente;
+		return bonusAccerchiamento;
 
 	}
 	
