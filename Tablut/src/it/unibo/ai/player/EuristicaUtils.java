@@ -1,5 +1,8 @@
 package it.unibo.ai.player;
 
+import java.util.List;
+
+import it.unibo.ai.didattica.competition.tablut.domain.Action;
 import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Pawn;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
@@ -29,8 +32,13 @@ public class EuristicaUtils {
 		System.out.println("Bonus numero pedoni "+bonusNumPawn);
 		double bonusStradeLibere= -kingOpenRoads(s);
 		System.out.println("Bonus strade libere re "+bonusStradeLibere);
+		double biancheGoing = this.pedineBiancheGoingToDie(s);
+		double nereGoing = -this.pedineNereGoingToDie(s);
+		double kingGoing = this.kingCaptured(king, s)*20;
+		double bonusVeggente = kingGoing;
+		System.out.println("Going BIANCHE-NERE-KING: "+biancheGoing+"|"+nereGoing+"|"+kingGoing);
 		System.out.println("*****FINE BLACK*****");
-		return bonusAccerchiamento + bonusVuote + bonusNumPawn + bonusStradeLibere;
+		return bonusAccerchiamento + bonusVuote + bonusNumPawn + bonusStradeLibere+bonusVeggente;
 
 	}
 	
@@ -51,8 +59,14 @@ public class EuristicaUtils {
 		double bonusStradeLibere= kingOpenRoads(s);
 		System.out.println("Bonus strade libere re "+bonusStradeLibere);
 		double bonusMovimentoKing = movimentoKing(s);
+		double biancheGoing = -this.pedineBiancheGoingToDie(s);
+		double nereGoing = this.pedineNereGoingToDie(s);
+		double kingGoing = - this.kingCaptured(king, s)*20;
+		double bonusVeggente = biancheGoing+nereGoing+kingGoing;
+		System.out.println("Going BIANCHE-NERE-KING: "+biancheGoing+"|"+nereGoing+"|"+kingGoing);
+		
 		System.out.println("*****FINE WHITE*****");
-		return bonusVuote + bonusNumPawn+ bonusStradeLibere + bonusMovimentoKing + bonusAccerchiamento;
+		return bonusVuote + bonusNumPawn+ bonusStradeLibere + bonusMovimentoKing + bonusAccerchiamento + bonusVeggente;
 	}
 	
 	/**
@@ -347,6 +361,132 @@ public class EuristicaUtils {
 //		}else {															//sotto la soglia 2 non restituisce nulla
 			return openRoads*weight; 
 //		}
-		
 	}
+	
+	
+	 /* Funzione che stabilisce se una pedina si va a suicidare
+	 * @param state
+	 * @return
+	 */
+	private double isGoingToDie(int pawnValue, Pawn pawn, StateTablut state) {
+		int riga = pawnValue/DIM;
+		int col = pawnValue - (riga*DIM);
+		boolean inDanger = false, dead = false;
+		Pawn otherColor;
+		List<Action> azioni;
+		double result = 0;
+		
+		if(pawn.equals(Pawn.BLACK)) {
+			otherColor = Pawn.WHITE;
+			azioni = this.actionsUtils.whiteActions();
+		}
+		else {
+			otherColor = Pawn.BLACK;
+			azioni = this.actionsUtils.blackActions();
+		}
+
+		if (isDead(riga+1, col, riga-1, col, state, azioni)) result++; //arriva sotto
+		else if (isDead(riga-1, col, riga+1, col, state, azioni)) result++; //arriva sopra
+		else if (isDead(riga, col-1, riga, col+1, state, azioni)) result++; //arriva a sinistra
+		else if (isDead(riga, col+1, riga, col-1, state, azioni)) result++; //arriva a destra
+		
+		return result;
+	}
+	
+	private boolean isDead(int riga, int colonna, int newRiga, int newColonna, StateTablut state, List<Action> azioni) {
+		boolean result = false;
+		if(newRiga >=0 && newRiga<=8 && newColonna >= 0 && newColonna <=8 &&
+				riga >=0 && riga<=8 && colonna >= 0 && colonna <=8) {
+			if(state.getPawn(riga, colonna)!= Pawn.EMPTY || board.isCamp(riga, colonna)) {
+				for (Action a : azioni) {
+					if(a.getRowTo() == newRiga && a.getColumnTo() == newColonna) {
+						result = true;
+					}
+				}
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * Funzione che rileva se il re viene catturato
+	 * @param posKing
+	 * @param state
+	 * @return true if is captured, false otherwise
+	 */
+	public double kingCaptured(int posKing, StateTablut state) { //
+		
+		//se posKing == 40 (ovvero si trova nel trono), al momento non lo consideriamo (return 0?)
+		if(posKing == 40 ) return 0;
+		if(posKing != 31 && posKing != 39 && posKing!=41 && posKing != 49)
+			return this.isGoingToDie(posKing, Pawn.KING, state);
+		
+		int riga=posKing/DIM;
+		int col=posKing-(riga*DIM);
+		int circondato = 0;
+		Pawn sopra=state.getPawn(riga-1, col);
+		Pawn sotto =state.getPawn(riga+1, col);
+		Pawn destra =state.getPawn(riga, col+1); 
+		Pawn sinistra =state.getPawn(riga, col-1);
+		
+	
+		if(sopra.equals(Pawn.BLACK)) circondato++;
+		if(sotto.equals(Pawn.BLACK)) circondato++;
+		if(destra.equals(Pawn.BLACK)) circondato++;
+		if(sinistra.equals(Pawn.BLACK)) circondato++;
+		
+		if(circondato != 2) return 0; 
+		
+		List<Action> azioni = this.actionsUtils.blackActions();		
+		
+		if(sopra.equals(Pawn.EMPTY)) {
+			for(Action a : azioni) {
+				if(a.getRowTo() == riga-1 && a.getColumnTo() == col) {
+					return 1;
+				}
+			}
+		}
+		
+		if(sotto.equals(Pawn.EMPTY)) {
+			for(Action a : azioni) {
+				if(a.getRowTo() == riga+1 && a.getColumnTo() == col) {
+					return 1;
+				}
+			}
+		}
+		
+		if(sinistra.equals(Pawn.EMPTY)) {
+			for(Action a : azioni) {
+				if(a.getRowTo() == riga && a.getColumnTo() == col-1) {
+					return 1;
+				}
+			}
+		}
+		
+		if(destra.equals(Pawn.EMPTY)) {
+			for(Action a : azioni) {
+				if(a.getRowTo() == riga && a.getColumnTo() == col+1) {
+					return 1;
+				}
+			}
+		}
+		return 0;		
+	}
+	
+	private double pedineNereGoingToDie(StateTablut state) {
+		double result = 0;
+		for(Integer pawnValue : this.actionsUtils.getBlackPawns()) {
+			result+=this.isGoingToDie(pawnValue, Pawn.BLACK, state);
+		}
+		return result;
+	}
+	
+	private double pedineBiancheGoingToDie(StateTablut state) {
+		double result = 0;
+		for(Integer pawnValue : this.actionsUtils.getWhitePawns()) {
+			result+=this.isGoingToDie(pawnValue, Pawn.WHITE, state);
+		}
+		return result;
+	}
+	
 }

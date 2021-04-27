@@ -20,13 +20,14 @@ public class ActionsUtils {
 	private int[] blackPawns = new int[NUM_BLACK_PAWNS];
 	private int[] pawns = new int[NUM_PAWNS];
 	private BoardState board = BoardState.getIstance();
-	
+	private StateTablut state;
 	
 	
 	public ActionsUtils(StateTablut s) {
 		super();
+		this.state = s;
 		initializePawns();
-		populatePawnsArrays(s);
+		populatePawnsArrays(state);
 	}
 	
 	/**
@@ -251,6 +252,10 @@ public class ActionsUtils {
 	public int[] getPawns() {
 		return pawns;
 	}
+	
+	
+	/**
+	
 	
 	
 	/*
