@@ -11,21 +11,25 @@ public class EuristicaUtils {
 //	private int NUM_PAWNS = 25;
 	private BoardState board= BoardState.getIstance();
 	private static TurnNumberSingleton turn; 
+	private ActionsUtils actionsUtils;
 	
-	public EuristicaUtils() {
+	public EuristicaUtils(ActionsUtils actionsUtils) {
 		turn= TurnNumberSingleton.getIstance();
+		this.actionsUtils=actionsUtils;
 	}
 
 	public double euristicaBlack(StateTablut s,int[] whitePawns, int king) {
 //		double lateGame = this.getTurnCount();
-		double bonusAccerchiamento=-accerchiamento(s, whitePawns, king)/100;
+		System.out.println("*****BLACK*****");
+		double bonusAccerchiamento=accerchiamento(s, whitePawns, king)/100;
 		System.out.println("Bonus accerchiamento "+bonusAccerchiamento);
 		double bonusVuote=this.righeColonne(s, Turn.BLACK);
 		System.out.println("Bonus vuote "+bonusVuote);
 		double bonusNumPawn= blackpawnInTrouble(s,Turn.BLACK);
 		System.out.println("Bonus numero pedoni "+bonusNumPawn);
-		double bonusStradeLibere= - kingOpenRoads(s);
+		double bonusStradeLibere= -kingOpenRoads(s);
 		System.out.println("Bonus strade libere re "+bonusStradeLibere);
+		System.out.println("*****FINE BLACK*****");
 		return bonusAccerchiamento + bonusVuote + bonusNumPawn + bonusStradeLibere;
 
 	}
@@ -37,15 +41,26 @@ public class EuristicaUtils {
 		//facendo 1-1/accerchiamento dovremmo avere un valore complementare rispetto a quello del black
 		//se il ragionamento è corretto cambiatelo
 		
-		double bonusAccerchiamento=+accerchiamento(s, whitePawns, king)/100;
+		double bonusAccerchiamento=-accerchiamento(s, whitePawns, king)/1000;
+		System.out.println("*****WHITE*****");
 		System.out.println("Bonus accerchiamento "+bonusAccerchiamento);
-		double bonusVuote=this.righeColonne(s, Turn.WHITE);
+		double bonusVuote=this.righeColonne(s, Turn.WHITE)*100;
 		System.out.println("Bonus vuote "+bonusVuote);
 		double bonusNumPawn= blackpawnInTrouble(s,Turn.WHITE);
 		System.out.println("Bonus numero pedoni "+bonusNumPawn);
 		double bonusStradeLibere= kingOpenRoads(s);
 		System.out.println("Bonus strade libere re "+bonusStradeLibere);
-		return bonusAccerchiamento + bonusVuote + bonusNumPawn+ bonusStradeLibere;
+		double bonusMovimentoKing = movimentoKing(s);
+		System.out.println("*****FINE WHITE*****");
+		return bonusVuote + bonusNumPawn+ bonusStradeLibere + bonusMovimentoKing + bonusAccerchiamento;
+	}
+	
+	/**
+	 * Funzione che calcola le mosse possibili del Re
+	 * @return il numero di mosse possibili del re
+	 */
+	private double movimentoKing(StateTablut state) {
+		return this.actionsUtils.calculateActions(this.findKing(state), state.getTurn()).size();
 	}
 	
 
@@ -56,10 +71,10 @@ public class EuristicaUtils {
 	 */
 	private double accerchiamento(StateTablut s, int[] whitePawns, int king) {
 		double distanzaTot=0;
-		double bonusKing=3;
+		double bonusKing=5;
 		
-		if(turn.getTurn() > 5) 
-			//bonusKing = Math.pow(turn.getTurn(), 2);
+//		if(turn.getTurn() > 4) 
+//			//bonusKing = Math.pow(turn.getTurn(), 2);
 			bonusKing*=turn.getTurn();
 		System.out.println("******BONUS KING= "+bonusKing+" ********");
 		
@@ -142,6 +157,13 @@ public class EuristicaUtils {
 		return distanza;
 	}
 	
+	/**
+	 * Conta quante righe e colonne sono vuote, in quante righe/colonne c'è solo un bianco/nero,
+	 * e se il re è in una riga/colonna vuota
+	 * @param s
+	 * @param t
+	 * @return
+	 */
 	private double righeColonne(StateTablut s, Turn t) {
 		double onlyBlack=0;
 		double onlyWhite=0;
@@ -177,10 +199,10 @@ public class EuristicaUtils {
 		
 		if(t.equals(Turn.BLACK)) {
 			if(onlyKing>=1) return -1; 
-			return (vuote/18 + onlyWhite/18)*-1; 
+			return (vuote/18 + onlyWhite/9)*-1; 
 		}else { //WHITE
 			if(onlyKing>=1) return 1; 
-			return (vuote/18 + onlyWhite/18);
+			return (vuote/18 + onlyWhite/9);
 		}	
 //		capire se utilizzare anche onlyBlack oppure inutile
 		
@@ -192,9 +214,13 @@ public class EuristicaUtils {
 		int blackRemoved= NUM_BLACK_PAWNS - state.getNumberOf(Pawn.BLACK);
 		int oddsBlackWhite = blackRemoved-whiteRemoved;
 		
-		if( oddsBlackWhite ==0 ) 
+		if( oddsBlackWhite ==0 && oddsBlackWhite>7 ) {
+			if (oddsBlackWhite > 7 ) {
+				return 10;
+			}
 			//same number of pawn deleted
 			return 0;
+		}
 		else
 			{
 			int resultBlackInTrouble= 1 - (1/oddsBlackWhite);
@@ -255,7 +281,11 @@ public class EuristicaUtils {
 		return -1;
 	}
 	
-	//scritta per far si che se ci sono due strade libere l'euristica si rafforzi
+	/**
+	 * scritta per far si che se ci sono due strade libere l'euristica si rafforzi
+	 * @param state
+	 * @return
+	 */
 	private double kingOpenRoads(StateTablut state) {
 		int posKing=findKing(state);
 		int weight=5;
@@ -267,7 +297,7 @@ public class EuristicaUtils {
 			int col=posKing-(riga*DIM);
 			if(board.isEscapeTile(riga, 0)) {							//controlla escape tile a sinistra del re
 				for(int i=col-1; i>=0 && closeRoadSx==false; i--) {		//se trova un pedone in mezzo esce subito dal ciclo per non perdere tempo
-					if(state.getPawn(riga, i)!= null) {
+					if(state.getPawn(riga, i)!= Pawn.EMPTY) {
 						closeRoadSx=true;
 					}
 				}
@@ -279,7 +309,7 @@ public class EuristicaUtils {
 			
 			if(board.isEscapeTile(0, col)) {							//controlla escape tile sopra al re
 				for(int i=riga-1; i>=0 && closeRoadTop==false; i--) {
-					if(state.getPawn(i, col)!= null) {
+					if(state.getPawn(i, col)!= Pawn.EMPTY) {
 						closeRoadTop=true;
 					}
 				}
@@ -290,7 +320,7 @@ public class EuristicaUtils {
 			}
 			if(board.isEscapeTile(riga, DIM)) {							//controlla escape tile a destra del re
 				for(int i=col+1; i<DIM && closeRoadDx==false; i++) {	
-					if(state.getPawn(riga, i)!= null) {
+					if(state.getPawn(riga, i)!= Pawn.EMPTY) {
 						closeRoadDx=true;
 					}
 				}
@@ -302,7 +332,7 @@ public class EuristicaUtils {
 			
 			if(board.isEscapeTile(DIM, col)) {							//controlla escape tile sotto al re
 				for(int i=riga+1; i<DIM && closeRoadBottom==false; i++) {
-					if(state.getPawn(i, col)!= null) {
+					if(state.getPawn(i, col)!= Pawn.EMPTY) {
 						closeRoadBottom=true;
 					}
 				}
@@ -312,11 +342,11 @@ public class EuristicaUtils {
 				}
 			}
 		}
-		if(openRoads >=10) {											//restituisce un valore molto alto se ci sono due o più strade libere 
+//		if(openRoads >=10) {											//restituisce un valore molto alto se ci sono due o più strade libere 
 			return openRoads;											//in modo che il re sia avvantaggiato a scappare
-		}else {															//sotto la soglia 2 non restituisce nulla
-			return 0; 
-		}
+//		}else {															//sotto la soglia 2 non restituisce nulla
+//			return 0; 
+//		}
 		
 	}
 }
