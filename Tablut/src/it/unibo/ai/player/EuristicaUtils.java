@@ -214,7 +214,7 @@ public class EuristicaUtils {
 		int blackRemoved= NUM_BLACK_PAWNS - state.getNumberOf(Pawn.BLACK);
 		int oddsBlackWhite = blackRemoved-whiteRemoved;
 		
-		if( oddsBlackWhite ==0 && oddsBlackWhite>7 ) {
+		if( oddsBlackWhite ==0 || oddsBlackWhite>7 ) {
 			if (oddsBlackWhite > 7 ) {
 				return 10;
 			}

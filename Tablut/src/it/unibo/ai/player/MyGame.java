@@ -137,7 +137,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	@Override
 	public double getUtility(StateTablut s, Turn t) {
 		this.actions = new ActionsUtils(s);
-		EuristicaUtils euristica= new EuristicaUtils();
+		EuristicaUtils euristica= new EuristicaUtils(this.actions);
 		
 		double punteggio = 0;
 		if(t.equals(Turn.BLACK)) {
