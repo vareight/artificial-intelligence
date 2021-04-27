@@ -24,11 +24,11 @@ public class EuristicaUtils {
 	public double euristicaBlack(StateTablut s,int[] whitePawns, int king) {
 //		double lateGame = this.getTurnCount();
 		System.out.println("*****BLACK*****");
-		double bonusAccerchiamento=1/accerchiamento(s, whitePawns, king);
+		double bonusAccerchiamento=100/accerchiamento(s, whitePawns, king);
 		System.out.println("Bonus accerchiamento "+bonusAccerchiamento);
 		double bonusVuote=this.righeColonne(s, Turn.BLACK);
 		System.out.println("Bonus vuote "+bonusVuote);
-		double bonusNumPawn= blackpawnInTrouble(s,Turn.BLACK);
+		double bonusNumPawn= blackpawnInTrouble(s,Turn.BLACK)*5;
 		System.out.println("Bonus numero pedoni "+bonusNumPawn);
 		double bonusStradeLibere= -kingOpenRoads(s);
 		System.out.println("Bonus strade libere re "+bonusStradeLibere);
@@ -38,7 +38,7 @@ public class EuristicaUtils {
 		double bonusVeggente = kingGoing;
 		System.out.println("Going BIANCHE-NERE-KING: "+biancheGoing+"|"+nereGoing+"|"+kingGoing);
 		System.out.println("*****FINE BLACK*****");
-		return bonusAccerchiamento;
+		return bonusAccerchiamento+bonusVuote+bonusNumPawn+bonusStradeLibere+bonusVeggente;
 
 	}
 	
