@@ -3,6 +3,7 @@
 	<name>Tablut2021</name>
 	<comment></comment>
 	<projects>
+		<project>challenge-tablut</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

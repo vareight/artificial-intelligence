@@ -34,7 +34,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	 * in base allo stato attuale calcoliamo le azioni possibili
 	 */
 	
-	
+	private int expansion=3;
 	private final int DIM = 9;
 	private int NUM_WHITE_PAWNS = 8;
 	private int NUM_BLACK_PAWNS = 16;
@@ -49,6 +49,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	private StateTablut initialState;
 	private MoveResult moveResult;
 	private ActionsUtils actions;
+	private TurnNumberSingleton turn= TurnNumberSingleton.getIstance();
 
 	
 		
@@ -101,8 +102,14 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		if (getActions(s).isEmpty()) {
 			noMoves=true;
 		}
+		if (finishTurn) {
+			return true;
+		} else if (turn.getTurn() >= expansion) {
+			return true;
+		}
+		return false;
 		
-		return true; // TODO modificare
+		//return true; // TODO modificare
 //		return finishTurn || noMoves;
 		
 
