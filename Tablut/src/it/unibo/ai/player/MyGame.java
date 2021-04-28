@@ -1,5 +1,6 @@
 package it.unibo.ai.player;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import aima.core.search.adversarial.Game;
@@ -64,10 +65,11 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	public List<Action> getActions(StateTablut s) {
 		Turn turn= s.getTurn();
 		this.actions = new ActionsUtils(s);
-		if (turn.equals(Turn.WHITE)) return actions.whiteActions();
-		if (turn.equals(Turn.BLACK)) return actions.blackActions();
+		List <Action> act= new ArrayList<Action>(); 
+		if (turn.equals(Turn.WHITE)) act= actions.whiteActions();
+		if (turn.equals(Turn.BLACK)) act= actions.blackActions();
 		
-		return List.of(); //TODO capire se restituire altro quando non � W o B
+		return act; //TODO capire se restituire altro quando non � W o B
 	}
 	
 
