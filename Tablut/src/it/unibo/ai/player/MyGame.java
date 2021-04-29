@@ -34,11 +34,11 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	 * in base allo stato attuale calcoliamo le azioni possibili
 	 */
 	
-	private int expansion=300;
+	private int expansion=1000;
 	private final int DIM = 9;
-	private int NUM_WHITE_PAWNS = 8;
-	private int NUM_BLACK_PAWNS = 16;
-	private int NUM_PAWNS = 25;
+	//private int NUM_WHITE_PAWNS = 8;
+	//private int NUM_BLACK_PAWNS = 16;
+	//private int NUM_PAWNS = 25;
 	
 	//private int king;
 	//private int[] whitePawns = new int[NUM_WHITE_PAWNS];
@@ -100,10 +100,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		isTerminalCalls++;	
 		Turn t= s.getTurn();
 		boolean finishTurn = t.equals(Turn.BLACKWIN) || t.equals(Turn.WHITEWIN) || t.equals(Turn.DRAW);
-		boolean noMoves=false;
-		if (getActions(s).isEmpty()) {
-			noMoves=true;
-		}
+		
 		if(finishTurn) {
 			return true;
 		}
@@ -180,7 +177,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	 * @param state
 	 * @return the position of the king, -1 if not found
 	 */
-	private int findKing(StateTablut state) {
+/*	private int findKing(StateTablut state) {
 		for(int i=0; i<DIM; i++) {
 			for(int j=0; j<DIM; j++) {
 				if(state.getPawn(i, j).equals(Pawn.KING)) {
@@ -190,23 +187,23 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		}
 		return -1;
 	}
-	
+*/	
 	/**
 	 * Funzione che rileva se il re raggiunge una posizione di salvataggio sul bordo
 	 * @param posKing
 	 * @return true if the king escapes, false otherwise
 	 */
-	private boolean kingEscapes(int posKing) {
+/*	private boolean kingEscapes(int posKing) {
 		return board.isEscapeTile(posKing);
 	}
-	
+*/	
 	/**
 	 * Funzione che rileva se il re viene catturato
 	 * @param posKing
 	 * @param state
 	 * @return true if is captured, false otherwise
 	 */
-	private boolean kingCaptured(int posKing, StateTablut state) { // 
+/*	private boolean kingCaptured(int posKing, StateTablut state) { // 
 		int riga=posKing/DIM;
 		int col=posKing-(riga*DIM);
 		Pawn sopra ;
@@ -260,7 +257,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		return pawnCaptured(state, riga, col, sopra, sotto, destra, sinistra);
 				
 	}
-	
+*/	
 	/**
 	 * Funzione generale per controllare se una pedina viene catturata
 	 * @param state
@@ -272,7 +269,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	 * @param sinistra
 	 * @return true if the pawn is captured, false otherwise
 	 */
-	private boolean pawnCaptured(StateTablut state,int riga, int col, Pawn sopra, Pawn sotto, Pawn destra, Pawn sinistra) {
+/*	private boolean pawnCaptured(StateTablut state,int riga, int col, Pawn sopra, Pawn sotto, Pawn destra, Pawn sinistra) {
 		
 		Turn turnVittima = state.getTurn();
 		Pawn pawnPredatore = turnVittima.equals(Turn.WHITE) ? Pawn.BLACK : Pawn.WHITE ;
@@ -291,7 +288,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		}
 		return false; 
 	}
-	
+	*/
 	
 	
 	

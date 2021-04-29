@@ -179,7 +179,7 @@ public class EuristicaUtils {
 	 * @return
 	 */
 	private double righeColonne(StateTablut s, Turn t) {
-		double onlyBlack=0;
+		//double onlyBlack=0;
 		double onlyWhite=0;
 		double onlyKing=0;
 		double vuote=0;
@@ -202,11 +202,11 @@ public class EuristicaUtils {
 				if(s.getPawn(j, i).equals(Pawn.KING)) kingC=true;
 			}
 			if(numBlackR==0 && numWhiteR==0 && !kingR) vuote++;
-			if(numBlackR==1 && numWhiteR==0 && !kingR) onlyBlack++;
+			//if(numBlackR==1 && numWhiteR==0 && !kingR) onlyBlack++;
 			if(numBlackR==0 && numWhiteR==1 && !kingR) onlyWhite++;
 			if(numBlackR==0 && numWhiteR==0 && kingR) onlyKing=1;
 			if(numBlackC==0 && numWhiteC==0 && !kingC) vuote++;
-			if(numBlackC==1 && numWhiteC==0 && !kingC) onlyBlack++;
+			//if(numBlackC==1 && numWhiteC==0 && !kingC) onlyBlack++;
 			if(numBlackC==0 && numWhiteC==1 && !kingC) onlyWhite++;
 			if(numBlackC==0 && numWhiteC==0 && kingC) onlyKing=1;
 		}
@@ -371,7 +371,7 @@ public class EuristicaUtils {
 	private double isGoingToDie(int pawnValue, Pawn pawn, StateTablut state) {
 		int riga = pawnValue/DIM;
 		int col = pawnValue - (riga*DIM);
-		boolean inDanger = false, dead = false;
+		//boolean inDanger = false, dead = false;
 		Pawn otherColor;
 		List<Action> azioni;
 		double result = 0;
