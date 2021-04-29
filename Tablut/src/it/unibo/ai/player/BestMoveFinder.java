@@ -1,6 +1,6 @@
 package it.unibo.ai.player;
 
-import aima.core.search.adversarial.*;
+import aima.core.search.adversarial.AlphaBetaSearch;
 import it.unibo.ai.didattica.competition.tablut.domain.Action;
 import it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
@@ -19,6 +19,7 @@ public class BestMoveFinder {
 	}
 
 	public Action findBestAction(StateTablut state) {
+		
 		return alphabeta.makeDecision(state);
 	}
 

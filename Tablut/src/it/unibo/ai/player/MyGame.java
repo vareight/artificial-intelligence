@@ -34,7 +34,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	 * in base allo stato attuale calcoliamo le azioni possibili
 	 */
 	
-	
+	private int expansion=300;
 	private final int DIM = 9;
 	private int NUM_WHITE_PAWNS = 8;
 	private int NUM_BLACK_PAWNS = 16;
@@ -49,12 +49,15 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	private StateTablut initialState;
 	private MoveResult moveResult;
 	private ActionsUtils actions;
+	private TurnNumberSingleton turn=TurnNumberSingleton.getIstance();
+	private int isTerminalCalls;
 
 	
 		
 	public MyGame(StateTablut initialState, GameAshtonTablut game) {
 		super();
 		this.initialState = initialState;
+		this.isTerminalCalls=0;
 		//this.game=game;
 		this.actions = new ActionsUtils(initialState);
 		this.moveResult = new MoveResult(game.getRepeated_moves_allowed(), game.getCache_size());
@@ -94,15 +97,22 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 
 	@Override
 	public boolean isTerminal(StateTablut s) {
-				
+		isTerminalCalls++;	
 		Turn t= s.getTurn();
 		boolean finishTurn = t.equals(Turn.BLACKWIN) || t.equals(Turn.WHITEWIN) || t.equals(Turn.DRAW);
 		boolean noMoves=false;
 		if (getActions(s).isEmpty()) {
 			noMoves=true;
 		}
+		if(finishTurn) {
+			return true;
+		}
+		else if(isTerminalCalls-turn.getTurn() >=expansion) {
+			return true;
+		}
+	
 		
-		return true; // TODO modificare
+		return false; // TODO modificare
 //		return finishTurn || noMoves;
 		
 
