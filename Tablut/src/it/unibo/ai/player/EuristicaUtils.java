@@ -22,23 +22,25 @@ public class EuristicaUtils {
 	}
 
 	public double euristicaBlack(StateTablut s,int[] whitePawns, int king) {
-//		double lateGame = this.getTurnCount();
-		System.out.println("*****BLACK*****");
+		double lateGame = turn.getTurn();
+		//System.out.println("*****BLACK*****");
 		double bonusAccerchiamento=1000/accerchiamento(s, whitePawns, king);
-		System.out.println("Bonus accerchiamento "+bonusAccerchiamento);
+		//System.out.println("Bonus accerchiamento "+bonusAccerchiamento);
 		double bonusVuote=this.righeColonne(s, Turn.BLACK);
-		System.out.println("Bonus vuote "+bonusVuote);
+		//System.out.println("Bonus vuote "+bonusVuote);
 		double bonusNumPawn= blackpawnInTrouble(s,Turn.BLACK)*5;
-		System.out.println("Bonus numero pedoni "+bonusNumPawn);
+		//System.out.println("Bonus numero pedoni "+bonusNumPawn);
 		double bonusStradeLibere= -kingOpenRoads(s);
-		System.out.println("Bonus strade libere re "+bonusStradeLibere);
+		//System.out.println("Bonus strade libere re "+bonusStradeLibere);
 		double biancheGoing = this.pedineBiancheGoingToDie(s);
 		double nereGoing = -this.pedineNereGoingToDie(s);
 		double kingGoing = this.kingCaptured(king, s)*20;
 		double bonusVeggente = kingGoing+biancheGoing+nereGoing;
-		System.out.println("Going BIANCHE-NERE-KING: "+biancheGoing+"|"+nereGoing+"|"+kingGoing);
-		System.out.println("*****FINE BLACK*****");
-		return bonusAccerchiamento+bonusVuote+bonusNumPawn+bonusStradeLibere+bonusVeggente;
+		//System.out.println("Going BIANCHE-NERE-KING: "+biancheGoing+"|"+nereGoing+"|"+kingGoing);
+		double diagonali=(lateGame <=16)? this.diagonalizzazioneNero(s) : this.diagonalizzazioneNero(s)*0.5 ;
+		//System.out.println("Diagonali "+ diagonali);
+		//System.out.println("*****FINE BLACK*****");
+		return bonusAccerchiamento+bonusVuote+bonusNumPawn+bonusStradeLibere+bonusVeggente+diagonali;
 
 	}
 	
@@ -50,22 +52,22 @@ public class EuristicaUtils {
 		//se il ragionamento è corretto cambiatelo
 		
 		double bonusAccerchiamento=-accerchiamento(s, whitePawns, king)/1000;
-		System.out.println("*****WHITE*****");
-		System.out.println("Bonus accerchiamento "+bonusAccerchiamento);
+		//System.out.println("*****WHITE*****");
+		//System.out.println("Bonus accerchiamento "+bonusAccerchiamento);
 		double bonusVuote=this.righeColonne(s, Turn.WHITE)*100;
-		System.out.println("Bonus vuote "+bonusVuote);
+		//System.out.println("Bonus vuote "+bonusVuote);
 		double bonusNumPawn= blackpawnInTrouble(s,Turn.WHITE);
-		System.out.println("Bonus numero pedoni "+bonusNumPawn);
+		//System.out.println("Bonus numero pedoni "+bonusNumPawn);
 		double bonusStradeLibere= kingOpenRoads(s);
-		System.out.println("Bonus strade libere re "+bonusStradeLibere);
+		//System.out.println("Bonus strade libere re "+bonusStradeLibere);
 		double bonusMovimentoKing = movimentoKing(s);
 		double biancheGoing = -this.pedineBiancheGoingToDie(s);
 		double nereGoing = this.pedineNereGoingToDie(s);
 		double kingGoing = - this.kingCaptured(king, s)*20;
 		double bonusVeggente = biancheGoing+nereGoing+kingGoing;
-		System.out.println("Going BIANCHE-NERE-KING: "+biancheGoing+"|"+nereGoing+"|"+kingGoing);
+		//System.out.println("Going BIANCHE-NERE-KING: "+biancheGoing+"|"+nereGoing+"|"+kingGoing);
 		
-		System.out.println("*****FINE WHITE*****");
+		//System.out.println("*****FINE WHITE*****");
 		return bonusVuote + bonusNumPawn+ bonusStradeLibere + bonusMovimentoKing + bonusAccerchiamento + bonusVeggente;
 	}
 	
@@ -90,7 +92,7 @@ public class EuristicaUtils {
 //		if(turn.getTurn() > 4) 
 //			//bonusKing = Math.pow(turn.getTurn(), 2);
 			bonusKing*=turn.getTurn();
-		System.out.println("******BONUS KING= "+bonusKing+" ********");
+		//System.out.println("******BONUS KING= "+bonusKing+" ********");
 		
 		for(int i=0; i<NUM_WHITE_PAWNS; i++) {
 			int pawnValue=whitePawns[i];
@@ -488,5 +490,32 @@ public class EuristicaUtils {
 		}
 		return result;
 	}
-	
+	private double diagonalizzazioneNero(StateTablut state) {
+		double diagonaliFull=0;
+		if (state.getPawn(2, 3).equals(Pawn.BLACK)) { //primo quadrante
+			diagonaliFull++;
+		}
+		if (state.getPawn(3, 2).equals(Pawn.BLACK)) {
+			diagonaliFull++;
+		}
+		if (state.getPawn(2, 5).equals(Pawn.BLACK)) { //
+			diagonaliFull++;
+		}
+		if (state.getPawn(3, 6).equals(Pawn.BLACK)) {
+			diagonaliFull++;
+		}
+		if (state.getPawn(2, 5).equals(Pawn.BLACK)) {
+			diagonaliFull++;
+		}
+		if (state.getPawn(3, 6).equals(Pawn.BLACK)) {
+			diagonaliFull++;
+		}
+		if (state.getPawn(5, 6).equals(Pawn.BLACK)) {
+			diagonaliFull++;
+		}
+		if (state.getPawn(6, 5).equals(Pawn.BLACK)) {
+			diagonaliFull++;
+		}
+		return diagonaliFull;
+	}
 }

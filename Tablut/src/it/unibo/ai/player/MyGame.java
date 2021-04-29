@@ -34,7 +34,9 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	 * in base allo stato attuale calcoliamo le azioni possibili
 	 */
 	
-	private int expansion=1000;
+	private int expansion=800;
+	private int expansionTurn=4;
+	private int turnCount=0;
 	private final int DIM = 9;
 	//private int NUM_WHITE_PAWNS = 8;
 	//private int NUM_BLACK_PAWNS = 16;
@@ -89,8 +91,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		//newState= (StateTablut) game.movePawn(clonedState, a);
 		newState= moveResult.makeMove(clonedState, a);
 		newState.setTurnCount(newState.getTurnCount()+1);
-			
-		
+		turnCount++;
 		return newState;
 	}
 	
@@ -105,8 +106,12 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 			return true;
 		}
 		else if(isTerminalCalls-turn.getTurn() >=expansion) {
-			return true;
+ 			return true;
 		}
+//		else if(turnCount-turn.getTurn() >=expansionTurn) {
+//			return true;
+//		}
+		
 	
 		
 		return false; // TODO modificare

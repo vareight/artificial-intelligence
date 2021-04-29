@@ -60,6 +60,32 @@ public class TablutAIClient extends TablutClient {
 		state.setTurn(State.Turn.WHITE);
 		GameAshtonTablut rules = new GameAshtonTablut(99, 0, "garbage", "fake", "fake");
 		System.out.println("Ashton Tablut game");
+		System.out.println("\n"+
+	               "+--------------------------  Tablut challenge 2021  --------------------------+");
+//	        System.out.println(
+//	        	   "|                                                                          |\n" +
+//	               "|    ████████               █████         ████████                ██  ██   |\n" +
+//	               "|       ██   ██   ██ ██     ██  ██   ████    ██    ████    ████   ██████   |\n" +
+//	               "|    	██   ██   ██ ██     ██ ███  ██  ██   ██   ██  ██  ██  ██ ██ ██ ██  |\n" +
+//	               "|       ██   ██   ██ ██     ██   ██ ██████   ██   ██ ██   ██████ ██    ██  |\n" +
+//	               "|       ██   ███████ ██████ ██████  ██  ██   ██   ███████ ██  ██ ██    ██  |\n" +
+//	               "|                                                                          |\n" +
+//	               "|                                                                          |\"");
+//	        
+			System.out.println("\n"+
+					   "+----------------------------------- Tablut Challenge 2021  -------------------------------------+");
+	        System.out.println(
+	        		   "|                                                                                                |\n" +
+		               "|   █              ████   █                   █                                                  |\n" +
+		               "|   ██████        █   ██  █                   ██████                                             |\n" +
+		               "|   ██      █   █ █   ██  ██████    ████ █    ██       ████       ████ █     ████ ██ ███         |\n" +
+		               "|   ██    █ █   ████ ██   ██   ██  ██   ██    ██    █ █   ██   █ ██   ██    ██  █   █   █   █    |\n" +
+		               "|   ██    █ █   █  ██     ██    ██ ██   ██   ███    █ █  ██   ██ ██   ██   ██   █   █   █  ██    |\n" +
+		               "|    ██████ █████   █████ ███████   ████ █████ ██████  ████████   ████ █████    █   █   ████     |\n" + 
+		               "|                                                                                                |\n" +
+		               "|                                                                                                |\n" );
+	        System.out.println(
+	                   "+----------------------------------- Autori  Ila, Ric, Sof --------------------------------------+\n");
 		
 		TurnNumberSingleton turn= TurnNumberSingleton.getIstance();
 		
