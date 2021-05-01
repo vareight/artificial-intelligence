@@ -35,7 +35,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	 */
 	
 	private int expansion=800;
-	private int expansionTurn=4;
+	private int expansionTurn=3;
 	private int turnCount=0;
 	private final int DIM = 9;
 	//private int NUM_WHITE_PAWNS = 8;
@@ -158,8 +158,8 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		if(t.equals(Turn.BLACK)) {
 			switch(s.getTurn()) {
 			case DRAW : punteggio=0; break;
-			case WHITEWIN : punteggio=-10000; break;
-			case BLACKWIN : punteggio=10000; break;
+			case WHITEWIN : punteggio=Double.NEGATIVE_INFINITY; break;
+			case BLACKWIN : punteggio=Double.POSITIVE_INFINITY; break;
 			default : punteggio=euristica.euristicaBlack(s, actions.getWhitePawns(),actions.getKing());
 			}
 			
@@ -167,12 +167,13 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		if(t.equals(Turn.WHITE)) {
 			switch(s.getTurn()) {
 			case DRAW : punteggio=0; break;
-			case WHITEWIN : punteggio=10000; break;
-			case BLACKWIN : punteggio=-10000; break;
+			case WHITEWIN : punteggio=Double.POSITIVE_INFINITY; break;
+			case BLACKWIN : punteggio=Double.NEGATIVE_INFINITY; break;
 			default : punteggio=euristica.euristicaWhite(s, actions.getWhitePawns(),actions.getKing());
 			}
 		}
 		//EURISTICA (dovrebbe essere meglio il valore pi� grande)
+		System.out.println("Punteggio: " + punteggio);
 		return punteggio;
 	}
 	
