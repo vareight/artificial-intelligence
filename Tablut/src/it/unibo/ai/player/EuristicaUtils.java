@@ -40,7 +40,7 @@ public class EuristicaUtils {
 		double diagonali=(lateGame <=16)? this.diagonalizzazioneNero(s) : this.diagonalizzazioneNero(s)*0.5 ;
 		//System.out.println("Diagonali "+ diagonali);
 		//System.out.println("*****FINE BLACK*****");
-		return bonusAccerchiamento+bonusVuote+bonusNumPawn+bonusStradeLibere+bonusVeggente+diagonali;
+		return bonusAccerchiamento+diagonali+bonusVuote+bonusNumPawn+bonusStradeLibere+bonusVeggente;
 
 	}
 	
@@ -68,7 +68,7 @@ public class EuristicaUtils {
 		//System.out.println("Going BIANCHE-NERE-KING: "+biancheGoing+"|"+nereGoing+"|"+kingGoing);
 		
 		//System.out.println("*****FINE WHITE*****");
-		return bonusVuote + bonusNumPawn+ bonusStradeLibere + bonusMovimentoKing + bonusVeggente;
+		return bonusVuote+bonusNumPawn+bonusStradeLibere+bonusVeggente+bonusMovimentoKing;
 	}
 	
 	/**
