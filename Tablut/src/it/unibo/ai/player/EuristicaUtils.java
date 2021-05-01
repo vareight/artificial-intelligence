@@ -53,7 +53,7 @@ public class EuristicaUtils {
 		//double bonusAccerchiamento=1-1/accerchiamento(s, whitePawns, king);   
 		//secondo me solo con accerchiamento riceveva un valore altissimo e  non confrontabile con gli altri valori dell'euristica
 		//facendo 1-1/accerchiamento dovremmo avere un valore complementare rispetto a quello del black
-		//se il ragionamento è corretto cambiatelo
+		//se il ragionamento ï¿½ corretto cambiatelo
 		
 //		double bonusAccerchiamento=-accerchiamento(s, whitePawns, king)/1000;
 		//System.out.println("*****WHITE*****");
@@ -182,8 +182,8 @@ public class EuristicaUtils {
 	}
 	
 	/**
-	 * Conta quante righe e colonne sono vuote, in quante righe/colonne c'è solo un bianco/nero,
-	 * e se il re è in una riga/colonna vuota
+	 * Conta quante righe e colonne sono vuote, in quante righe/colonne c'ï¿½ solo un bianco/nero,
+	 * e se il re ï¿½ in una riga/colonna vuota
 	 * @param s
 	 * @param t
 	 * @return
@@ -232,7 +232,7 @@ public class EuristicaUtils {
 		
 	}
 	
-	//pensare se può avere meno peso visto che questa euristica toglie punti a chi è in svantaggio e moltiplicare tutto per 1/2 per esempio
+	//pensare se puï¿½ avere meno peso visto che questa euristica toglie punti a chi ï¿½ in svantaggio e moltiplicare tutto per 1/2 per esempio
 	private double blackpawnInTrouble(StateTablut state, Turn turn) {
 		int whiteRemoved= NUM_WHITE_PAWNS - state.getNumberOf(Pawn.WHITE);
 		int blackRemoved= NUM_BLACK_PAWNS - state.getNumberOf(Pawn.BLACK);
@@ -325,7 +325,7 @@ public class EuristicaUtils {
 						closeRoadSx=true;
 					}
 				}
-				if(closeRoadSx==false) {								//se la strada non è chiusa incrementa openRoads
+				if(closeRoadSx==false) {								//se la strada non ï¿½ chiusa incrementa openRoads
 					//return 10;
 					openRoads++;
 				}
@@ -366,7 +366,7 @@ public class EuristicaUtils {
 				}
 			}
 		}
-//		if(openRoads > 1) {											//restituisce un valore molto alto se ci sono due o più strade libere 
+//		if(openRoads > 1) {											//restituisce un valore molto alto se ci sono due o piï¿½ strade libere 
 //			return openRoads*weight;											//in modo che il re sia avvantaggiato a scappare
 //		}else {															//sotto la soglia 2 non restituisce nulla
 			return openRoads; 
