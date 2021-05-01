@@ -35,7 +35,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	 */
 	
 	private int expansion=800;
-	private int expansionTurn=4;
+	private int expansionTurn=3;
 	private int turnCount=0;
 	private final int DIM = 9;
 	//private int NUM_WHITE_PAWNS = 8;
@@ -105,12 +105,12 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		if(finishTurn) {
 			return true;
 		}
-		else if(isTerminalCalls-turn.getTurn() >=expansion) {
- 			return true;
-		}
-//		else if(turnCount-turn.getTurn() >=expansionTurn) {
-//			return true;
+//		else if(isTerminalCalls-turn.getTurn() >=expansion) {
+// 			return true;
 //		}
+		else if(s.getTurnCount()-turn.getTurn() >=expansionTurn) {
+			return true;
+		}
 		
 	
 		

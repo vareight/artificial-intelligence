@@ -51,7 +51,7 @@ public class EuristicaUtils {
 		//facendo 1-1/accerchiamento dovremmo avere un valore complementare rispetto a quello del black
 		//se il ragionamento è corretto cambiatelo
 		
-		double bonusAccerchiamento=-accerchiamento(s, whitePawns, king)/1000;
+//		double bonusAccerchiamento=-accerchiamento(s, whitePawns, king)/1000;
 		//System.out.println("*****WHITE*****");
 		//System.out.println("Bonus accerchiamento "+bonusAccerchiamento);
 		double bonusVuote=this.righeColonne(s, Turn.WHITE)*100;
@@ -68,7 +68,7 @@ public class EuristicaUtils {
 		//System.out.println("Going BIANCHE-NERE-KING: "+biancheGoing+"|"+nereGoing+"|"+kingGoing);
 		
 		//System.out.println("*****FINE WHITE*****");
-		return bonusVuote + bonusNumPawn+ bonusStradeLibere + bonusMovimentoKing + bonusAccerchiamento + bonusVeggente;
+		return bonusVuote + bonusNumPawn+ bonusStradeLibere + bonusMovimentoKing + bonusVeggente;
 	}
 	
 	/**
