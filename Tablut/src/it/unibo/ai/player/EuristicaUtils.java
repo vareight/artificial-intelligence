@@ -64,7 +64,7 @@ public class EuristicaUtils {
 		//System.out.println("Bonus numero pedoni "+bonusNumPawn);
 		double bonusStradeLibere= kingOpenRoads(s)*100;
 		//System.out.println("Bonus strade libere re "+bonusStradeLibere);
-		double bonusMovimentoKing = movimentoKing(s);
+		double bonusMovimentoKing = movimentoKing(s)*20;
 		double biancheGoing = -this.pedineBiancheGoingToDie(s);
 		double nereGoing = this.pedineNereGoingToDie(s);
 		double kingGoing = - this.kingCaptured(king, s)*100;
