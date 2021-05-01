@@ -74,6 +74,7 @@ public class StateTablut extends State implements Serializable {
 
 		Pawn oldboard[][] = this.getBoard();
 		Pawn newboard[][] = result.getBoard();
+		result.setTurnCount(this.turnCount);
 
 		for (int i = 0; i < this.board.length; i++) {
 			for (int j = 0; j < this.board[i].length; j++) {

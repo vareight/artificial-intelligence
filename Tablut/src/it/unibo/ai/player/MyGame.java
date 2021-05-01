@@ -1,5 +1,6 @@
 package it.unibo.ai.player;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import aima.core.search.adversarial.Game;
@@ -33,11 +34,13 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	 * in base allo stato attuale calcoliamo le azioni possibili
 	 */
 	
-	
+	private int expansion=800;
+	private int expansionTurn=3;
+	private int turnCount=0;
 	private final int DIM = 9;
-	private int NUM_WHITE_PAWNS = 8;
-	private int NUM_BLACK_PAWNS = 16;
-	private int NUM_PAWNS = 25;
+	//private int NUM_WHITE_PAWNS = 8;
+	//private int NUM_BLACK_PAWNS = 16;
+	//private int NUM_PAWNS = 25;
 	
 	//private int king;
 	//private int[] whitePawns = new int[NUM_WHITE_PAWNS];
@@ -48,12 +51,15 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	private StateTablut initialState;
 	private MoveResult moveResult;
 	private ActionsUtils actions;
+	private TurnNumberSingleton turn=TurnNumberSingleton.getIstance();
+	private int isTerminalCalls;
 
 	
 		
 	public MyGame(StateTablut initialState, GameAshtonTablut game) {
 		super();
 		this.initialState = initialState;
+		this.isTerminalCalls=0;
 		//this.game=game;
 		this.actions = new ActionsUtils(initialState);
 		this.moveResult = new MoveResult(game.getRepeated_moves_allowed(), game.getCache_size());
@@ -64,10 +70,11 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	public List<Action> getActions(StateTablut s) {
 		Turn turn= s.getTurn();
 		this.actions = new ActionsUtils(s);
-		if (turn.equals(Turn.WHITE)) return actions.whiteActions();
-		if (turn.equals(Turn.BLACK)) return actions.blackActions();
+		List <Action> act= new ArrayList<Action>(); 
+		if (turn.equals(Turn.WHITE)) act= actions.whiteActions();
+		if (turn.equals(Turn.BLACK)) act= actions.blackActions();
 		
-		return List.of(); //TODO capire se restituire altro quando non � W o B
+		return act; //TODO capire se restituire altro quando non � W o B
 	}
 	
 
@@ -84,23 +91,31 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		//newState= (StateTablut) game.movePawn(clonedState, a);
 		newState= moveResult.makeMove(clonedState, a);
 		newState.setTurnCount(newState.getTurnCount()+1);
-			
-		
+		turnCount++;
 		return newState;
 	}
 	
 
 	@Override
 	public boolean isTerminal(StateTablut s) {
-				
+		isTerminalCalls++;	
 		Turn t= s.getTurn();
 		boolean finishTurn = t.equals(Turn.BLACKWIN) || t.equals(Turn.WHITEWIN) || t.equals(Turn.DRAW);
-		boolean noMoves=false;
-		if (getActions(s).isEmpty()) {
-			noMoves=true;
+		
+		if(finishTurn) {
+			return true;
+		}
+//		else if(isTerminalCalls-turn.getTurn() >=expansion) {
+// 			return true;
+//		}
+		else if(s.getTurnCount() >=expansionTurn) {
+//			System.out.println("Turno: "+s.getTurnCount());
+			return true;
 		}
 		
-		return true; // TODO modificare
+	
+		
+		return false; // TODO modificare
 //		return finishTurn || noMoves;
 		
 
@@ -143,8 +158,8 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		if(t.equals(Turn.BLACK)) {
 			switch(s.getTurn()) {
 			case DRAW : punteggio=0; break;
-			case WHITEWIN : punteggio=-10000; break;
-			case BLACKWIN : punteggio=10000; break;
+			case WHITEWIN : punteggio=Double.NEGATIVE_INFINITY; break;
+			case BLACKWIN : punteggio=Double.POSITIVE_INFINITY; break;
 			default : punteggio=euristica.euristicaBlack(s, actions.getWhitePawns(),actions.getKing());
 			}
 			
@@ -152,12 +167,13 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		if(t.equals(Turn.WHITE)) {
 			switch(s.getTurn()) {
 			case DRAW : punteggio=0; break;
-			case WHITEWIN : punteggio=10000; break;
-			case BLACKWIN : punteggio=-10000; break;
+			case WHITEWIN : punteggio=Double.POSITIVE_INFINITY; break;
+			case BLACKWIN : punteggio=Double.NEGATIVE_INFINITY; break;
 			default : punteggio=euristica.euristicaWhite(s, actions.getWhitePawns(),actions.getKing());
 			}
 		}
 		//EURISTICA (dovrebbe essere meglio il valore pi� grande)
+		System.out.println("Punteggio: " + punteggio);
 		return punteggio;
 	}
 	
@@ -168,7 +184,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	 * @param state
 	 * @return the position of the king, -1 if not found
 	 */
-	private int findKing(StateTablut state) {
+/*	private int findKing(StateTablut state) {
 		for(int i=0; i<DIM; i++) {
 			for(int j=0; j<DIM; j++) {
 				if(state.getPawn(i, j).equals(Pawn.KING)) {
@@ -178,23 +194,23 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		}
 		return -1;
 	}
-	
+*/	
 	/**
 	 * Funzione che rileva se il re raggiunge una posizione di salvataggio sul bordo
 	 * @param posKing
 	 * @return true if the king escapes, false otherwise
 	 */
-	private boolean kingEscapes(int posKing) {
+/*	private boolean kingEscapes(int posKing) {
 		return board.isEscapeTile(posKing);
 	}
-	
+*/	
 	/**
 	 * Funzione che rileva se il re viene catturato
 	 * @param posKing
 	 * @param state
 	 * @return true if is captured, false otherwise
 	 */
-	private boolean kingCaptured(int posKing, StateTablut state) { // 
+/*	private boolean kingCaptured(int posKing, StateTablut state) { // 
 		int riga=posKing/DIM;
 		int col=posKing-(riga*DIM);
 		Pawn sopra ;
@@ -248,7 +264,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		return pawnCaptured(state, riga, col, sopra, sotto, destra, sinistra);
 				
 	}
-	
+*/	
 	/**
 	 * Funzione generale per controllare se una pedina viene catturata
 	 * @param state
@@ -260,7 +276,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	 * @param sinistra
 	 * @return true if the pawn is captured, false otherwise
 	 */
-	private boolean pawnCaptured(StateTablut state,int riga, int col, Pawn sopra, Pawn sotto, Pawn destra, Pawn sinistra) {
+/*	private boolean pawnCaptured(StateTablut state,int riga, int col, Pawn sopra, Pawn sotto, Pawn destra, Pawn sinistra) {
 		
 		Turn turnVittima = state.getTurn();
 		Pawn pawnPredatore = turnVittima.equals(Turn.WHITE) ? Pawn.BLACK : Pawn.WHITE ;
@@ -279,7 +295,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		}
 		return false; 
 	}
-	
+	*/
 	
 	
 	
