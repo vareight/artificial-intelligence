@@ -26,21 +26,25 @@ public class EuristicaUtils {
 		//System.out.println("*****BLACK*****");
 		double bonusAccerchiamento=1000/accerchiamento(s, whitePawns, king);
 		//System.out.println("Bonus accerchiamento "+bonusAccerchiamento);
-		double bonusVuote=this.righeColonne(s, Turn.BLACK);
+		//double bonusVuote=this.righeColonne(s, Turn.BLACK);
 		//System.out.println("Bonus vuote "+bonusVuote);
 		double bonusNumPawn= blackpawnInTrouble(s,Turn.BLACK)*5;
 		//System.out.println("Bonus numero pedoni "+bonusNumPawn);
-		double bonusStradeLibere= -kingOpenRoads(s);
+		double bonusStradeLibere= -20*kingOpenRoads(s);
 		//System.out.println("Bonus strade libere re "+bonusStradeLibere);
 		double biancheGoing = this.pedineBiancheGoingToDie(s);
 		double nereGoing = -this.pedineNereGoingToDie(s);
-		double kingGoing = this.kingCaptured(king, s)*20;
+		double kingGoing = this.kingCaptured(king, s)*100;
 		double bonusVeggente = kingGoing+biancheGoing+nereGoing;
+		double inTrouble=0;
+		if(bonusNumPawn<0) {
+			inTrouble=10*( nereGoing+biancheGoing);
+		}
 		//System.out.println("Going BIANCHE-NERE-KING: "+biancheGoing+"|"+nereGoing+"|"+kingGoing);
-		double diagonali=(lateGame <=16)? this.diagonalizzazioneNero(s) : this.diagonalizzazioneNero(s)*0.5 ;
+		double diagonali=(lateGame <=8)? this.diagonalizzazioneNero(s) : 0 ;
 		//System.out.println("Diagonali "+ diagonali);
 		//System.out.println("*****FINE BLACK*****");
-		return bonusAccerchiamento+bonusVuote+bonusNumPawn+bonusStradeLibere+bonusVeggente+diagonali;
+		return bonusAccerchiamento+bonusStradeLibere+diagonali+inTrouble+kingGoing;
 
 	}
 	
@@ -58,17 +62,21 @@ public class EuristicaUtils {
 		//System.out.println("Bonus vuote "+bonusVuote);
 		double bonusNumPawn= blackpawnInTrouble(s,Turn.WHITE);
 		//System.out.println("Bonus numero pedoni "+bonusNumPawn);
-		double bonusStradeLibere= kingOpenRoads(s);
+		double bonusStradeLibere= kingOpenRoads(s)*100;
 		//System.out.println("Bonus strade libere re "+bonusStradeLibere);
 		double bonusMovimentoKing = movimentoKing(s);
 		double biancheGoing = -this.pedineBiancheGoingToDie(s);
 		double nereGoing = this.pedineNereGoingToDie(s);
-		double kingGoing = - this.kingCaptured(king, s)*20;
-		double bonusVeggente = biancheGoing+nereGoing+kingGoing;
+		double kingGoing = - this.kingCaptured(king, s)*100;
+		//double bonusVeggente = biancheGoing+nereGoing+kingGoing;
 		//System.out.println("Going BIANCHE-NERE-KING: "+biancheGoing+"|"+nereGoing+"|"+kingGoing);
+		double inTrouble=0;
+		if(bonusNumPawn<0) {
+			inTrouble=10*( nereGoing+biancheGoing);
+		}
 		
 		//System.out.println("*****FINE WHITE*****");
-		return bonusVuote + bonusNumPawn+ bonusStradeLibere + bonusMovimentoKing + bonusVeggente;
+		return bonusVuote + bonusStradeLibere + bonusMovimentoKing + inTrouble + kingGoing;
 	}
 	
 	/**
@@ -304,7 +312,7 @@ public class EuristicaUtils {
 	 */
 	private double kingOpenRoads(StateTablut state) {
 		int posKing=findKing(state);
-		int weight=5;
+		
 		boolean closeRoadSx=false, closeRoadTop=false ;
 		boolean closeRoadDx=false, closeRoadBottom=false ;
 		int openRoads=0; 
@@ -361,7 +369,7 @@ public class EuristicaUtils {
 //		if(openRoads > 1) {											//restituisce un valore molto alto se ci sono due o più strade libere 
 //			return openRoads*weight;											//in modo che il re sia avvantaggiato a scappare
 //		}else {															//sotto la soglia 2 non restituisce nulla
-			return openRoads*weight; 
+			return openRoads; 
 //		}
 	}
 	
