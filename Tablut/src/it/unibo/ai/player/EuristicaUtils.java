@@ -68,15 +68,16 @@ public class EuristicaUtils {
 //		double biancheGoing = -this.pedineBiancheGoingToDie(s);
 //		double nereGoing = this.pedineNereGoingToDie(s);
 //		double kingGoing = - this.kingCaptured(king, s)*100;
-		double bonusVeggente = veggente(s, Turn.WHITE); // inizio: 4
+		double bonusVeggente = veggente(s, Turn.WHITE)*2; // inizio: 4
 		//System.out.println("Going BIANCHE-NERE-KING: "+biancheGoing+"|"+nereGoing+"|"+kingGoing);
 //		double inTrouble=0;
 //		if(bonusNumPawn<0) {
 //			inTrouble=10*( nereGoing+biancheGoing);
 //		}
+		double bonusMobilita = mobilita(s, whitePawns, king)*0.1;
 		
 		//System.out.println("*****FINE WHITE*****");
-		return bonusVuote + bonusVeggente + bonusKeyCells;
+		return bonusVuote + bonusVeggente + bonusKeyCells + bonusMobilita;
 	}
 	
 	/**
@@ -238,7 +239,7 @@ public class EuristicaUtils {
 //			if(onlyKing>=1) return -1; 
 //			return (vuote/18 + onlyWhite/9)*-1; 
 		}else { //WHITE
-			result = onlyWhite + 4*vuote - onlyBlack/2.0;
+			result = 4*vuote - onlyBlack/2.0; //tolgo onlyWhite?
 //			if(onlyKing>=1) return 1; 
 //			return (vuote/18 + onlyWhite/9);
 		}	
@@ -559,5 +560,68 @@ public class EuristicaUtils {
 			diagonaliFull++;
 		}
 		return diagonaliFull;
+	}
+	
+	private double mobilita(StateTablut state, int[] whitePawns, int king) {
+		double result = 0;
+		double bonusKing = 2;
+		
+		for(int i=0; i<NUM_WHITE_PAWNS; i++) {
+			int pawnValue=whitePawns[i];
+			if(pawnValue==-1) break;
+			
+			result+=checkMobilita(pawnValue, state);
+			
+		}
+		result+=checkMobilita(king, state)*bonusKing;
+		
+		return result;
+		
+	}
+	
+	private int checkMobilita(int pawnValue, StateTablut s) {
+		int result = 0;
+		
+		// ***************************************************************
+		// ***controlliamo la strada percorribile a DESTRA della pedina***
+		// ***************************************************************	
+		int newRow = (pawnValue+1)/DIM;
+		int newColumn = (pawnValue+1)-(newRow*DIM);
+		if(isInsideBoard(newRow, newColumn) && s.getPawn(newRow, newColumn).equalsPawn(Pawn.EMPTY.toString())){
+			result++;
+		}
+		
+		// ***************************************************************
+		// ***controlliamo la strada percorribile SOTTO alla pedina***
+		// ***************************************************************
+		newRow = (pawnValue+DIM)/DIM;
+		newColumn = (pawnValue+DIM)-(newRow*DIM);
+		if(isInsideBoard(newRow, newColumn) && s.getPawn(newRow, newColumn).equalsPawn(Pawn.EMPTY.toString())){
+			result++;
+		}
+	
+		// ***************************************************************
+		// ***controlliamo la strada percorribile a SINISTRA della pedina***
+		// ***************************************************************
+		newRow = (pawnValue-1)/DIM;
+		newColumn = (pawnValue-1)-(newRow*DIM);
+		if(isInsideBoard(newRow, newColumn) && s.getPawn(newRow, newColumn).equalsPawn(Pawn.EMPTY.toString())){
+			result++;
+		}
+		
+		// ***************************************************************
+		// ***controlliamo la strada percorribile SOPRA alla pedina***
+		// ***************************************************************
+		newRow = (pawnValue-DIM)/DIM;
+		newColumn = (pawnValue-DIM)-(newRow*DIM);
+		if(isInsideBoard(newRow, newColumn) && s.getPawn(newRow, newColumn).equalsPawn(Pawn.EMPTY.toString())){
+			result++;
+		}
+
+		return result;
+	}
+	
+	private boolean isInsideBoard(int row, int column) {
+		return row >= 0 && row <=8 && column >=0 && column <=8;
 	}
 }
