@@ -22,29 +22,29 @@ public class EuristicaUtils {
 	}
 
 	public double euristicaBlack(StateTablut s,int[] whitePawns, int king) {
-		double lateGame = turn.getTurn();
+//		double lateGame = turn.getTurn();
 		//System.out.println("*****BLACK*****");
 		double bonusAccerchiamento=1000/accerchiamento(s, whitePawns, king);
 		//System.out.println("Bonus accerchiamento "+bonusAccerchiamento);
 		//double bonusVuote=this.righeColonne(s, Turn.BLACK);
 		//System.out.println("Bonus vuote "+bonusVuote);
-		double bonusNumPawn= blackpawnInTrouble(s,Turn.BLACK)*5;
-		//System.out.println("Bonus numero pedoni "+bonusNumPawn);
-		double bonusStradeLibere= -20*kingOpenRoads(s);
-		//System.out.println("Bonus strade libere re "+bonusStradeLibere);
-		double biancheGoing = this.pedineBiancheGoingToDie(s);
-		double nereGoing = -this.pedineNereGoingToDie(s);
-		double kingGoing = this.kingCaptured(king, s)*100;
-		double bonusVeggente = kingGoing+biancheGoing+nereGoing;
-		double inTrouble=0;
-		if(bonusNumPawn<0) {
-			inTrouble=10*( nereGoing+biancheGoing);
-		}
+//		double bonusNumPawn= blackpawnInTrouble(s,Turn.BLACK)*5;
+//		//System.out.println("Bonus numero pedoni "+bonusNumPawn);
+//		double bonusStradeLibere= -20*kingOpenRoads(s);
+//		//System.out.println("Bonus strade libere re "+bonusStradeLibere);
+//		double biancheGoing = this.pedineBiancheGoingToDie(s);
+//		double nereGoing = -this.pedineNereGoingToDie(s);
+//		double kingGoing = this.kingCaptured(king, s)*100;
+		double bonusVeggente = veggente(s, Turn.BLACK);
+//		double inTrouble=0;
+//		if(bonusNumPawn<0) {
+//			inTrouble=10*( nereGoing+biancheGoing);
+//		}
 		//System.out.println("Going BIANCHE-NERE-KING: "+biancheGoing+"|"+nereGoing+"|"+kingGoing);
-		double diagonali=(lateGame <=8)? this.diagonalizzazioneNero(s) : 0 ;
+//		double diagonali=(lateGame <=8)? this.diagonalizzazioneNero(s) : 0 ;
 		//System.out.println("Diagonali "+ diagonali);
 		//System.out.println("*****FINE BLACK*****");
-		return bonusAccerchiamento+bonusStradeLibere+diagonali+inTrouble+kingGoing;
+		return bonusAccerchiamento+bonusVeggente;
 
 	}
 	
@@ -58,25 +58,25 @@ public class EuristicaUtils {
 //		double bonusAccerchiamento=-accerchiamento(s, whitePawns, king)/1000;
 		//System.out.println("*****WHITE*****");
 		//System.out.println("Bonus accerchiamento "+bonusAccerchiamento);
-		double bonusVuote=this.righeColonne(s, Turn.WHITE)*100;
-		//System.out.println("Bonus vuote "+bonusVuote);
-		double bonusNumPawn= blackpawnInTrouble(s,Turn.WHITE);
-		//System.out.println("Bonus numero pedoni "+bonusNumPawn);
-		double bonusStradeLibere= kingOpenRoads(s)*100;
-		//System.out.println("Bonus strade libere re "+bonusStradeLibere);
-		double bonusMovimentoKing = movimentoKing(s)*20;
-		double biancheGoing = -this.pedineBiancheGoingToDie(s);
-		double nereGoing = this.pedineNereGoingToDie(s);
-		double kingGoing = - this.kingCaptured(king, s)*100;
-		//double bonusVeggente = biancheGoing+nereGoing+kingGoing;
+//		double bonusVuote=this.righeColonne(s, Turn.WHITE)*100;
+//		//System.out.println("Bonus vuote "+bonusVuote);
+//		double bonusNumPawn= blackpawnInTrouble(s,Turn.WHITE);
+//		//System.out.println("Bonus numero pedoni "+bonusNumPawn);
+//		double bonusStradeLibere= kingOpenRoads(s);
+//		//System.out.println("Bonus strade libere re "+bonusStradeLibere);
+		double bonusMovimentoKing = movimentoKing(s);
+//		double biancheGoing = -this.pedineBiancheGoingToDie(s);
+//		double nereGoing = this.pedineNereGoingToDie(s);
+//		double kingGoing = - this.kingCaptured(king, s)*100;
+		double bonusVeggente = veggente(s, Turn.WHITE);
 		//System.out.println("Going BIANCHE-NERE-KING: "+biancheGoing+"|"+nereGoing+"|"+kingGoing);
-		double inTrouble=0;
-		if(bonusNumPawn<0) {
-			inTrouble=10*( nereGoing+biancheGoing);
-		}
+//		double inTrouble=0;
+//		if(bonusNumPawn<0) {
+//			inTrouble=10*( nereGoing+biancheGoing);
+//		}
 		
 		//System.out.println("*****FINE WHITE*****");
-		return bonusVuote + bonusStradeLibere + bonusMovimentoKing + inTrouble + kingGoing;
+		return bonusVeggente + bonusMovimentoKing;
 	}
 	
 	/**
@@ -118,10 +118,10 @@ public class EuristicaUtils {
 		int row= pawnValue/DIM;
 		int column= pawnValue-(row*DIM);
 		int distanza=0;
+		
 		// ***************************************************************
 		// ***controlliamo la strada percorribile a DESTRA della pedina***
 		// ***************************************************************
-
 		for(int currentPawnValue=pawnValue+1; currentPawnValue<=(row+1)*DIM-1; currentPawnValue++) {
 			int newRow = currentPawnValue/DIM;
 			int newColumn = currentPawnValue-(newRow*DIM);
@@ -498,6 +498,26 @@ public class EuristicaUtils {
 		}
 		return result;
 	}
+	
+	private double veggente(StateTablut state, Turn turn) {
+		double result = 0;
+		int numBlack = state.getNumberOf(Pawn.BLACK);
+		int numWhite = state.getNumberOf(Pawn.WHITE);
+		double weightBlack = 0.25, weightWhite = 0.5; 
+		
+		if(turn.equalsTurn(Turn.BLACK.toString())) {
+			weightBlack *=3;
+			result = numBlack*weightBlack - weightWhite*numWhite;
+		}
+		if(turn.equalsTurn(Turn.WHITE.toString())) {
+			weightWhite *=2;
+			result = weightWhite*numWhite - numBlack*weightBlack;
+		}
+		
+		return result;
+	}
+	
+	
 	private double diagonalizzazioneNero(StateTablut state) {
 		double diagonaliFull=0;
 		if (state.getPawn(2, 3).equals(Pawn.BLACK)) { //primo quadrante

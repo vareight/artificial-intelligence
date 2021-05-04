@@ -35,7 +35,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	 */
 	
 	private int expansion=800;
-	private int expansionTurn=3;
+	private int expansionTurn=4;
 	private int turnCount=0;
 	private final int DIM = 9;
 	//private int NUM_WHITE_PAWNS = 8;
