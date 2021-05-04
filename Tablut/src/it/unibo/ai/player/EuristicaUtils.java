@@ -26,7 +26,7 @@ public class EuristicaUtils {
 		//System.out.println("*****BLACK*****");
 		double bonusAccerchiamento=1000/accerchiamento(s, whitePawns, king);
 		//System.out.println("Bonus accerchiamento "+bonusAccerchiamento);
-		//double bonusVuote=this.righeColonne(s, Turn.BLACK);
+		double bonusVuote=this.righeColonne(s, Turn.BLACK);
 		//System.out.println("Bonus vuote "+bonusVuote);
 //		double bonusNumPawn= blackpawnInTrouble(s,Turn.BLACK)*5;
 //		//System.out.println("Bonus numero pedoni "+bonusNumPawn);
@@ -44,7 +44,7 @@ public class EuristicaUtils {
 //		double diagonali=(lateGame <=8)? this.diagonalizzazioneNero(s) : 0 ;
 		//System.out.println("Diagonali "+ diagonali);
 		//System.out.println("*****FINE BLACK*****");
-		return bonusAccerchiamento+bonusVeggente;
+		return bonusAccerchiamento+bonusVeggente+bonusVuote;
 
 	}
 	
