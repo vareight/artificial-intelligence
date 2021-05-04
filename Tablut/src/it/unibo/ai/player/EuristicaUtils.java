@@ -205,8 +205,9 @@ public class EuristicaUtils {
 		double vuote=0;
 		int numBlackR, numWhiteR,numBlackC, numWhiteC;
 		boolean kingR,kingC;
+		int keyCells[] = {2, 6};
 		
-		for(int i=0; i<DIM; i++) {
+		for(Integer i : keyCells) {
 			numBlackR=0;
 			numWhiteR=0;
 			numBlackC=0;
@@ -223,7 +224,7 @@ public class EuristicaUtils {
 			}
 			if(numBlackR==0 && numWhiteR==0 && !kingR) vuote++;
 			if(numBlackC==0 && numWhiteC==0 && !kingC) vuote++;
-			if(i==0 || i==DIM-1) continue;
+//			if(i==0 || i==DIM-1) continue;
 			if(numBlackR>=1 && numWhiteR==0 && !kingR) onlyBlack++;
 			if(numBlackR==0 && numWhiteR>=1 && !kingR) onlyWhite++;
 			if(numBlackR==0 && numWhiteR==0 && kingR) onlyKing=5;
