@@ -58,17 +58,17 @@ public class EuristicaUtils {
 //		double bonusAccerchiamento=-accerchiamento(s, whitePawns, king)/1000;
 		//System.out.println("*****WHITE*****");
 		//System.out.println("Bonus accerchiamento "+bonusAccerchiamento);
-//		double bonusVuote=this.righeColonne(s, Turn.WHITE)*100;
+		double bonusVuote=this.righeColonne(s, Turn.WHITE); // circa [-1.5, 3]
 //		//System.out.println("Bonus vuote "+bonusVuote);
 //		double bonusNumPawn= blackpawnInTrouble(s,Turn.WHITE);
 //		//System.out.println("Bonus numero pedoni "+bonusNumPawn);
-//		double bonusStradeLibere= kingOpenRoads(s);
+		double bonusKeyCells= kingOpenRoads(s) > 1 ? Double.POSITIVE_INFINITY : 0; // num celle chiave disponibili [0-4]
 //		//System.out.println("Bonus strade libere re "+bonusStradeLibere);
-		double bonusMovimentoKing = movimentoKing(s);
+//		double bonusMovimentoKing = movimentoKing(s)*0.1; // circa [0, 1]
 //		double biancheGoing = -this.pedineBiancheGoingToDie(s);
 //		double nereGoing = this.pedineNereGoingToDie(s);
 //		double kingGoing = - this.kingCaptured(king, s)*100;
-		double bonusVeggente = veggente(s, Turn.WHITE);
+		double bonusVeggente = veggente(s, Turn.WHITE); // inizio: 4
 		//System.out.println("Going BIANCHE-NERE-KING: "+biancheGoing+"|"+nereGoing+"|"+kingGoing);
 //		double inTrouble=0;
 //		if(bonusNumPawn<0) {
@@ -76,7 +76,7 @@ public class EuristicaUtils {
 //		}
 		
 		//System.out.println("*****FINE WHITE*****");
-		return bonusVeggente + bonusMovimentoKing;
+		return bonusVuote + bonusVeggente + bonusKeyCells;
 	}
 	
 	/**
@@ -118,6 +118,7 @@ public class EuristicaUtils {
 		int row= pawnValue/DIM;
 		int column= pawnValue-(row*DIM);
 		int distanza=0;
+		BoardState board = BoardState.getIstance();
 		
 		// ***************************************************************
 		// ***controlliamo la strada percorribile a DESTRA della pedina***
@@ -125,7 +126,9 @@ public class EuristicaUtils {
 		for(int currentPawnValue=pawnValue+1; currentPawnValue<=(row+1)*DIM-1; currentPawnValue++) {
 			int newRow = currentPawnValue/DIM;
 			int newColumn = currentPawnValue-(newRow*DIM);
-			if(s.getPawn(newRow, newColumn).equals(Pawn.BLACK)){
+			if(s.getPawn(newRow, newColumn).equals(Pawn.BLACK) || 
+					s.getPawn(newRow, newColumn).equals(Pawn.THRONE) || 
+					board.isCamp(newRow, newColumn)){
 				//indexPawnToCheck++; //probabilmente non serve
 				break;
 			}else {
@@ -140,7 +143,9 @@ public class EuristicaUtils {
 		for(int currentPawnValue=pawnValue+DIM; currentPawnValue<=DIM*(DIM-1)+column; currentPawnValue+=DIM) { //sotto
 			int newRow = currentPawnValue/DIM;
 			int newColumn = currentPawnValue-(newRow*DIM);
-			if(s.getPawn(newRow, newColumn).equals(Pawn.BLACK)){
+			if(s.getPawn(newRow, newColumn).equals(Pawn.BLACK) || 
+					s.getPawn(newRow, newColumn).equals(Pawn.THRONE) || 
+					board.isCamp(newRow, newColumn)){
 				//indexPawnToCheck++; //probabilmente non serve
 				break;
 			}else {
@@ -154,7 +159,9 @@ public class EuristicaUtils {
 		for(int currentPawnValue=pawnValue-1; currentPawnValue>=row*DIM; currentPawnValue--) { //sx
 			int newRow = currentPawnValue/DIM;
 			int newColumn = currentPawnValue-(newRow*DIM);
-			if(s.getPawn(newRow, newColumn).equals(Pawn.BLACK)){
+			if(s.getPawn(newRow, newColumn).equals(Pawn.BLACK) || 
+					s.getPawn(newRow, newColumn).equals(Pawn.THRONE) || 
+					board.isCamp(newRow, newColumn)){
 				//indexPawnToCheck++; //probabilmente non serve
 				break;
 			}else {
@@ -169,7 +176,9 @@ public class EuristicaUtils {
 		for(int currentPawnValue=pawnValue-DIM; currentPawnValue>=column; currentPawnValue-=DIM) { //sopra
 			int newRow = currentPawnValue/DIM;
 			int newColumn = currentPawnValue-(newRow*DIM);
-			if(s.getPawn(newRow, newColumn).equals(Pawn.BLACK)){
+			if(s.getPawn(newRow, newColumn).equals(Pawn.BLACK) || 
+					s.getPawn(newRow, newColumn).equals(Pawn.THRONE) || 
+					board.isCamp(newRow, newColumn)){
 				//indexPawnToCheck++; //probabilmente non serve
 				break;
 			}else {
@@ -189,7 +198,8 @@ public class EuristicaUtils {
 	 * @return
 	 */
 	private double righeColonne(StateTablut s, Turn t) {
-		//double onlyBlack=0;
+		double result = 0;
+		double onlyBlack=0;
 		double onlyWhite=0;
 		double onlyKing=0;
 		double vuote=0;
@@ -212,24 +222,27 @@ public class EuristicaUtils {
 				if(s.getPawn(j, i).equals(Pawn.KING)) kingC=true;
 			}
 			if(numBlackR==0 && numWhiteR==0 && !kingR) vuote++;
-			//if(numBlackR==1 && numWhiteR==0 && !kingR) onlyBlack++;
-			if(numBlackR==0 && numWhiteR==1 && !kingR) onlyWhite++;
-			if(numBlackR==0 && numWhiteR==0 && kingR) onlyKing=1;
 			if(numBlackC==0 && numWhiteC==0 && !kingC) vuote++;
-			//if(numBlackC==1 && numWhiteC==0 && !kingC) onlyBlack++;
-			if(numBlackC==0 && numWhiteC==1 && !kingC) onlyWhite++;
-			if(numBlackC==0 && numWhiteC==0 && kingC) onlyKing=1;
+			if(i==0 || i==DIM-1) continue;
+			if(numBlackR>=1 && numWhiteR==0 && !kingR) onlyBlack++;
+			if(numBlackR==0 && numWhiteR>=1 && !kingR) onlyWhite++;
+			if(numBlackR==0 && numWhiteR==0 && kingR) onlyKing=5;
+			if(numBlackC>=1 && numWhiteC==0 && !kingC) onlyBlack++;
+			if(numBlackC==0 && numWhiteC>=1 && !kingC) onlyWhite++;
+			if(numBlackC==0 && numWhiteC==0 && kingC) onlyKing=5;
 		}
 		
 		if(t.equals(Turn.BLACK)) {
-			if(onlyKing>=1) return -1; 
-			return (vuote/18 + onlyWhite/9)*-1; 
+			result = onlyBlack/2.0 - onlyWhite - 4*vuote;
+//			if(onlyKing>=1) return -1; 
+//			return (vuote/18 + onlyWhite/9)*-1; 
 		}else { //WHITE
-			if(onlyKing>=1) return 1; 
-			return (vuote/18 + onlyWhite/9);
+			result = onlyWhite + 4*vuote - onlyBlack/2.0;
+//			if(onlyKing>=1) return 1; 
+//			return (vuote/18 + onlyWhite/9);
 		}	
 //		capire se utilizzare anche onlyBlack oppure inutile
-		
+		return result;
 	}
 	
 	//pensare se pu� avere meno peso visto che questa euristica toglie punti a chi � in svantaggio e moltiplicare tutto per 1/2 per esempio
@@ -503,7 +516,7 @@ public class EuristicaUtils {
 		double result = 0;
 		int numBlack = state.getNumberOf(Pawn.BLACK);
 		int numWhite = state.getNumberOf(Pawn.WHITE);
-		double weightBlack = 0.25, weightWhite = 0.5; 
+		double weightBlack = 0.5, weightWhite = 1; 
 		
 		if(turn.equalsTurn(Turn.BLACK.toString())) {
 			weightBlack *=3;
