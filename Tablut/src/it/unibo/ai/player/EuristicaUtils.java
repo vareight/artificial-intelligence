@@ -129,18 +129,18 @@ public class EuristicaUtils {
 		
 		if((row<=2 && (col<=2 || col>=7)) ||(row>=7 && (col<=2 || col>=7))) {
 			punti +=5;
-		}else if(row>=3 && row<=5 && col>=3 && col <=5) {
+		}/*else if(row>=3 && row<=5 && col>=3 && col <=5) {
 			punti-=2;
-		}
+		}*/
 		
 		for(int pawn : whitePawns) {
 			 row = pawn/DIM;
 			 col = pawn-(row*DIM);
 			if((row<=2 && (col<=2 || col>=7)) ||(row>=7 && (col<=2 || col>=7))) {
 				punti +=1;
-			}else if(row>=3 && row<=5 && col>=3 && col <=5) {
+			}/*else if(row>=3 && row<=5 && col>=3 && col <=5) {
 				punti-=0.5;
-			}
+			}*/
 		}
 		
 		return punti;
@@ -557,16 +557,16 @@ public class EuristicaUtils {
 		if(turn.equalsTurn(Turn.BLACK.toString())) {
 			weightBlack *=3;
 			result = numBlack*weightBlack - weightWhite*numWhite;
-		}/*
+		}
 		if(turn.equalsTurn(Turn.WHITE.toString())) {
-			weightWhite *=3;
+			if(numWhite<=4) weightWhite *=3;
 			result = weightWhite*numWhite - numBlack*weightBlack;
-		}*/
-		if(turn.equalsTurn(Turn.WHITE.toString())) {
+		}
+		/*if(turn.equalsTurn(Turn.WHITE.toString())) {
 			if(numWhite<=4) weightWhite *=3;
 			weightBlack *=3;
 			result = weightBlack*mangiateBlack - weightWhite*mangiateWhite ;
-		}
+		}*/
 		return result;
 	}
 	
