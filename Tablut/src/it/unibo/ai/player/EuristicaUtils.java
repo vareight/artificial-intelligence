@@ -75,9 +75,12 @@ public class EuristicaUtils {
 //			inTrouble=10*( nereGoing+biancheGoing);
 //		}
 		double bonusMobilita = mobilita(s, whitePawns, king)*0.02;
+		double penalita = 0;
+		
+		if (king == 40) penalita = -5; // il re è ancora sul trono
 		
 		//System.out.println("*****FINE WHITE*****");
-		return bonusVuote + bonusVeggente + bonusKeyCells + bonusMobilita;
+		return bonusVuote + bonusVeggente + bonusKeyCells + bonusMobilita+penalita;
 	}
 	
 	/**
@@ -519,14 +522,15 @@ public class EuristicaUtils {
 		int numBlack = state.getNumberOf(Pawn.BLACK);
 		int numWhite = state.getNumberOf(Pawn.WHITE);
 		double weightBlack = 0.5, weightWhite = 1; 
+		int totPawns = numBlack+numWhite;
 		
 		if(turn.equalsTurn(Turn.BLACK.toString())) {
 			weightBlack *=3;
 			result = numBlack*weightBlack - weightWhite*numWhite;
 		}
 		if(turn.equalsTurn(Turn.WHITE.toString())) {
-			weightWhite *=2;
-			result = weightWhite*numWhite - numBlack*weightBlack;
+			weightWhite *=3;
+			result = weightWhite*numWhite - numBlack*weightBlack - totPawns/2.0;
 		}
 		
 		return result;
