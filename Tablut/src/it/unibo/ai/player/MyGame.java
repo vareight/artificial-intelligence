@@ -173,7 +173,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 			}
 		}
 		//EURISTICA (dovrebbe essere meglio il valore pi� grande)
-		System.out.println("Punteggio "+t.toString()+": " + punteggio);
+//		System.out.println("Punteggio "+t.toString()+": " + punteggio);
 		return punteggio;
 	}
 	

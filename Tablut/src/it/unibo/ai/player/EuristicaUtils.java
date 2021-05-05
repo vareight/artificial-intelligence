@@ -74,7 +74,7 @@ public class EuristicaUtils {
 //		if(bonusNumPawn<0) {
 //			inTrouble=10*( nereGoing+biancheGoing);
 //		}
-		double bonusMobilita = mobilita(s, whitePawns, king)*0.1;
+		double bonusMobilita = mobilita(s, whitePawns, king)*0.02;
 		
 		//System.out.println("*****FINE WHITE*****");
 		return bonusVuote + bonusVeggente + bonusKeyCells + bonusMobilita;
@@ -100,7 +100,7 @@ public class EuristicaUtils {
 		
 //		if(turn.getTurn() > 4) 
 //			//bonusKing = Math.pow(turn.getTurn(), 2);
-			bonusKing*=turn.getTurn();
+		bonusKing+=turn.getTurn();
 		//System.out.println("******BONUS KING= "+bonusKing+" ********");
 		
 		for(int i=0; i<NUM_WHITE_PAWNS; i++) {
@@ -570,11 +570,12 @@ public class EuristicaUtils {
 			int pawnValue=whitePawns[i];
 			if(pawnValue==-1) break;
 			
-			result+=checkMobilita(pawnValue, state);
+//			result+=checkMobilita(pawnValue, state);
+			result+=this.actionsUtils.calculateActions(pawnValue, state.getTurn()).size();
 			
 		}
-		result+=checkMobilita(king, state)*bonusKing;
-		
+//		result+=checkMobilita(king, state)*bonusKing;
+		result+=this.actionsUtils.calculateActions(king, state.getTurn()).size()*bonusKing;
 		return result;
 		
 	}
