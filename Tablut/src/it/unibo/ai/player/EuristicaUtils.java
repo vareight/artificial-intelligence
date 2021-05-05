@@ -50,7 +50,8 @@ public class EuristicaUtils {
 	
 	public double euristicaWhite(StateTablut s,int[] whitePawns, int king) {
 		// TODO
-		//double bonusAccerchiamento=1-1/accerchiamento(s, whitePawns, king);   
+		double bonusAccerchiamento=accerchiamento(s, whitePawns, king)*0.05;
+		if(s.getTurnCount() >= 10) bonusAccerchiamento = 0;
 		//secondo me solo con accerchiamento riceveva un valore altissimo e  non confrontabile con gli altri valori dell'euristica
 		//facendo 1-1/accerchiamento dovremmo avere un valore complementare rispetto a quello del black
 		//se il ragionamento ï¿½ corretto cambiatelo
@@ -62,7 +63,7 @@ public class EuristicaUtils {
 //		//System.out.println("Bonus vuote "+bonusVuote);
 //		double bonusNumPawn= blackpawnInTrouble(s,Turn.WHITE);
 //		//System.out.println("Bonus numero pedoni "+bonusNumPawn);
-		double bonusKeyCells= kingOpenRoads(s) > 1 ? Double.POSITIVE_INFINITY : 0; // num celle chiave disponibili [0-4]
+		double bonusKeyCells= kingOpenRoads(s) > 1 ? 10000 : 0; // num celle chiave disponibili [0-4]
 //		//System.out.println("Bonus strade libere re "+bonusStradeLibere);
 //		double bonusMovimentoKing = movimentoKing(s)*0.1; // circa [0, 1]
 //		double biancheGoing = -this.pedineBiancheGoingToDie(s);
@@ -74,13 +75,13 @@ public class EuristicaUtils {
 //		if(bonusNumPawn<0) {
 //			inTrouble=10*( nereGoing+biancheGoing);
 //		}
-		double bonusMobilita = mobilita(s, whitePawns, king)*0.02;
+//		double bonusMobilita = mobilita(s, whitePawns, king)*0.02;
 		double penalita = 0;
 		
 		if (king == 40) penalita = -5; // il re è ancora sul trono
 		
 		//System.out.println("*****FINE WHITE*****");
-		return bonusVuote + bonusVeggente + bonusKeyCells + bonusMobilita+penalita;
+		return bonusVuote + bonusVeggente + bonusKeyCells +penalita+bonusAccerchiamento;
 	}
 	
 	/**

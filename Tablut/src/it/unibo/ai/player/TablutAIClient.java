@@ -13,6 +13,8 @@ import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
 
 public class TablutAIClient extends TablutClient {
 
+	private static int timeout = 60;
+	
 	public TablutAIClient(String player, String name, int timeout, String ipAddress) throws UnknownHostException, IOException {
 		super(player, name, timeout, ipAddress);
 	}
@@ -21,7 +23,7 @@ public class TablutAIClient extends TablutClient {
 		String role = "";
 		String name = "tulbaTeam";
 		String ipAddress = "localhost";
-		int timeout = 60;
+//		int timeout = 60;
 		// TODO: change the behavior?
 		if (args.length < 1) {
 			System.out.println("You must specify which player you are (WHITE or BLACK)");
@@ -111,7 +113,7 @@ public class TablutAIClient extends TablutClient {
 			if (this.getPlayer().equals(Turn.WHITE)) {
 				// Mio turno WHITE
 				if (this.getCurrentState().getTurn().equals(StateTablut.Turn.WHITE)) {
-					BestMoveFinder finder= new BestMoveFinder(state, rules);
+					BestMoveFinder finder= new BestMoveFinder(state, rules, timeout);
 					Action action =finder.findBestAction(state);
 					turn.newTurn();
 					System.out.println("***Turno " + turn.getTurn());
@@ -151,7 +153,7 @@ public class TablutAIClient extends TablutClient {
 
 				// Mio turno BLACK
 				if (this.getCurrentState().getTurn().equals(StateTablut.Turn.BLACK)) {
-					BestMoveFinder finder= new BestMoveFinder(state, rules);
+					BestMoveFinder finder= new BestMoveFinder(state, rules, timeout);
 					Action action =finder.findBestAction(state);
 					turn.newTurn();
 					System.out.println("***Turno " + turn.getTurn());
