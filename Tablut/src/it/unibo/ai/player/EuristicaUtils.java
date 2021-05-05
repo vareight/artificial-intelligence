@@ -50,8 +50,9 @@ public class EuristicaUtils {
 	
 	public double euristicaWhite(StateTablut s,int[] whitePawns, int king) {
 		// TODO
-		double bonusAccerchiamento=accerchiamento(s, whitePawns, king)*0.05;
-		if(s.getTurnCount() >= 10) bonusAccerchiamento = 0;
+		double bonusAccerchiamento=accerchiamento(s, whitePawns, king)*0.02;
+//		if(s.getTurnCount() >= 10) bonusAccerchiamento = 0;
+		if(bonusAccerchiamento <= 10) return -100;
 		//secondo me solo con accerchiamento riceveva un valore altissimo e  non confrontabile con gli altri valori dell'euristica
 		//facendo 1-1/accerchiamento dovremmo avere un valore complementare rispetto a quello del black
 		//se il ragionamento ï¿½ corretto cambiatelo
@@ -81,7 +82,7 @@ public class EuristicaUtils {
 		if (king == 40) penalita = -5; // il re è ancora sul trono
 		
 		//System.out.println("*****FINE WHITE*****");
-		return bonusVuote + bonusVeggente + bonusKeyCells +penalita+bonusAccerchiamento;
+		return bonusVuote + bonusVeggente + bonusKeyCells +penalita + bonusAccerchiamento;
 	}
 	
 	/**
@@ -243,7 +244,7 @@ public class EuristicaUtils {
 //			if(onlyKing>=1) return -1; 
 //			return (vuote/18 + onlyWhite/9)*-1; 
 		}else { //WHITE
-			result = 4*vuote - onlyBlack/2.0; //tolgo onlyWhite?
+			result = 10*vuote - onlyBlack/2.0; //tolgo onlyWhite?
 //			if(onlyKing>=1) return 1; 
 //			return (vuote/18 + onlyWhite/9);
 		}	

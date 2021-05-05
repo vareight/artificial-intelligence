@@ -353,7 +353,7 @@ class MyGameTest {
 //	       	 assertTrue(calculatedactions.contains(a));
 //	        }
 	    	
-	    	BestMoveFinder finder= new BestMoveFinder(state, rules);
+	    	BestMoveFinder finder= new BestMoveFinder(state, rules, 60);
 			Action action =finder.findBestAction(state);
 			System.out.println("Mossa scelta: " + action.toString());
 	    }
