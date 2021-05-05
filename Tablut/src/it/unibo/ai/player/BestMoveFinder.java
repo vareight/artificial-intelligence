@@ -14,11 +14,11 @@ public class BestMoveFinder {
 	private AlphaBetaSearch<StateTablut, Action, State.Turn> alphabeta;
 	private IterativeDeepeningAlphaBetaSearch<StateTablut,Action,State.Turn> iterative;
 
-	public BestMoveFinder(StateTablut state, GameAshtonTablut rules) {
+	public BestMoveFinder(StateTablut state, GameAshtonTablut rules, int timeout) {
 		game = new MyGame(state, rules);
 		//game = new MyGame(rules);
 		alphabeta = AlphaBetaSearch.createFor(game);
-		iterative = IterativeDeepeningAlphaBetaSearch.createFor(game, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 50);
+		iterative = IterativeDeepeningAlphaBetaSearch.createFor(game, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, timeout-5);
 	}
 
 	public Action findBestAction(StateTablut state) {
