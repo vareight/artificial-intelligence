@@ -50,9 +50,9 @@ public class EuristicaUtils {
 	
 	public double euristicaWhite(StateTablut s,int[] whitePawns, int king) {
 		// TODO
-		double bonusAccerchiamento=accerchiamento(s, whitePawns, king)*0.02;
+//		double bonusAccerchiamento=accerchiamento(s, whitePawns, king)*0.02;
 //		if(s.getTurnCount() >= 10) bonusAccerchiamento = 0;
-		if(bonusAccerchiamento <= 10) return -100;
+//		if(bonusAccerchiamento <= 10) return -100;
 		//secondo me solo con accerchiamento riceveva un valore altissimo e  non confrontabile con gli altri valori dell'euristica
 		//facendo 1-1/accerchiamento dovremmo avere un valore complementare rispetto a quello del black
 		//se il ragionamento ï¿½ corretto cambiatelo
@@ -77,12 +77,12 @@ public class EuristicaUtils {
 //			inTrouble=10*( nereGoing+biancheGoing);
 //		}
 //		double bonusMobilita = mobilita(s, whitePawns, king)*0.02;
-		double penalita = 0;
-		
-		if (king == 40) penalita = -5; // il re è ancora sul trono
+//		double penalita = 0;
+//		
+//		if (king == 40) penalita = -5; // il re è ancora sul trono
 		
 		//System.out.println("*****FINE WHITE*****");
-		return bonusVuote + bonusVeggente + bonusKeyCells +penalita + bonusAccerchiamento;
+		return bonusVuote + bonusVeggente + bonusKeyCells;
 	}
 	
 	/**
@@ -244,7 +244,7 @@ public class EuristicaUtils {
 //			if(onlyKing>=1) return -1; 
 //			return (vuote/18 + onlyWhite/9)*-1; 
 		}else { //WHITE
-			result = 10*vuote - onlyBlack/2.0; //tolgo onlyWhite?
+			result = 4*vuote - onlyBlack/2.0; //tolgo onlyWhite?
 //			if(onlyKing>=1) return 1; 
 //			return (vuote/18 + onlyWhite/9);
 		}	
@@ -525,14 +525,19 @@ public class EuristicaUtils {
 		int numWhite = state.getNumberOf(Pawn.WHITE);
 		double weightBlack = 0.5, weightWhite = 1; 
 		int totPawns = numBlack+numWhite;
+		int whiteOut = NUM_WHITE_PAWNS-numWhite;
+		int blackOut = NUM_BLACK_PAWNS-numBlack;
 		
 		if(turn.equalsTurn(Turn.BLACK.toString())) {
 			weightBlack *=3;
 			result = numBlack*weightBlack - weightWhite*numWhite;
 		}
 		if(turn.equalsTurn(Turn.WHITE.toString())) {
-			weightWhite *=3;
-			result = weightWhite*numWhite - numBlack*weightBlack - totPawns/2.0;
+			weightWhite *=2;
+			result = weightWhite*numWhite - numBlack*weightBlack - totPawns/3.0;
+			if(whiteOut>blackOut+1) {
+				result -= 3*(whiteOut-blackOut);
+			}
 		}
 		
 		return result;
