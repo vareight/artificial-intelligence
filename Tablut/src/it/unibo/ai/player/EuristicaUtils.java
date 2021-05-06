@@ -16,9 +16,16 @@ public class EuristicaUtils {
 	private static TurnNumberSingleton turn; 
 	private ActionsUtils actionsUtils;
 	
+	private int whiteOut;
+	private int blackOut;
+	private boolean chain;
+	
 	public EuristicaUtils(ActionsUtils actionsUtils) {
 		turn= TurnNumberSingleton.getIstance();
 		this.actionsUtils=actionsUtils;
+		this.whiteOut=0;
+		this.blackOut=0;
+		this.chain=false;
 	}
 
 	public double euristicaBlack(StateTablut s,int[] whitePawns, int king) {
@@ -525,8 +532,8 @@ public class EuristicaUtils {
 		int numWhite = state.getNumberOf(Pawn.WHITE);
 		double weightBlack = 0.5, weightWhite = 1; 
 		int totPawns = numBlack+numWhite;
-		int whiteOut = NUM_WHITE_PAWNS-numWhite;
-		int blackOut = NUM_BLACK_PAWNS-numBlack;
+		int whiteOutFuture = NUM_WHITE_PAWNS-numWhite;
+		int blackOutFuture = NUM_BLACK_PAWNS-numBlack;
 		
 		if(turn.equalsTurn(Turn.BLACK.toString())) {
 			weightBlack *=3;
@@ -535,8 +542,27 @@ public class EuristicaUtils {
 		if(turn.equalsTurn(Turn.WHITE.toString())) {
 			weightWhite *=2;
 			result = weightWhite*numWhite - numBlack*weightBlack - totPawns/3.0;
-			if(whiteOut>blackOut+1) {
-				result -= 3*(whiteOut-blackOut);
+			if(whiteOutFuture>blackOutFuture+1) {
+				result -= 3*(whiteOutFuture-blackOutFuture);
+			}
+			
+			if(chain) { // we are in a sequence of pawns elimination
+				if(whiteOutFuture!=this.whiteOut || blackOutFuture != this.blackOut) {
+					result+=2;
+					this.whiteOut = whiteOutFuture;
+					this.blackOut = blackOutFuture;
+				}
+				else {
+					chain = false; //the sequence ends
+				}
+			}
+			else { // stall situation
+				if(whiteOutFuture!=this.whiteOut || blackOutFuture != this.blackOut) {
+					chain = true; //starts a sequence of pawns eliminations
+					result+=1;
+					this.whiteOut = whiteOutFuture;
+					this.blackOut = blackOutFuture;
+				}
 			}
 		}
 		
