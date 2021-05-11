@@ -16,9 +16,16 @@ public class EuristicaUtils {
 	private static TurnNumberSingleton turn; 
 	private ActionsUtils actionsUtils;
 	
+	private int whiteOut;
+	private int blackOut;
+	private boolean chain;
+	
 	public EuristicaUtils(ActionsUtils actionsUtils) {
 		turn= TurnNumberSingleton.getIstance();
 		this.actionsUtils=actionsUtils;
+		this.whiteOut=0;
+		this.blackOut=0;
+		this.chain=false;
 	}
 
 	public double euristicaBlack(StateTablut s,int[] whitePawns, int king) {
@@ -50,9 +57,9 @@ public class EuristicaUtils {
 	
 	public double euristicaWhite(StateTablut s,int[] whitePawns, int king) {
 		// TODO
-		//double bonusAccerchiamento=accerchiamento(s, whitePawns, king)*0.02;
+//		double bonusAccerchiamento=accerchiamento(s, whitePawns, king)*0.02;
 //		if(s.getTurnCount() >= 10) bonusAccerchiamento = 0;
-		//if(bonusAccerchiamento <= 2 || s.getNumberOf(Pawn.WHITE)<=2) return -100;
+//		if(bonusAccerchiamento <= 10) return -100;
 		//secondo me solo con accerchiamento riceveva un valore altissimo e  non confrontabile con gli altri valori dell'euristica
 		//facendo 1-1/accerchiamento dovremmo avere un valore complementare rispetto a quello del black
 		//se il ragionamento ï¿½ corretto cambiatelo
@@ -71,19 +78,18 @@ public class EuristicaUtils {
 //		double nereGoing = this.pedineNereGoingToDie(s);
 //		double kingGoing = - this.kingCaptured(king, s)*100;
 		double bonusVeggente = veggente(s, Turn.WHITE)*2; // inizio: 4
-		//System.out.println("Going BIANCHE-NERE-KING: "+biancheGoing+"|"+nereGoing+"|"+kingGoing);
+//		System.out.println("veggente: "+bonusVeggente);
 //		double inTrouble=0;
 //		if(bonusNumPawn<0) {
 //			inTrouble=10*( nereGoing+biancheGoing);
 //		}
 //		double bonusMobilita = mobilita(s, whitePawns, king)*0.02;
-		double penalita = 0;
-		double noArrocco= noArrocco(s,whitePawns,king);
+//		double penalita = 0;
+//		
+//		if (king == 40) penalita = -5; // il re è ancora sul trono
 		
-		if (king == 40) penalita = -5; // il re è ancora sul trono
-		
-		//System.out.println("*WHITE* vuote: "+bonusVuote+ " veg: "+ bonusVeggente+ " keycel: "+ bonusKeyCells+ " arr: "+ noArrocco);
-		return bonusVuote + bonusVeggente + bonusKeyCells +penalita  + noArrocco;
+		//System.out.println("*****FINE WHITE*****");
+		return bonusVuote + bonusVeggente + bonusKeyCells;
 	}
 	
 	/**
@@ -93,7 +99,6 @@ public class EuristicaUtils {
 	private double movimentoKing(StateTablut state) {
 		return this.actionsUtils.calculateActions(this.findKing(state), state.getTurn()).size();
 	}
-	
 	
 
 	/**
@@ -120,30 +125,6 @@ public class EuristicaUtils {
 		distanzaTot+=calcolaDistanza(king, s)*bonusKing;
 		
 		return distanzaTot;
-	}
-	
-	private double noArrocco(StateTablut s,int[] whitePawns, int king) {
-		int row = king/DIM;
-		int col = king-(row*DIM);
-		double punti=0;
-		
-		if((row<=2 && (col<=2 || col>=7)) ||(row>=7 && (col<=2 || col>=7))) {
-			punti +=5;
-		}/*else if(row>=3 && row<=5 && col>=3 && col <=5) {
-			punti-=2;
-		}*/
-		
-		for(int pawn : whitePawns) {
-			 row = pawn/DIM;
-			 col = pawn-(row*DIM);
-			if((row<=2 && (col<=2 || col>=7)) ||(row>=7 && (col<=2 || col>=7))) {
-				punti +=1;
-			}/*else if(row>=3 && row<=5 && col>=3 && col <=5) {
-				punti-=0.5;
-			}*/
-		}
-		
-		return punti;
 	}
 	
 	private int calcolaDistanza(int pawnValue, StateTablut s) {
@@ -270,7 +251,7 @@ public class EuristicaUtils {
 //			if(onlyKing>=1) return -1; 
 //			return (vuote/18 + onlyWhite/9)*-1; 
 		}else { //WHITE
-			result = 10*vuote - onlyBlack/2.0; //tolgo onlyWhite?
+			result = onlyKing+4*vuote - onlyBlack/2.0; //tolgo onlyWhite?
 //			if(onlyKing>=1) return 1; 
 //			return (vuote/18 + onlyWhite/9);
 		}	
@@ -549,24 +530,24 @@ public class EuristicaUtils {
 		double result = 0;
 		int numBlack = state.getNumberOf(Pawn.BLACK);
 		int numWhite = state.getNumberOf(Pawn.WHITE);
-		int mangiateBlack= NUM_BLACK_PAWNS - numBlack;
-		int mangiateWhite= NUM_WHITE_PAWNS - numWhite;
 		double weightBlack = 0.5, weightWhite = 1; 
 		int totPawns = numBlack+numWhite;
+		int whiteOutFuture = NUM_WHITE_PAWNS-numWhite;
+		int blackOutFuture = NUM_BLACK_PAWNS-numBlack;
 		
 		if(turn.equalsTurn(Turn.BLACK.toString())) {
 			weightBlack *=3;
 			result = numBlack*weightBlack - weightWhite*numWhite;
 		}
 		if(turn.equalsTurn(Turn.WHITE.toString())) {
-			if(numWhite<=4) weightWhite *=3;
+			weightWhite *=2;
 			result = weightWhite*numWhite - numBlack*weightBlack;
+			if(whiteOutFuture>blackOutFuture+1) {
+				result -= 3*(whiteOutFuture-blackOutFuture);
+			}
+			
 		}
-		/*if(turn.equalsTurn(Turn.WHITE.toString())) {
-			if(numWhite<=4) weightWhite *=3;
-			weightBlack *=3;
-			result = weightBlack*mangiateBlack - weightWhite*mangiateWhite ;
-		}*/
+		
 		return result;
 	}
 	

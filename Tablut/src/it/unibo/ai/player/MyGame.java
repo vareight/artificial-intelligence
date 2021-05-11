@@ -35,8 +35,8 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	 */
 	
 	private int expansion=800;
-	private int expansionTurn=2;
-	//private int turnCount=0;
+	private int expansionTurn=4;
+	private int turnCount=0;
 	private final int DIM = 9;
 	//private int NUM_WHITE_PAWNS = 8;
 	//private int NUM_BLACK_PAWNS = 16;
@@ -90,7 +90,8 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		StateTablut clonedState = s.clone();
 		//newState= (StateTablut) game.movePawn(clonedState, a);
 		newState= moveResult.makeMove(clonedState, a);
-		newState.setTurnCount(clonedState.getTurnCount()+1);
+		newState.setTurnCount(newState.getTurnCount()+1);
+		turnCount++;
 		return newState;
 	}
 	
@@ -100,15 +101,15 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		isTerminalCalls++;	
 		Turn t= s.getTurn();
 		boolean finishTurn = t.equals(Turn.BLACKWIN) || t.equals(Turn.WHITEWIN) || t.equals(Turn.DRAW);
-		System.out.println(t.toString() + " sigleton: "+ turn.getTurn() + " turn: " + s.getTurnCount());
+		
 		if(finishTurn) {
 			return true;
 		}
 //		else if(isTerminalCalls-turn.getTurn() >=expansion) {
 // 			return true;
 //		}
-		else if(s.getTurnCount() - this.getInitialState().getTurnCount() >=expansionTurn) {
-//			System.out.println("Turno: "+s.getTurnCount());
+		else if(s.getTurnCount() - this.initialState.getTurnCount()>=expansionTurn) {
+//			System.out.println("TurnCount: "+s.getTurnCount()+" singl: "+ turn.getTurn());
 			return true;
 		}
 		
@@ -172,7 +173,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 			}
 		}
 		//EURISTICA (dovrebbe essere meglio il valore pi� grande)
-		System.out.println("Punteggio "+t.toString()+": " + punteggio + " sigleton: "+ turn.getTurn() + " turn: " + s.getTurnCount());
+//		System.out.println("Punteggio "+t.toString()+": " + punteggio+" TurnFuturo: "+s.getTurnCount()+ " TurnAtt: "+this.initialState.getTurnCount());
 		return punteggio;
 	}
 	
