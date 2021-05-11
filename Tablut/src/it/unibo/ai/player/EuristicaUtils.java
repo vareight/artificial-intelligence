@@ -79,6 +79,7 @@ public class EuristicaUtils {
 //		double kingGoing = - this.kingCaptured(king, s)*100;
 		double bonusVeggente = veggente(s, Turn.WHITE)*2; // inizio: 4
 //		System.out.println("veggente: "+bonusVeggente);
+		double bonusArrocco = noArrocco(s, whitePawns,king);
 //		double inTrouble=0;
 //		if(bonusNumPawn<0) {
 //			inTrouble=10*( nereGoing+biancheGoing);
@@ -89,7 +90,7 @@ public class EuristicaUtils {
 //		if (king == 40) penalita = -5; // il re è ancora sul trono
 		
 		//System.out.println("*****FINE WHITE*****");
-		return bonusVuote + bonusVeggente + bonusKeyCells;
+		return bonusVuote + bonusVeggente + bonusKeyCells+bonusArrocco;
 	}
 	
 	/**
@@ -643,5 +644,29 @@ public class EuristicaUtils {
 	
 	private boolean isInsideBoard(int row, int column) {
 		return row >= 0 && row <=8 && column >=0 && column <=8;
+	}
+	
+	private double noArrocco(StateTablut s,int[] whitePawns, int king) {
+		int row = king/DIM;
+		int col = king-(row*DIM);
+		double punti=0;
+		
+		if((row<=2 && (col<=2 || col>=7)) ||(row>=7 && (col<=2 || col>=7))) {
+			punti +=5;
+		}/*else if(row>=3 && row<=5 && col>=3 && col <=5) {
+			punti-=2;
+		}*/
+		
+		for(int pawn : whitePawns) {
+			 row = pawn/DIM;
+			 col = pawn-(row*DIM);
+			if((row<=2 && (col<=2 || col>=7)) ||(row>=7 && (col<=2 || col>=7))) {
+				punti +=1;
+			}/*else if(row>=3 && row<=5 && col>=3 && col <=5) {
+				punti-=0.5;
+			}*/
+		}
+		
+		return punti;
 	}
 }
