@@ -543,9 +543,9 @@ public class EuristicaUtils {
 		if(turn.equalsTurn(Turn.WHITE.toString())) {
 			weightWhite *=3;
 			result = weightWhite*blackOutFuture;
-			/*if(whiteOutFuture>blackOutFuture+1) {
-				result -= 3*(whiteOutFuture-blackOutFuture);
-			}*/
+			if(numWhite<=4) {
+				result -= 2*(whiteOutFuture);
+			}
 			
 		}
 		
@@ -646,6 +646,12 @@ public class EuristicaUtils {
 		return row >= 0 && row <=8 && column >=0 && column <=8;
 	}
 	
+	/**
+	 * @param s
+	 * @param whitePawns
+	 * @param king
+	 * @return
+	 */
 	private double noArrocco(StateTablut s,int[] whitePawns, int king) {
 		int row = king/DIM;
 		int col = king-(row*DIM);
@@ -663,15 +669,16 @@ public class EuristicaUtils {
 			punti-=2;
 		}*/
 		
-		for(int pawn : whitePawns) {
-			 row = pawn/DIM;
-			 col = pawn-(row*DIM);
-			if((row<=2 && (col<=2 || col>=7)) ||(row>=7 && (col<=2 || col>=7))) {
-				punti +=1;
-			}/*else if(row>=3 && row<=5 && col>=3 && col <=5) {
-				punti-=0.5;
-			}*/
-		}
+//		for(int pawn : whitePawns) {
+//			 row = pawn/DIM;
+//			 col = pawn-(row*DIM);
+//			if((row<=2 && (col<=2 || col>=7)) ||(row>=7 && (col<=2 || col>=7))) {
+//				punti +=1;
+//			}
+//			else if(row>=3 && row<=5 && col>=3 && col <=5) {
+//				punti-=0.5;
+//			}
+//		}
 		
 		return punti;
 	}
