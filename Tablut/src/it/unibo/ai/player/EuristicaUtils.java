@@ -541,9 +541,15 @@ public class EuristicaUtils {
 			result = numBlack*weightBlack - weightWhite*numWhite;
 		}
 		if(turn.equalsTurn(Turn.WHITE.toString())) {
-			weightWhite *=3;
+			weightWhite *=4;
+			if(state.getTurnCount()<=6) {
+				weightBlack*=20;
+			}
 			result = weightWhite*blackOutFuture - weightBlack*whiteOutFuture;
-			if(numWhite<=4) {
+			if(numWhite<=3) {
+				result -= whiteOutFuture;
+			}
+			if(numWhite+1<=numBlack/3.5) {
 				result -= 2*(whiteOutFuture);
 			}
 //			else
