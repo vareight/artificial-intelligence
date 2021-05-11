@@ -79,7 +79,7 @@ public class EuristicaUtils {
 //		double kingGoing = - this.kingCaptured(king, s)*100;
 		double bonusVeggente = veggente(s, Turn.WHITE)*2; // inizio: 4
 //		System.out.println("veggente: "+bonusVeggente);
-		double bonusArrocco = turn.getTurn() <= 8 ? noArrocco(s, whitePawns,king) : 0;
+		double bonusArrocco = turn.getTurn() <= 4 ? noArrocco(s, whitePawns,king) : 0;
 //		double inTrouble=0;
 //		if(bonusNumPawn<0) {
 //			inTrouble=10*( nereGoing+biancheGoing);
@@ -546,7 +546,12 @@ public class EuristicaUtils {
 			if(whiteOutFuture>blackOutFuture+1) {
 				result -= 3*(whiteOutFuture-blackOutFuture);
 			}
-			
+			if(3*numWhite < numBlack) {
+				result -= 1;
+			}
+			else
+				result += Math.pow(blackOutFuture+1, 2);
+			 
 		}
 		
 		return result;
@@ -669,4 +674,5 @@ public class EuristicaUtils {
 		
 		return punti;
 	}
+
 }
