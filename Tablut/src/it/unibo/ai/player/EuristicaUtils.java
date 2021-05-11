@@ -79,7 +79,7 @@ public class EuristicaUtils {
 //		double kingGoing = - this.kingCaptured(king, s)*100;
 		double bonusVeggente = veggente(s, Turn.WHITE)*2; // inizio: 4
 //		System.out.println("veggente: "+bonusVeggente);
-//		double bonusArrocco = turn.getTurn() <= 4 ? noArrocco(s, whitePawns,king) : 0;
+		double bonusArrocco = noArrocco(s, whitePawns,king);
 //		double inTrouble=0;
 //		if(bonusNumPawn<0) {
 //			inTrouble=10*( nereGoing+biancheGoing);
@@ -90,7 +90,7 @@ public class EuristicaUtils {
 //		if (king == 40) penalita = -5; // il re � ancora sul trono
 		
 		//System.out.println("*****FINE WHITE*****");
-		return bonusVuote + bonusVeggente + bonusKeyCells;
+		return bonusVuote + bonusVeggente + bonusKeyCells + bonusArrocco;
 	}
 	
 	/**
@@ -542,12 +542,12 @@ public class EuristicaUtils {
 		}
 		if(turn.equalsTurn(Turn.WHITE.toString())) {
 			weightWhite *=3;
-			result = weightWhite*blackOutFuture;
+			result = weightWhite*blackOutFuture - weightBlack*whiteOutFuture;
 			if(numWhite<=4) {
 				result -= 2*(whiteOutFuture);
 			}
-			else
-				result += blackOutFuture*4;
+//			else
+//				result += blackOutFuture*4;
 		}
 		
 		return result;
