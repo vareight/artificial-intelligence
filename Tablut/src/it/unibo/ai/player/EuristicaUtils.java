@@ -541,11 +541,11 @@ public class EuristicaUtils {
 			result = numBlack*weightBlack - weightWhite*numWhite;
 		}
 		if(turn.equalsTurn(Turn.WHITE.toString())) {
-			weightWhite *=2;
-			result = weightWhite*numWhite - numBlack*weightBlack;
-			if(whiteOutFuture>blackOutFuture+1) {
+			weightWhite *=3;
+			result = weightWhite*blackOutFuture;
+			/*if(whiteOutFuture>blackOutFuture+1) {
 				result -= 3*(whiteOutFuture-blackOutFuture);
-			}
+			}*/
 			
 		}
 		
@@ -651,6 +651,12 @@ public class EuristicaUtils {
 		int col = king-(row*DIM);
 		double punti=0;
 		
+		int bonrow= Math.abs(5-row);
+		int boncol= Math.abs(5-col);
+		
+		punti=3*bonrow+3*boncol;
+		
+		/*
 		if((row<=2 && (col<=2 || col>=7)) ||(row>=7 && (col<=2 || col>=7))) {
 			punti +=10;
 		}/*else if(row>=3 && row<=5 && col>=3 && col <=5) {
