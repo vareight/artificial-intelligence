@@ -3,7 +3,9 @@ Project for the tablut challenge, Foundations of Artificial Intelligence AA 2020
 
 # Tablut 
 
-![tablutboard]()
+![tablutboard](https://github.com/vareight/challenge-tablut/blob/main/tablut.png)
+
+
 Tablut is an medioeval northern Europe game, almost unknown. Linneo was the first to document the rules of this game, after he had seen some Lapps playing it, but theres no trace of the original rules.
 The game is assymetric the players have different chekers and aims. The game board is a grid of 9X9 squares. Two players alternate in moving their checkers, the attacker is the Balck player and defender is the White player.
 
@@ -26,7 +28,7 @@ Download the zip file from github or clone it from the command line
 
 ```bash
 git clone https://github.com/vareight/challenge-tablut
-cd ....
+cd /challenge-tablut/Tablut/jars/
 ```
 
 # Run from shell
@@ -48,6 +50,8 @@ java -jar <role> <timeout-in-seconds> <server-ip>
 # Run from virtual machine 
 
 Download the virtual machine from this link: 
+
+
 Then move in the directory /home/tablut/tablut and execute the Tablut player
 
 ```bash
