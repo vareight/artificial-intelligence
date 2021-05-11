@@ -87,7 +87,7 @@ public class EuristicaUtils {
 //		double bonusMobilita = mobilita(s, whitePawns, king)*0.02;
 //		double penalita = 0;
 //		
-//		if (king == 40) penalita = -5; // il re è ancora sul trono
+//		if (king == 40) penalita = -5; // il re ï¿½ ancora sul trono
 		
 		//System.out.println("*****FINE WHITE*****");
 		return bonusVuote + bonusVeggente + bonusKeyCells;
@@ -541,13 +541,10 @@ public class EuristicaUtils {
 			result = numBlack*weightBlack - weightWhite*numWhite;
 		}
 		if(turn.equalsTurn(Turn.WHITE.toString())) {
-			weightWhite *=2;
-			result = weightWhite*numWhite - numBlack*weightBlack;
-//			if(whiteOutFuture>blackOutFuture+1) {
-//				result -= 3*(whiteOutFuture-blackOutFuture);
-//			}
-			if(3*numWhite < numBlack || state.getTurnCount() <= 6) {
-				result += blackOutFuture;
+			weightWhite *=3;
+			result = weightWhite*blackOutFuture;
+			if(numWhite<=4) {
+				result -= 2*(whiteOutFuture);
 			}
 			else
 				result += blackOutFuture*4;
@@ -650,26 +647,39 @@ public class EuristicaUtils {
 		return row >= 0 && row <=8 && column >=0 && column <=8;
 	}
 	
+	/**
+	 * @param s
+	 * @param whitePawns
+	 * @param king
+	 * @return
+	 */
 	private double noArrocco(StateTablut s,int[] whitePawns, int king) {
 		int row = king/DIM;
 		int col = king-(row*DIM);
 		double punti=0;
 		
+		int bonrow= Math.abs(5-row);
+		int boncol= Math.abs(5-col);
+		
+		punti=3*bonrow+3*boncol;
+		
+		/*
 		if((row<=2 && (col<=2 || col>=7)) ||(row>=7 && (col<=2 || col>=7))) {
-			punti +=5;
+			punti +=10;
 		}/*else if(row>=3 && row<=5 && col>=3 && col <=5) {
 			punti-=2;
 		}*/
 		
-		for(int pawn : whitePawns) {
-			 row = pawn/DIM;
-			 col = pawn-(row*DIM);
-			if((row<=2 && (col<=2 || col>=7)) ||(row>=7 && (col<=2 || col>=7))) {
-				punti +=1;
-			}/*else if(row>=3 && row<=5 && col>=3 && col <=5) {
-				punti-=0.5;
-			}*/
-		}
+//		for(int pawn : whitePawns) {
+//			 row = pawn/DIM;
+//			 col = pawn-(row*DIM);
+//			if((row<=2 && (col<=2 || col>=7)) ||(row>=7 && (col<=2 || col>=7))) {
+//				punti +=1;
+//			}
+//			else if(row>=3 && row<=5 && col>=3 && col <=5) {
+//				punti-=0.5;
+//			}
+//		}
 		
 		return punti;
 	}
