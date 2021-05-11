@@ -108,8 +108,8 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 //		else if(isTerminalCalls-turn.getTurn() >=expansion) {
 // 			return true;
 //		}
-		else if(s.getTurnCount() >=expansionTurn) {
-//			System.out.println("Turno: "+s.getTurnCount());
+		else if(s.getTurnCount() - this.initialState.getTurnCount()>=expansionTurn) {
+//			System.out.println("TurnCount: "+s.getTurnCount()+" singl: "+ turn.getTurn());
 			return true;
 		}
 		
@@ -173,7 +173,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 			}
 		}
 		//EURISTICA (dovrebbe essere meglio il valore pi� grande)
-//		System.out.println("Punteggio "+t.toString()+": " + punteggio);
+//		System.out.println("Punteggio "+t.toString()+": " + punteggio+" TurnFuturo: "+s.getTurnCount()+ " TurnAtt: "+this.initialState.getTurnCount());
 		return punteggio;
 	}
 	

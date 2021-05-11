@@ -78,7 +78,7 @@ public class EuristicaUtils {
 //		double nereGoing = this.pedineNereGoingToDie(s);
 //		double kingGoing = - this.kingCaptured(king, s)*100;
 		double bonusVeggente = veggente(s, Turn.WHITE)*2; // inizio: 4
-		//System.out.println("Going BIANCHE-NERE-KING: "+biancheGoing+"|"+nereGoing+"|"+kingGoing);
+//		System.out.println("veggente: "+bonusVeggente);
 //		double inTrouble=0;
 //		if(bonusNumPawn<0) {
 //			inTrouble=10*( nereGoing+biancheGoing);
@@ -251,7 +251,7 @@ public class EuristicaUtils {
 //			if(onlyKing>=1) return -1; 
 //			return (vuote/18 + onlyWhite/9)*-1; 
 		}else { //WHITE
-			result = 4*vuote - onlyBlack/2.0; //tolgo onlyWhite?
+			result = onlyKing+4*vuote - onlyBlack/2.0; //tolgo onlyWhite?
 //			if(onlyKing>=1) return 1; 
 //			return (vuote/18 + onlyWhite/9);
 		}	
@@ -541,29 +541,11 @@ public class EuristicaUtils {
 		}
 		if(turn.equalsTurn(Turn.WHITE.toString())) {
 			weightWhite *=2;
-			result = weightWhite*numWhite - numBlack*weightBlack - totPawns/3.0;
+			result = weightWhite*numWhite - numBlack*weightBlack;
 			if(whiteOutFuture>blackOutFuture+1) {
 				result -= 3*(whiteOutFuture-blackOutFuture);
 			}
 			
-			if(chain) { // we are in a sequence of pawns elimination
-				if(whiteOutFuture!=this.whiteOut || blackOutFuture != this.blackOut) {
-					result+=2;
-					this.whiteOut = whiteOutFuture;
-					this.blackOut = blackOutFuture;
-				}
-				else {
-					chain = false; //the sequence ends
-				}
-			}
-			else { // stall situation
-				if(whiteOutFuture!=this.whiteOut || blackOutFuture != this.blackOut) {
-					chain = true; //starts a sequence of pawns eliminations
-					result+=1;
-					this.whiteOut = whiteOutFuture;
-					this.blackOut = blackOutFuture;
-				}
-			}
 		}
 		
 		return result;
