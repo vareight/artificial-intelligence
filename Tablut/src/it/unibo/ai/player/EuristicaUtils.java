@@ -652,7 +652,7 @@ public class EuristicaUtils {
 		double punti=0;
 		
 		if((row<=2 && (col<=2 || col>=7)) ||(row>=7 && (col<=2 || col>=7))) {
-			punti +=5;
+			punti +=10;
 		}/*else if(row>=3 && row<=5 && col>=3 && col <=5) {
 			punti-=2;
 		}*/
