@@ -115,7 +115,6 @@ public class TablutAIClient extends TablutClient {
 				if (this.getCurrentState().getTurn().equals(StateTablut.Turn.WHITE)) {
 					BestMoveFinder finder= new BestMoveFinder(state, rules, timeout);
 					Action action =finder.findBestAction(state);
-					turn.newTurn();
 					System.out.println("***Turno " + turn.getTurn());
 //					if(action == null) { // a che servono? non li uso mai questi due..
 //						State stateProva = this.getCurrentState();
@@ -125,6 +124,7 @@ public class TablutAIClient extends TablutClient {
 				
 					try {
 						this.write(action);
+						turn.newTurn();
 					} catch (ClassNotFoundException | IOException e) {
 						e.printStackTrace();
 					}
@@ -132,6 +132,7 @@ public class TablutAIClient extends TablutClient {
 				// Turno dell'avversario
 				else if (state.getTurn().equals(StateTablut.Turn.BLACK)) {
 					System.out.println("Waiting for your opponent move... ");
+					turn.newTurn();
 				}
 				// ho vinto
 				else if (state.getTurn().equals(StateTablut.Turn.WHITEWIN)) {
@@ -155,7 +156,6 @@ public class TablutAIClient extends TablutClient {
 				if (this.getCurrentState().getTurn().equals(StateTablut.Turn.BLACK)) {
 					BestMoveFinder finder= new BestMoveFinder(state, rules, timeout);
 					Action action =finder.findBestAction(state);
-					turn.newTurn();
 					System.out.println("***Turno " + turn.getTurn());
 //					if(action == null) { // come sopra, a che serve?
 //						State stateProva = this.getCurrentState();
@@ -173,6 +173,7 @@ public class TablutAIClient extends TablutClient {
 				}
 				else if (state.getTurn().equals(StateTablut.Turn.WHITE)) {
 					System.out.println("Waiting for your opponent move... ");
+					turn.newTurn();
 				} 
 				else if (state.getTurn().equals(StateTablut.Turn.WHITEWIN)) {
 					System.out.println("YOU LOSE!");
