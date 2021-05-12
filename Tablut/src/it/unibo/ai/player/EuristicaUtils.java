@@ -11,7 +11,7 @@ public class EuristicaUtils {
 	private final int DIM = 9;
 	private int NUM_WHITE_PAWNS = 8;
 	private int NUM_BLACK_PAWNS = 16;
-//	private int NUM_PAWNS = 25;
+
 	private BoardState board= BoardState.getIstance();
 	private static TurnNumberSingleton turn; 
 	private ActionsUtils actionsUtils;
@@ -29,77 +29,24 @@ public class EuristicaUtils {
 	}
 
 	public double euristicaBlack(StateTablut s,int[] whitePawns, int king) {
-//		double lateGame = turn.getTurn();
-		//System.out.println("*****BLACK*****");
+
 		double bonusAccerchiamento=1000/accerchiamento(s, whitePawns, king);
-		//System.out.println("Bonus accerchiamento "+bonusAccerchiamento);
 		double bonusVuote=this.righeColonne(s, Turn.BLACK);
-		//System.out.println("Bonus vuote "+bonusVuote);
-//		double bonusNumPawn= blackpawnInTrouble(s,Turn.BLACK)*5;
-//		//System.out.println("Bonus numero pedoni "+bonusNumPawn);
-//		double bonusStradeLibere= -20*kingOpenRoads(s);
-//		//System.out.println("Bonus strade libere re "+bonusStradeLibere);
-//		double biancheGoing = this.pedineBiancheGoingToDie(s);
-//		double nereGoing = -this.pedineNereGoingToDie(s);
-//		double kingGoing = this.kingCaptured(king, s)*100;
 		double bonusVeggente = veggente(s, Turn.BLACK);
-//		double inTrouble=0;
-//		if(bonusNumPawn<0) {
-//			inTrouble=10*( nereGoing+biancheGoing);
-//		}
-		//System.out.println("Going BIANCHE-NERE-KING: "+biancheGoing+"|"+nereGoing+"|"+kingGoing);
-//		double diagonali=(lateGame <=8)? this.diagonalizzazioneNero(s) : 0 ;
-		//System.out.println("Diagonali "+ diagonali);
-		//System.out.println("*****FINE BLACK*****");
 		return bonusAccerchiamento+bonusVeggente+bonusVuote;
 
 	}
 	
 	public double euristicaWhite(StateTablut s,int[] whitePawns, int king) {
-		// TODO
-//		double bonusAccerchiamento=accerchiamento(s, whitePawns, king)*0.02;
-//		if(s.getTurnCount() >= 10) bonusAccerchiamento = 0;
-//		if(bonusAccerchiamento <= 10) return -100;
-		//secondo me solo con accerchiamento riceveva un valore altissimo e  non confrontabile con gli altri valori dell'euristica
-		//facendo 1-1/accerchiamento dovremmo avere un valore complementare rispetto a quello del black
-		//se il ragionamento ï¿½ corretto cambiatelo
-		
-//		double bonusAccerchiamento=-accerchiamento(s, whitePawns, king)/1000;
-		//System.out.println("*****WHITE*****");
-		//System.out.println("Bonus accerchiamento "+bonusAccerchiamento);
+	
 		double bonusVuote=this.righeColonne(s, Turn.WHITE); // circa [-1.5, 3]
-//		//System.out.println("Bonus vuote "+bonusVuote);
-//		double bonusNumPawn= blackpawnInTrouble(s,Turn.WHITE);
-//		//System.out.println("Bonus numero pedoni "+bonusNumPawn);
 		double bonusKeyCells= kingOpenRoads(s) > 1 ? 10000 : 0; // num celle chiave disponibili [0-4]
-//		//System.out.println("Bonus strade libere re "+bonusStradeLibere);
-//		double bonusMovimentoKing = movimentoKing(s)*0.1; // circa [0, 1]
-//		double biancheGoing = -this.pedineBiancheGoingToDie(s);
-//		double nereGoing = this.pedineNereGoingToDie(s);
-//		double kingGoing = - this.kingCaptured(king, s)*100;
 		double bonusVeggente = veggente(s, Turn.WHITE)*2; // inizio: 4
-//		System.out.println("veggente: "+bonusVeggente);
 		double bonusArrocco = turn.getTurn() <= 8 ? noArrocco(s, whitePawns,king) : 0;
-//		double inTrouble=0;
-//		if(bonusNumPawn<0) {
-//			inTrouble=10*( nereGoing+biancheGoing);
-//		}
-//		double bonusMobilita = mobilita(s, whitePawns, king)*0.02;
-//		double penalita = 0;
-//		
-//		if (king == 40) penalita = -5; // il re è ancora sul trono
-		
-		//System.out.println("*****FINE WHITE*****");
 		return bonusVuote + bonusVeggente + bonusKeyCells+bonusArrocco;
 	}
 	
-	/**
-	 * Funzione che calcola le mosse possibili del Re
-	 * @return il numero di mosse possibili del re
-	 */
-	private double movimentoKing(StateTablut state) {
-		return this.actionsUtils.calculateActions(this.findKing(state), state.getTurn()).size();
-	}
+	
 	
 
 	/**
@@ -110,12 +57,6 @@ public class EuristicaUtils {
 	private double accerchiamento(StateTablut s, int[] whitePawns, int king) {
 		double distanzaTot=0;
 		double bonusKing=5;
-		
-//		if(turn.getTurn() > 4) 
-//			//bonusKing = Math.pow(turn.getTurn(), 2);
-		bonusKing+=turn.getTurn();
-		//System.out.println("******BONUS KING= "+bonusKing+" ********");
-		
 		for(int i=0; i<NUM_WHITE_PAWNS; i++) {
 			int pawnValue=whitePawns[i];
 			if(pawnValue==-1) break;
@@ -133,17 +74,12 @@ public class EuristicaUtils {
 		int column= pawnValue-(row*DIM);
 		int distanza=0;
 		BoardState board = BoardState.getIstance();
-		
-		// ***************************************************************
-		// ***controlliamo la strada percorribile a DESTRA della pedina***
-		// ***************************************************************
 		for(int currentPawnValue=pawnValue+1; currentPawnValue<=(row+1)*DIM-1; currentPawnValue++) {
 			int newRow = currentPawnValue/DIM;
 			int newColumn = currentPawnValue-(newRow*DIM);
 			if(s.getPawn(newRow, newColumn).equals(Pawn.BLACK) || 
 					s.getPawn(newRow, newColumn).equals(Pawn.THRONE) || 
 					board.isCamp(newRow, newColumn)){
-				//indexPawnToCheck++; //probabilmente non serve
 				break;
 			}else {
 				distanza++;
@@ -238,7 +174,6 @@ public class EuristicaUtils {
 			}
 			if(numBlackR==0 && numWhiteR==0 && !kingR) vuote++;
 			if(numBlackC==0 && numWhiteC==0 && !kingC) vuote++;
-//			if(i==0 || i==DIM-1) continue;
 			if(numBlackR>=1 && numWhiteR==0 && !kingR) onlyBlack++;
 			if(numBlackR==0 && numWhiteR>=1 && !kingR) onlyWhite++;
 			if(numBlackR==0 && numWhiteR==0 && kingR) onlyKing=5;
@@ -249,71 +184,10 @@ public class EuristicaUtils {
 		
 		if(t.equals(Turn.BLACK)) {
 			result = onlyBlack/2.0 - onlyWhite - 4*vuote;
-//			if(onlyKing>=1) return -1; 
-//			return (vuote/18 + onlyWhite/9)*-1; 
 		}else { //WHITE
 			result = onlyKing+4*vuote - onlyBlack/2.0; //tolgo onlyWhite?
-//			if(onlyKing>=1) return 1; 
-//			return (vuote/18 + onlyWhite/9);
 		}	
-//		capire se utilizzare anche onlyBlack oppure inutile
 		return result;
-	}
-	
-	//pensare se puï¿½ avere meno peso visto che questa euristica toglie punti a chi ï¿½ in svantaggio e moltiplicare tutto per 1/2 per esempio
-	private double blackpawnInTrouble(StateTablut state, Turn turn) {
-		int whiteRemoved= NUM_WHITE_PAWNS - state.getNumberOf(Pawn.WHITE);
-		int blackRemoved= NUM_BLACK_PAWNS - state.getNumberOf(Pawn.BLACK);
-		int oddsBlackWhite = blackRemoved-whiteRemoved;
-		
-		if( oddsBlackWhite ==0 || oddsBlackWhite>7 ) {
-			if (oddsBlackWhite > 7 ) {
-				return 10;
-			}
-			//same number of pawn deleted
-			return 0;
-		}
-		else
-			{
-			int resultBlackInTrouble= 1 - (1/oddsBlackWhite);
-			int resultNormalSituationBlack= 1/(NUM_WHITE_PAWNS-oddsBlackWhite);
-			int resultNormalSituationWhite= 1/(NUM_WHITE_PAWNS+oddsBlackWhite);
-			int resultWhiteInTrouble= 1 + (1/oddsBlackWhite); //oddsblackWhite negativo 
-			
-			if(oddsBlackWhite >=2 ) {
-				//black in serious trouble
-				if(turn.equals(Turn.BLACK)) 			
-					return -resultBlackInTrouble;      		 //toglie all'euristica nera valori -1/2 -2/3 -3/4 -4/5 -5/6... se in svantaggio
-				else 
-					return resultBlackInTrouble;			 //toglie all'euristica bianca valori 1/2 2/3 3/4 4/5 5/6... se in vantaggio
-			}
-			if( oddsBlackWhite ==1 ) { 
-				//black in trouble
-				if(turn.equals(Turn.BLACK)) 
-					return -resultNormalSituationBlack;  	// toglie all'euristica nera -1/7 o -1/8
-				else 
-					return resultNormalSituationBlack; 		//aggiunge all'euristica bianca un vantaggio di 1/7 o 1/8
-			}
-			
-			if(oddsBlackWhite ==-1 ) {
-				//white in trouble
-				if(turn.equals(Turn.BLACK)) 
-					return resultNormalSituationWhite; 		//aggiunge all'euristica nera un vantaggio di 1/7 o 1/8
-				else 
-					return -resultNormalSituationWhite;		// toglie all'euristica  bianca -1/7 o -1/8
-			}
-			
-			if(oddsBlackWhite < -1 ) {
-				//black in advantage
-				if(turn.equals(Turn.BLACK)) 
-					return resultWhiteInTrouble; 
-				else 
-					return -resultWhiteInTrouble; 
-				
-			}
-		}
-		
-		return 0;
 	}
 	
 
@@ -394,9 +268,7 @@ public class EuristicaUtils {
 				}
 			}
 		}
-//		if(openRoads > 1) {											//restituisce un valore molto alto se ci sono due o piï¿½ strade libere 
-//			return openRoads*weight;											//in modo che il re sia avvantaggiato a scappare
-//		}else {															//sotto la soglia 2 non restituisce nulla
+									
 			return openRoads; 
 //		}
 	}
@@ -511,21 +383,7 @@ public class EuristicaUtils {
 		return 0;		
 	}
 	
-	private double pedineNereGoingToDie(StateTablut state) {
-		double result = 0;
-		for(Integer pawnValue : this.actionsUtils.getBlackPawns()) {
-			result+=this.isGoingToDie(pawnValue, Pawn.BLACK, state);
-		}
-		return result;
-	}
-	
-	private double pedineBiancheGoingToDie(StateTablut state) {
-		double result = 0;
-		for(Integer pawnValue : this.actionsUtils.getWhitePawns()) {
-			result+=this.isGoingToDie(pawnValue, Pawn.WHITE, state);
-		}
-		return result;
-	}
+
 	
 	private double veggente(StateTablut state, Turn turn) {
 		double result = 0;
@@ -552,100 +410,8 @@ public class EuristicaUtils {
 		return result;
 	}
 	
-	
-	private double diagonalizzazioneNero(StateTablut state) {
-		double diagonaliFull=0;
-		if (state.getPawn(2, 3).equals(Pawn.BLACK)) { //primo quadrante
-			diagonaliFull++;
-		}
-		if (state.getPawn(3, 2).equals(Pawn.BLACK)) {
-			diagonaliFull++;
-		}
-		if (state.getPawn(2, 5).equals(Pawn.BLACK)) { //
-			diagonaliFull++;
-		}
-		if (state.getPawn(3, 6).equals(Pawn.BLACK)) {
-			diagonaliFull++;
-		}
-		if (state.getPawn(2, 5).equals(Pawn.BLACK)) {
-			diagonaliFull++;
-		}
-		if (state.getPawn(3, 6).equals(Pawn.BLACK)) {
-			diagonaliFull++;
-		}
-		if (state.getPawn(5, 6).equals(Pawn.BLACK)) {
-			diagonaliFull++;
-		}
-		if (state.getPawn(6, 5).equals(Pawn.BLACK)) {
-			diagonaliFull++;
-		}
-		return diagonaliFull;
-	}
-	
-	private double mobilita(StateTablut state, int[] whitePawns, int king) {
-		double result = 0;
-		double bonusKing = 2;
-		
-		for(int i=0; i<NUM_WHITE_PAWNS; i++) {
-			int pawnValue=whitePawns[i];
-			if(pawnValue==-1) break;
-			
-//			result+=checkMobilita(pawnValue, state);
-			result+=this.actionsUtils.calculateActions(pawnValue, state.getTurn()).size();
-			
-		}
-//		result+=checkMobilita(king, state)*bonusKing;
-		result+=this.actionsUtils.calculateActions(king, state.getTurn()).size()*bonusKing;
-		return result;
-		
-	}
-	
-	private int checkMobilita(int pawnValue, StateTablut s) {
-		int result = 0;
-		
-		// ***************************************************************
-		// ***controlliamo la strada percorribile a DESTRA della pedina***
-		// ***************************************************************	
-		int newRow = (pawnValue+1)/DIM;
-		int newColumn = (pawnValue+1)-(newRow*DIM);
-		if(isInsideBoard(newRow, newColumn) && s.getPawn(newRow, newColumn).equalsPawn(Pawn.EMPTY.toString())){
-			result++;
-		}
-		
-		// ***************************************************************
-		// ***controlliamo la strada percorribile SOTTO alla pedina***
-		// ***************************************************************
-		newRow = (pawnValue+DIM)/DIM;
-		newColumn = (pawnValue+DIM)-(newRow*DIM);
-		if(isInsideBoard(newRow, newColumn) && s.getPawn(newRow, newColumn).equalsPawn(Pawn.EMPTY.toString())){
-			result++;
-		}
-	
-		// ***************************************************************
-		// ***controlliamo la strada percorribile a SINISTRA della pedina***
-		// ***************************************************************
-		newRow = (pawnValue-1)/DIM;
-		newColumn = (pawnValue-1)-(newRow*DIM);
-		if(isInsideBoard(newRow, newColumn) && s.getPawn(newRow, newColumn).equalsPawn(Pawn.EMPTY.toString())){
-			result++;
-		}
-		
-		// ***************************************************************
-		// ***controlliamo la strada percorribile SOPRA alla pedina***
-		// ***************************************************************
-		newRow = (pawnValue-DIM)/DIM;
-		newColumn = (pawnValue-DIM)-(newRow*DIM);
-		if(isInsideBoard(newRow, newColumn) && s.getPawn(newRow, newColumn).equalsPawn(Pawn.EMPTY.toString())){
-			result++;
-		}
 
-		return result;
-	}
-	
-	private boolean isInsideBoard(int row, int column) {
-		return row >= 0 && row <=8 && column >=0 && column <=8;
-	}
-	
+
 	private double noArrocco(StateTablut s,int[] whitePawns, int king) {
 		int row = king/DIM;
 		int col = king-(row*DIM);

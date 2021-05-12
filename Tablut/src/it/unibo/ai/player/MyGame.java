@@ -34,20 +34,10 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	 * in base allo stato attuale calcoliamo le azioni possibili
 	 */
 	
-	private int expansion=800;
-	private int expansionTurn=4;
-	private int turnCount=0;
-	private final int DIM = 9;
-	//private int NUM_WHITE_PAWNS = 8;
-	//private int NUM_BLACK_PAWNS = 16;
-	//private int NUM_PAWNS = 25;
 	
-	//private int king;
-	//private int[] whitePawns = new int[NUM_WHITE_PAWNS];
-	//private int[] blackPawns = new int[NUM_BLACK_PAWNS];
-	//private int[] pawns = new int[NUM_PAWNS];
+	private final int expansionTurn=4;
+	private int turnCount=0;
 	private BoardState board= BoardState.getIstance();
-	//private GameAshtonTablut game;
 	private StateTablut initialState;
 	private MoveResult moveResult;
 	private ActionsUtils actions;
@@ -60,7 +50,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		super();
 		this.initialState = initialState;
 		this.isTerminalCalls=0;
-		//this.game=game;
+
 		this.actions = new ActionsUtils(initialState);
 		this.moveResult = new MoveResult(game.getRepeated_moves_allowed(), game.getCache_size());
 	}
@@ -74,7 +64,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		if (turn.equals(Turn.WHITE)) act= actions.whiteActions();
 		if (turn.equals(Turn.BLACK)) act= actions.blackActions();
 		
-		return act; //TODO capire se restituire altro quando non � W o B
+		return act; 
 	}
 	
 
@@ -88,7 +78,6 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	public StateTablut getResult(StateTablut s, Action a) {
 		StateTablut newState = null;
 		StateTablut clonedState = s.clone();
-		//newState= (StateTablut) game.movePawn(clonedState, a);
 		newState= moveResult.makeMove(clonedState, a);
 		newState.setTurnCount(newState.getTurnCount()+1);
 		turnCount++;
@@ -105,37 +94,10 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		if(finishTurn) {
 			return true;
 		}
-//		else if(isTerminalCalls-turn.getTurn() >=expansion) {
-// 			return true;
-//		}
 		else if(s.getTurnCount() - this.initialState.getTurnCount()>=expansionTurn) {
-//			System.out.println("TurnCount: "+s.getTurnCount()+" singl: "+ turn.getTurn());
 			return true;
 		}
-		
-	
-		
-		return false; // TODO modificare
-//		return finishTurn || noMoves;
-		
-
-		
-		/*
-		// situazione finale vittoria - sconfitta - pareggio
-		//white win 
-		int posKing = findKing(s);
-		boolean kingEscapes = kingEscapes(posKing);
-		
-		//black win
-		boolean kingCaptured= kingCaptured(posKing, s);
-		
-		//no moves avaible 
-		boolean noMoves=false;
-		if (getActions(s).isEmpty()) {
-			noMoves=true;
-		}
-		return kingEscapes || kingCaptured ; //manca caso pareggio = stato ripetuto
-		*/
+		return false; 
 	}
 	
 	@Override
@@ -172,133 +134,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 			default : punteggio=euristica.euristicaWhite(s, actions.getWhitePawns(),actions.getKing());
 			}
 		}
-		//EURISTICA (dovrebbe essere meglio il valore pi� grande)
-//		System.out.println("Punteggio "+t.toString()+": " + punteggio+" TurnFuturo: "+s.getTurnCount()+ " TurnAtt: "+this.initialState.getTurnCount());
 		return punteggio;
 	}
-	
-/*---------------------------------FUNZIONI DA SPOSTARE o ELIMINARE-------------------------------------------------------- 	
-	
-	/**
-	 * Funzione che trova la posizione del re nella scacchiera
-	 * @param state
-	 * @return the position of the king, -1 if not found
-	 */
-/*	private int findKing(StateTablut state) {
-		for(int i=0; i<DIM; i++) {
-			for(int j=0; j<DIM; j++) {
-				if(state.getPawn(i, j).equals(Pawn.KING)) {
-					return i*DIM +j;	
-				}
-			}
-		}
-		return -1;
-	}
-*/	
-	/**
-	 * Funzione che rileva se il re raggiunge una posizione di salvataggio sul bordo
-	 * @param posKing
-	 * @return true if the king escapes, false otherwise
-	 */
-/*	private boolean kingEscapes(int posKing) {
-		return board.isEscapeTile(posKing);
-	}
-*/	
-	/**
-	 * Funzione che rileva se il re viene catturato
-	 * @param posKing
-	 * @param state
-	 * @return true if is captured, false otherwise
-	 */
-/*	private boolean kingCaptured(int posKing, StateTablut state) { // 
-		int riga=posKing/DIM;
-		int col=posKing-(riga*DIM);
-		Pawn sopra ;
-		Pawn sotto ;
-		Pawn destra; 
-		Pawn sinistra; 
-		if( riga !=0) sopra=state.getPawn(riga-1, col);
-		else sopra =Pawn.EMPTY;
-		if( riga <DIM ) sotto =state.getPawn(riga+1, col);
-		else sotto =Pawn.EMPTY;
-		if(col <DIM) destra =state.getPawn(riga, col+1); 
-		else destra =Pawn.EMPTY;
-		if(col !=0) sinistra =state.getPawn(riga, col-1);
-		else sinistra =Pawn.EMPTY;
-	
-		// il re si trova nel castello ed � circondato
-		if(posKing==board.getCastle() && sopra.equals(Pawn.BLACK)
-				&& sotto.equals(Pawn.BLACK)
-				&& destra.equals(Pawn.BLACK)
-				&& sinistra.equals(Pawn.BLACK)) {
-			return true; 
-			
-		}
-		// posizioni adiacenti al castello: [31,39,41,49]
-		// il re si trova in una posizione adiacente al castello e vine catturato se circondato sui tre lati restanti
-		if(posKing==31 && sopra.equals(Pawn.BLACK)
-				&& destra.equals(Pawn.BLACK)
-				&& sinistra.equals(Pawn.BLACK)) {
-			return true; 
-			
-		}
-		if(posKing==39 && sopra.equals(Pawn.BLACK)
-				&& sotto.equals(Pawn.BLACK)
-				&& sinistra.equals(Pawn.BLACK)) {
-			return true; 
-			
-		}
-		if(posKing==41 && sopra.equals(Pawn.BLACK)
-				&& sotto.equals(Pawn.BLACK)
-				&& destra.equals(Pawn.BLACK)){
-			return true; 
-			
-		}
-		if(posKing==49 && sotto.equals(Pawn.BLACK)
-				&& destra.equals(Pawn.BLACK)
-				&& sinistra.equals(Pawn.BLACK)) {
-			return true; 
-			
-		}
-		//il re viene catturato in una qualunque altra posizione
-		return pawnCaptured(state, riga, col, sopra, sotto, destra, sinistra);
-				
-	}
-*/	
-	/**
-	 * Funzione generale per controllare se una pedina viene catturata
-	 * @param state
-	 * @param riga
-	 * @param col
-	 * @param sopra
-	 * @param sotto
-	 * @param destra
-	 * @param sinistra
-	 * @return true if the pawn is captured, false otherwise
-	 */
-/*	private boolean pawnCaptured(StateTablut state,int riga, int col, Pawn sopra, Pawn sotto, Pawn destra, Pawn sinistra) {
-		
-		Turn turnVittima = state.getTurn();
-		Pawn pawnPredatore = turnVittima.equals(Turn.WHITE) ? Pawn.BLACK : Pawn.WHITE ;
-		 sopra = sopra.equals(Pawn.KING) ? Pawn.WHITE : sopra;
-		 sotto = sotto.equals(Pawn.KING) ? Pawn.WHITE : sotto;
-		 destra = destra.equals(Pawn.KING) ? Pawn.WHITE : destra;
-		 sinistra = sinistra.equals(Pawn.KING) ? Pawn.WHITE : sinistra;
-		
-		if ((sopra.equals(pawnPredatore) || board.isCamp(riga*DIM+col-DIM) || riga*DIM+col-DIM == board.castle ) && 
-				(sotto.equals(pawnPredatore) || board.isCamp(riga*DIM+col+DIM) || riga*DIM+col+DIM == board.castle)) {
-			return true;
-		}
-		if ((destra.equals(pawnPredatore) || board.isCamp(riga*DIM+col +1) || riga*DIM+col+1 == board.castle) && 
-				(sinistra.equals(pawnPredatore) || board.isCamp(riga*DIM+col-1) ||riga*DIM+col-1 == board.castle)) {
-			return true;
-		}
-		return false; 
-	}
-	*/
-	
-	
-	
-	
 
 }

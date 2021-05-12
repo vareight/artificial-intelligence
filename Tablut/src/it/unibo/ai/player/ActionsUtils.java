@@ -74,7 +74,7 @@ public class ActionsUtils {
 					indexBlack++;
 					pawns[indexPawns]=i*DIM+j;
 					indexPawns++;
-				} //decidere se mettere break raggiunto il numero
+				} 
 			}
 		}
 	}
@@ -136,8 +136,6 @@ public class ActionsUtils {
 		int column= pawnValue-(row*DIM);
 		List<Action> azioni = new ArrayList<Action>();
 		
-		// pawnValueIndex: indica l'indice di pawnValue all'interno della scacchiera
-		// indexPawnsToCheck: indica l'indice di una pedina da controllare (su, gi�, dx, sx)
 		int pawnValueIndex = -1, indexPawnToCheck;
 		try {
 			// cerchiamo l'indice j della pedina corrente (corrispondente a pawnValue)
@@ -219,7 +217,6 @@ public class ActionsUtils {
 					indexPawnToCheck--;
 				}
 				if(pawns[indexPawnToCheck]==currentPawnValue || board.breakCampoOrCastle(pawnValue,currentPawnValue)){
-					//indexPawnToCheck--; //probabilmente non serve
 					break;
 				}else {
 					int newRow = currentPawnValue/DIM;
@@ -253,26 +250,6 @@ public class ActionsUtils {
 		return pawns;
 	}
 	
-	
-	/**
-	
-	
-	
-	/*
-	 * Funzione che stabilisce se l'azione dalla casella "from" alla casella "to" � lecita
-	 */
-//	private boolean isPermitted(int from, int to, Turn t) {
-//		if (to == board.getCastle()) return false;
-//		
-//		if(board.isCamp(to)) {
-//			if(t.equals(Turn.WHITE)) {
-//				return !(board.isCamp(to));
-//			}else {
-//				return board.sameCampo(from, to);
-//			}
-//		}return true;
-//
-//	}
 	
 	
 	
