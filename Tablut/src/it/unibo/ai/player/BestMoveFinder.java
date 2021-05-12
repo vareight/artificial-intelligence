@@ -1,6 +1,5 @@
 package it.unibo.ai.player;
 
-import aima.core.search.adversarial.AlphaBetaSearch;
 import aima.core.search.adversarial.IterativeDeepeningAlphaBetaSearch;
 import it.unibo.ai.didattica.competition.tablut.domain.Action;
 import it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut;
@@ -11,12 +10,10 @@ import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
 
 public class BestMoveFinder {
 	private MyGame game;
-	private AlphaBetaSearch<StateTablut, Action, State.Turn> alphabeta;
 	private IterativeDeepeningAlphaBetaSearch<StateTablut,Action,State.Turn> iterative;
 
 	public BestMoveFinder(StateTablut state, GameAshtonTablut rules, int timeout) {
-		game = new MyGame(state, rules);	//game = new MyGame(rules);
-		alphabeta = AlphaBetaSearch.createFor(game);
+		game = new MyGame(state, rules);
 		iterative = IterativeDeepeningAlphaBetaSearch.createFor(game, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, timeout-5);
 	}
 

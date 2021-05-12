@@ -1,8 +1,5 @@
 package it.unibo.ai.player;
 
-import java.util.List;
-
-import it.unibo.ai.didattica.competition.tablut.domain.Action;
 import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Pawn;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
@@ -12,20 +9,10 @@ public class EuristicaUtils {
 	private int NUM_WHITE_PAWNS = 8;
 	private int NUM_BLACK_PAWNS = 16;
 
-	private BoardState board= BoardState.getIstance();
-	private static TurnNumberSingleton turn; 
-	private ActionsUtils actionsUtils;
+	private BoardState board;
 	
-	private int whiteOut;
-	private int blackOut;
-	private boolean chain;
-	
-	public EuristicaUtils(ActionsUtils actionsUtils) {
-		turn= TurnNumberSingleton.getIstance();
-		this.actionsUtils=actionsUtils;
-		this.whiteOut=0;
-		this.blackOut=0;
-		this.chain=false;
+	public EuristicaUtils() {
+		board = BoardState.getIstance();
 	}
 
 	public double euristicaBlack(StateTablut s,int[] whitePawns, int king) {
@@ -42,18 +29,8 @@ public class EuristicaUtils {
 		double bonusVuote=this.righeColonne(s, Turn.WHITE); // circa [-1.5, 3]
 		double bonusKeyCells= kingOpenRoads(s) > 1 ? 10000 : 0; // num celle chiave disponibili [0-4]
 		double bonusVeggente = veggente(s, Turn.WHITE)*2; // inizio: 4
-//		System.out.println("veggente: "+bonusVeggente);
 		double bonusArrocco = noArrocco(s, whitePawns,king);
-//		double inTrouble=0;
-//		if(bonusNumPawn<0) {
-//			inTrouble=10*( nereGoing+biancheGoing);
-//		}
-//		double bonusMobilita = mobilita(s, whitePawns, king)*0.02;
-//		double penalita = 0;
-//		
-//		if (king == 40) penalita = -5; // il re � ancora sul trono
 		
-		//System.out.println("*****FINE WHITE*****");
 		return bonusVuote + bonusVeggente + bonusKeyCells + bonusArrocco;
 	}
 	
@@ -107,7 +84,6 @@ public class EuristicaUtils {
 			if(s.getPawn(newRow, newColumn).equals(Pawn.BLACK) || 
 					s.getPawn(newRow, newColumn).equals(Pawn.THRONE) || 
 					board.isCamp(newRow, newColumn)){
-				//indexPawnToCheck++; //probabilmente non serve
 				break;
 			}else {
 				distanza++;
@@ -123,7 +99,6 @@ public class EuristicaUtils {
 			if(s.getPawn(newRow, newColumn).equals(Pawn.BLACK) || 
 					s.getPawn(newRow, newColumn).equals(Pawn.THRONE) || 
 					board.isCamp(newRow, newColumn)){
-				//indexPawnToCheck++; //probabilmente non serve
 				break;
 			}else {
 				distanza++;
@@ -140,7 +115,6 @@ public class EuristicaUtils {
 			if(s.getPawn(newRow, newColumn).equals(Pawn.BLACK) || 
 					s.getPawn(newRow, newColumn).equals(Pawn.THRONE) || 
 					board.isCamp(newRow, newColumn)){
-				//indexPawnToCheck++; //probabilmente non serve
 				break;
 			}else {
 				distanza++;
@@ -196,7 +170,7 @@ public class EuristicaUtils {
 		if(t.equals(Turn.BLACK)) {
 			result = onlyBlack/2.0 - onlyWhite - 4*vuote;
 		}else { //WHITE
-			result = onlyKing+4*vuote - onlyBlack/2.0; //tolgo onlyWhite?
+			result = onlyKing+4*vuote - onlyBlack/2.0;
 		}	
 		return result;
 	}
@@ -239,7 +213,6 @@ public class EuristicaUtils {
 					}
 				}
 				if(closeRoadSx==false) {								//se la strada non � chiusa incrementa openRoads
-					//return 10;
 					openRoads++;
 				}
 			}
@@ -251,7 +224,6 @@ public class EuristicaUtils {
 					}
 				}
 				if(closeRoadTop==false) {								
-					//return 10;
 					openRoads++;
 				}
 			}
@@ -262,7 +234,6 @@ public class EuristicaUtils {
 					}
 				}
 				if(closeRoadDx==false) {								
-					//return 10;
 					openRoads++;
 				}
 			}
@@ -274,136 +245,21 @@ public class EuristicaUtils {
 					}
 				}
 				if(closeRoadBottom==false) {		
-					//return 10;
 					openRoads++;
 				}
 			}
 		}
 									
 			return openRoads; 
-//		}
 	}
-	
-	
-	 /* Funzione che stabilisce se una pedina si va a suicidare
-	 * @param state
-	 * @return
-	 */
-	private double isGoingToDie(int pawnValue, Pawn pawn, StateTablut state) {
-		int riga = pawnValue/DIM;
-		int col = pawnValue - (riga*DIM);
-		//boolean inDanger = false, dead = false;
-		Pawn otherColor;
-		List<Action> azioni;
-		double result = 0;
-		
-		if(pawn.equals(Pawn.BLACK)) {
-			otherColor = Pawn.WHITE;
-			azioni = this.actionsUtils.whiteActions();
-		}
-		else {
-			otherColor = Pawn.BLACK;
-			azioni = this.actionsUtils.blackActions();
-		}
-
-		if (isDead(riga+1, col, riga-1, col, state, azioni)) result++; //arriva sotto
-		else if (isDead(riga-1, col, riga+1, col, state, azioni)) result++; //arriva sopra
-		else if (isDead(riga, col-1, riga, col+1, state, azioni)) result++; //arriva a sinistra
-		else if (isDead(riga, col+1, riga, col-1, state, azioni)) result++; //arriva a destra
-		
-		return result;
-	}
-	
-	private boolean isDead(int riga, int colonna, int newRiga, int newColonna, StateTablut state, List<Action> azioni) {
-		boolean result = false;
-		if(newRiga >=0 && newRiga<=8 && newColonna >= 0 && newColonna <=8 &&
-				riga >=0 && riga<=8 && colonna >= 0 && colonna <=8) {
-			if(state.getPawn(riga, colonna)!= Pawn.EMPTY || board.isCamp(riga, colonna)) {
-				for (Action a : azioni) {
-					if(a.getRowTo() == newRiga && a.getColumnTo() == newColonna) {
-						result = true;
-					}
-				}
-			}
-		}
-		return result;
-	}
-	
-	/**
-	 * Funzione che rileva se il re viene catturato
-	 * @param posKing
-	 * @param state
-	 * @return true if is captured, false otherwise
-	 */
-	public double kingCaptured(int posKing, StateTablut state) { //
-		
-		//se posKing == 40 (ovvero si trova nel trono), al momento non lo consideriamo (return 0?)
-		if(posKing == 40 ) return 0;
-		if(posKing != 31 && posKing != 39 && posKing!=41 && posKing != 49)
-			return this.isGoingToDie(posKing, Pawn.KING, state);
-		
-		int riga=posKing/DIM;
-		int col=posKing-(riga*DIM);
-		int circondato = 0;
-		Pawn sopra=state.getPawn(riga-1, col);
-		Pawn sotto =state.getPawn(riga+1, col);
-		Pawn destra =state.getPawn(riga, col+1); 
-		Pawn sinistra =state.getPawn(riga, col-1);
-		
-	
-		if(sopra.equals(Pawn.BLACK)) circondato++;
-		if(sotto.equals(Pawn.BLACK)) circondato++;
-		if(destra.equals(Pawn.BLACK)) circondato++;
-		if(sinistra.equals(Pawn.BLACK)) circondato++;
-		
-		if(circondato != 2) return 0; 
-		
-		List<Action> azioni = this.actionsUtils.blackActions();		
-		
-		if(sopra.equals(Pawn.EMPTY)) {
-			for(Action a : azioni) {
-				if(a.getRowTo() == riga-1 && a.getColumnTo() == col) {
-					return 1;
-				}
-			}
-		}
-		
-		if(sotto.equals(Pawn.EMPTY)) {
-			for(Action a : azioni) {
-				if(a.getRowTo() == riga+1 && a.getColumnTo() == col) {
-					return 1;
-				}
-			}
-		}
-		
-		if(sinistra.equals(Pawn.EMPTY)) {
-			for(Action a : azioni) {
-				if(a.getRowTo() == riga && a.getColumnTo() == col-1) {
-					return 1;
-				}
-			}
-		}
-		
-		if(destra.equals(Pawn.EMPTY)) {
-			for(Action a : azioni) {
-				if(a.getRowTo() == riga && a.getColumnTo() == col+1) {
-					return 1;
-				}
-			}
-		}
-		return 0;		
-	}
-	
-
 	
 	private double veggente(StateTablut state, Turn turn) {
 		double result = 0;
 		int numBlack = state.getNumberOf(Pawn.BLACK);
 		int numWhite = state.getNumberOf(Pawn.WHITE);
 		double weightBlack = 0.5, weightWhite = 1; 
-		int totPawns = numBlack+numWhite;
-		int whiteOutFuture = NUM_WHITE_PAWNS-numWhite;
-		int blackOutFuture = NUM_BLACK_PAWNS-numBlack;
+		int whiteOut = NUM_WHITE_PAWNS-numWhite;
+		int blackOut = NUM_BLACK_PAWNS-numBlack;
 		
 		if(turn.equalsTurn(Turn.BLACK.toString())) {
 			weightBlack *=3;
@@ -414,15 +270,13 @@ public class EuristicaUtils {
 			if(state.getTurnCount()<=6) {
 				weightBlack*=20;
 			}
-			result = weightWhite*blackOutFuture - weightBlack*whiteOutFuture;
+			result = weightWhite*blackOut - weightBlack*whiteOut;
 			if(numWhite<=3) {
-				result -= whiteOutFuture;
+				result -= whiteOut;
 			}
 			if(numWhite+1<=numBlack/3.5) {
-				result -= 2*(whiteOutFuture);
+				result -= 2*(whiteOut);
 			}
-//			else
-//				result += blackOutFuture*4;
 		}
 		
 		return result;
@@ -438,25 +292,7 @@ public class EuristicaUtils {
 		int boncol= Math.abs(5-col);
 		
 		punti=3*bonrow+3*boncol;
-		
-		/*
-		if((row<=2 && (col<=2 || col>=7)) ||(row>=7 && (col<=2 || col>=7))) {
-			punti +=10;
-		}/*else if(row>=3 && row<=5 && col>=3 && col <=5) {
-			punti-=2;
-		}*/
-		
-//		for(int pawn : whitePawns) {
-//			 row = pawn/DIM;
-//			 col = pawn-(row*DIM);
-//			if((row<=2 && (col<=2 || col>=7)) ||(row>=7 && (col<=2 || col>=7))) {
-//				punti +=1;
-//			}
-//			else if(row>=3 && row<=5 && col>=3 && col <=5) {
-//				punti-=0.5;
-//			}
-//		}
-		
+	
 		return punti;
 	}
 

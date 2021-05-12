@@ -7,7 +7,6 @@ import aima.core.search.adversarial.Game;
 import it.unibo.ai.didattica.competition.tablut.domain.Action;
 import it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
-import it.unibo.ai.didattica.competition.tablut.domain.State.Pawn;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
 import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
 
@@ -36,12 +35,9 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	
 	
 	private final int expansionTurn=4;
-	private int turnCount=0;
-	private BoardState board= BoardState.getIstance();
 	private StateTablut initialState;
 	private MoveResult moveResult;
 	private ActionsUtils actions;
-	private TurnNumberSingleton turn=TurnNumberSingleton.getIstance();
 	private int nodiEspansi;
 
 	
@@ -80,7 +76,6 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		StateTablut clonedState = s.clone();
 		newState= moveResult.makeMove(clonedState, a);
 		newState.setTurnCount(newState.getTurnCount()+1);
-		turnCount++;
 		return newState;
 	}
 	
@@ -100,27 +95,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		
 		nodiEspansi++;
 		
-		return false; // TODO modificare
-//		return finishTurn || noMoves;
-		
-
-		
-		/*
-		// situazione finale vittoria - sconfitta - pareggio
-		//white win 
-		int posKing = findKing(s);
-		boolean kingEscapes = kingEscapes(posKing);
-		
-		//black win
-		boolean kingCaptured= kingCaptured(posKing, s);
-		
-		//no moves avaible 
-		boolean noMoves=false;
-		if (getActions(s).isEmpty()) {
-			noMoves=true;
-		}
-		return kingEscapes || kingCaptured ; //manca caso pareggio = stato ripetuto
-		*/
+		return false;
 	}
 	
 	@Override
@@ -137,7 +112,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	@Override
 	public double getUtility(StateTablut s, Turn t) {
 		this.actions = new ActionsUtils(s);
-		EuristicaUtils euristica= new EuristicaUtils(this.actions);
+		EuristicaUtils euristica= new EuristicaUtils();
 		
 		double punteggio = 0;
 		if(t.equals(Turn.BLACK)) {
