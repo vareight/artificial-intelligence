@@ -30,5 +30,7 @@ public class BestMoveFinder {
 		this.game = game;
 	}
 
-
+	public MyGame getCurrentGame() {
+		return this.game;
+	}
 }
