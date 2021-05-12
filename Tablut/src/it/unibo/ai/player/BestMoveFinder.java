@@ -15,15 +15,13 @@ public class BestMoveFinder {
 	private IterativeDeepeningAlphaBetaSearch<StateTablut,Action,State.Turn> iterative;
 
 	public BestMoveFinder(StateTablut state, GameAshtonTablut rules, int timeout) {
-		game = new MyGame(state, rules);
-		//game = new MyGame(rules);
+		game = new MyGame(state, rules);	//game = new MyGame(rules);
 		alphabeta = AlphaBetaSearch.createFor(game);
 		iterative = IterativeDeepeningAlphaBetaSearch.createFor(game, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, timeout-5);
 	}
 
 	public Action findBestAction(StateTablut state) {
 		return iterative.makeDecision(state);
-//		return alphabeta.makeDecision(state);
 	}
 
 	public void setCurrentGame(MyGame game) {

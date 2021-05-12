@@ -155,10 +155,7 @@ class MyGameTest {
 	    	 List <Action> calculatedactions= mygame.getActions(state);
 	    	 
 	        assertEquals(80, calculatedactions.size(), "Numer of initial moves avaible for black paws should be 80");     
-	       // assertEquals(actions, mygame.getActions(state), "Initial moves for black pawns"); // funziona se non sono ordinate uguali le due liste ?
-	       
-	       
-	        
+	     
 	        for(Action a : actions) {
 	        	 assertTrue(calculatedactions.contains(a));
 	        }
@@ -250,8 +247,7 @@ class MyGameTest {
 	   
 	    	List <Action> calculatedactions= mygame.getActions(state);
 	        assertEquals(56, calculatedactions.size(), "Numer of initial moves avaible for white paws should be 56");     
-	        //assertEquals(actions, mygame.getActions(state), "Initial moves for white pawns");
-	        
+	     
 	        for(Action a : actions) {
 	        	if(!calculatedactions.contains(a)) {
 	        		System.out.println(a.toString());
@@ -341,17 +337,6 @@ class MyGameTest {
 	    	actions.add( new Action(getBox(6,4), getBox(6,7), turn));
 	    	actions.add( new Action(getBox(6,4), getBox(6,8), turn));
 	    
-	   
-//	    	List <Action> calculatedactions= mygame.getActions(state);
-//	        assertEquals(56, calculatedactions.size(), "Numer of initial moves avaible for white paws should be 56");     
-//	        //assertEquals(actions, mygame.getActions(state), "Initial moves for white pawns");
-//	        
-//	        for(Action a : actions) {
-//	        	if(!calculatedactions.contains(a)) {
-//	        		System.out.println(a.toString());
-//	        	}
-//	       	 assertTrue(calculatedactions.contains(a));
-//	        }
 	    	
 	    	BestMoveFinder finder= new BestMoveFinder(state, rules, 60);
 			Action action =finder.findBestAction(state);

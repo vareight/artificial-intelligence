@@ -80,26 +80,14 @@ public class MoveResult {
 				int trovati = 0;
 				for (State s : drawConditions) {
 
-				//	System.out.println(s.toString());
+			
 
 					if (s.equals(state)) {
-						// DEBUG: //
-						// System.out.println("UGUALI:");
-						// System.out.println("STATO VECCHIO:\t" + s.toLinearString());
-						// System.out.println("STATO NUOVO:\t" +
-						// state.toLinearString());
-
 						trovati++;
 						if (trovati > repeated_moves_allowed) {
 							state.setTurn(State.Turn.DRAW);
 							break;
 						}
-					} else {
-						// DEBUG: //
-						// System.out.println("DIVERSI:");
-						// System.out.println("STATO VECCHIO:\t" + s.toLinearString());
-						// System.out.println("STATO NUOVO:\t" +
-						// state.toLinearString());
 					}
 				}
 				
@@ -108,8 +96,6 @@ public class MoveResult {
 				}
 				drawConditions.add(state.clone());
 
-				
-			//	System.out.println("Stato:\n" + state.toString());
 
 				return state;
 
@@ -176,9 +162,7 @@ public class MoveResult {
 				state.setTurn(State.Turn.WHITEWIN);
 			}
 		}
-		// TODO: implement the winning condition of the capture of the last
-		// black checker
-
+		
 		this.movesWithutCapturing++;
 		return state;
 	}

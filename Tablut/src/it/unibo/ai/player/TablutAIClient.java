@@ -23,8 +23,7 @@ public class TablutAIClient extends TablutClient {
 		String role = "";
 		String name = "tulbaTeam";
 		String ipAddress = "localhost";
-//		int timeout = 60;
-		// TODO: change the behavior?
+
 		if (args.length < 1) {
 			System.out.println("You must specify which player you are (WHITE or BLACK)");
 			System.exit(-1);
@@ -62,18 +61,7 @@ public class TablutAIClient extends TablutClient {
 		state.setTurn(State.Turn.WHITE);
 		GameAshtonTablut rules = new GameAshtonTablut(99, 0, "garbage", "fake", "fake");
 		System.out.println("Ashton Tablut game");
-		System.out.println("\n"+
-	               "+--------------------------  Tablut challenge 2021  --------------------------+");
-//	        System.out.println(
-//	        	   "|                                                                          |\n" +
-//	               "|    ████████               █████         ████████                ██  ██   |\n" +
-//	               "|       ██   ██   ██ ██     ██  ██   ████    ██    ████    ████   ██████   |\n" +
-//	               "|    	██   ██   ██ ██     ██ ███  ██  ██   ██   ██  ██  ██  ██ ██ ██ ██  |\n" +
-//	               "|       ██   ██   ██ ██     ██   ██ ██████   ██   ██ ██   ██████ ██    ██  |\n" +
-//	               "|       ██   ███████ ██████ ██████  ██  ██   ██   ███████ ██  ██ ██    ██  |\n" +
-//	               "|                                                                          |\n" +
-//	               "|                                                                          |\"");
-//	        
+		
 			System.out.println("\n"+
 					   "+----------------------------------- Tablut Challenge 2021  -------------------------------------+");
 	        System.out.println(
@@ -105,7 +93,7 @@ public class TablutAIClient extends TablutClient {
 			state = (StateTablut) this.getCurrentState(); //non sono sicura del casting
 			System.out.println(state.toString());
 			
-			try { //TODO vedere se serve questa sleep
+			try { 
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 			}
@@ -159,10 +147,6 @@ public class TablutAIClient extends TablutClient {
 					BestMoveFinder finder= new BestMoveFinder(state, rules, timeout);
 					Action action =finder.findBestAction(state);
 					System.out.println("***Turno " + turn.getTurn());
-//					if(action == null) { // come sopra, a che serve?
-//						State stateProva = this.getCurrentState();
-//						Action action2 = finder.findBestAction(state);
-//					}
 					System.out.println("***Mossa scelta: " + action.toString());
 					System.out.println("Nodi espansi: "+finder.getCurrentGame().getNodiEspansi());
 					try {
