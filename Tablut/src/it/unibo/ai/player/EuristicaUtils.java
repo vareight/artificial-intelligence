@@ -79,7 +79,7 @@ public class EuristicaUtils {
 //		double kingGoing = - this.kingCaptured(king, s)*100;
 		double bonusVeggente = veggente(s, Turn.WHITE)*2; // inizio: 4
 //		System.out.println("veggente: "+bonusVeggente);
-		double bonusArrocco = turn.getTurn() <= 8 ? noArrocco(s, whitePawns,king) : 0;
+		double bonusArrocco = noArrocco(s, whitePawns,king);
 //		double inTrouble=0;
 //		if(bonusNumPawn<0) {
 //			inTrouble=10*( nereGoing+biancheGoing);
@@ -87,10 +87,10 @@ public class EuristicaUtils {
 //		double bonusMobilita = mobilita(s, whitePawns, king)*0.02;
 //		double penalita = 0;
 //		
-//		if (king == 40) penalita = -5; // il re è ancora sul trono
+//		if (king == 40) penalita = -5; // il re ï¿½ ancora sul trono
 		
 		//System.out.println("*****FINE WHITE*****");
-		return bonusVuote + bonusVeggente + bonusKeyCells+bonusArrocco;
+		return bonusVuote + bonusVeggente + bonusKeyCells + bonusArrocco;
 	}
 	
 	/**
@@ -541,12 +541,19 @@ public class EuristicaUtils {
 			result = numBlack*weightBlack - weightWhite*numWhite;
 		}
 		if(turn.equalsTurn(Turn.WHITE.toString())) {
-			weightWhite *=2;
-			result = weightWhite*numWhite - numBlack*weightBlack;
-			if(whiteOutFuture>blackOutFuture+1) {
-				result -= 3*(whiteOutFuture-blackOutFuture);
+			weightWhite *=4;
+			if(state.getTurnCount()<=6) {
+				weightBlack*=20;
 			}
-			
+			result = weightWhite*blackOutFuture - weightBlack*whiteOutFuture;
+			if(numWhite<=3) {
+				result -= whiteOutFuture;
+			}
+			if(numWhite+1<=numBlack/3.5) {
+				result -= 2*(whiteOutFuture);
+			}
+//			else
+//				result += blackOutFuture*4;
 		}
 		
 		return result;
@@ -646,27 +653,41 @@ public class EuristicaUtils {
 		return row >= 0 && row <=8 && column >=0 && column <=8;
 	}
 	
+	/**
+	 * @param s
+	 * @param whitePawns
+	 * @param king
+	 * @return
+	 */
 	private double noArrocco(StateTablut s,int[] whitePawns, int king) {
 		int row = king/DIM;
 		int col = king-(row*DIM);
 		double punti=0;
 		
+		int bonrow= Math.abs(5-row);
+		int boncol= Math.abs(5-col);
+		
+		punti=3*bonrow+3*boncol;
+		
+		/*
 		if((row<=2 && (col<=2 || col>=7)) ||(row>=7 && (col<=2 || col>=7))) {
-			punti +=5;
+			punti +=10;
 		}/*else if(row>=3 && row<=5 && col>=3 && col <=5) {
 			punti-=2;
 		}*/
 		
-		for(int pawn : whitePawns) {
-			 row = pawn/DIM;
-			 col = pawn-(row*DIM);
-			if((row<=2 && (col<=2 || col>=7)) ||(row>=7 && (col<=2 || col>=7))) {
-				punti +=1;
-			}/*else if(row>=3 && row<=5 && col>=3 && col <=5) {
-				punti-=0.5;
-			}*/
-		}
+//		for(int pawn : whitePawns) {
+//			 row = pawn/DIM;
+//			 col = pawn-(row*DIM);
+//			if((row<=2 && (col<=2 || col>=7)) ||(row>=7 && (col<=2 || col>=7))) {
+//				punti +=1;
+//			}
+//			else if(row>=3 && row<=5 && col>=3 && col <=5) {
+//				punti-=0.5;
+//			}
+//		}
 		
 		return punti;
 	}
+
 }

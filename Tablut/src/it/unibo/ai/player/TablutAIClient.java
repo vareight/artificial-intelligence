@@ -122,7 +122,7 @@ public class TablutAIClient extends TablutClient {
 //						Action action2 = finder.findBestAction(state);
 //					}
 					System.out.println("Mossa scelta: " + action.toString());
-				
+					System.out.println("Nodi espansi: "+finder.getCurrentGame().getNodiEspansi());
 					try {
 						this.write(action);
 						turn.newTurn();
@@ -164,7 +164,7 @@ public class TablutAIClient extends TablutClient {
 //						Action action2 = finder.findBestAction(state);
 //					}
 					System.out.println("***Mossa scelta: " + action.toString());
-				
+					System.out.println("Nodi espansi: "+finder.getCurrentGame().getNodiEspansi());
 					try {
 						this.write(action);
 						turn.newTurn();

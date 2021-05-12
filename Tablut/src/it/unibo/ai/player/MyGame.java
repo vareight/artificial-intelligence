@@ -52,14 +52,14 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 	private MoveResult moveResult;
 	private ActionsUtils actions;
 	private TurnNumberSingleton turn=TurnNumberSingleton.getIstance();
-	private int isTerminalCalls;
+	private int nodiEspansi;
 
 	
 		
 	public MyGame(StateTablut initialState, GameAshtonTablut game) {
 		super();
 		this.initialState = initialState;
-		this.isTerminalCalls=0;
+		this.nodiEspansi=0;
 		//this.game=game;
 		this.actions = new ActionsUtils(initialState);
 		this.moveResult = new MoveResult(game.getRepeated_moves_allowed(), game.getCache_size());
@@ -98,7 +98,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 
 	@Override
 	public boolean isTerminal(StateTablut s) {
-		isTerminalCalls++;	
+			
 		Turn t= s.getTurn();
 		boolean finishTurn = t.equals(Turn.BLACKWIN) || t.equals(Turn.WHITEWIN) || t.equals(Turn.DRAW);
 		
@@ -113,7 +113,7 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 			return true;
 		}
 		
-	
+		nodiEspansi++;
 		
 		return false; // TODO modificare
 //		return finishTurn || noMoves;
@@ -175,6 +175,11 @@ public class MyGame implements Game<StateTablut, Action, State.Turn> {
 		//EURISTICA (dovrebbe essere meglio il valore pi� grande)
 //		System.out.println("Punteggio "+t.toString()+": " + punteggio+" TurnFuturo: "+s.getTurnCount()+ " TurnAtt: "+this.initialState.getTurnCount());
 		return punteggio;
+	}
+
+
+	public int getNodiEspansi() {
+		return nodiEspansi;
 	}
 	
 /*---------------------------------FUNZIONI DA SPOSTARE o ELIMINARE-------------------------------------------------------- 	
