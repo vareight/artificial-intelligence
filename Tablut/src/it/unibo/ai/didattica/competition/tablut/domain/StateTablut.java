@@ -29,7 +29,7 @@ public class StateTablut extends State implements Serializable {
 	public StateTablut() {
 		super();
 		this.board = new Pawn[9][9];
-		this.setTurnCount(TurnNumberSingleton.getIstance().getTurn());
+		this.setTurnCount(0);
 
 		for (int i = 0; i < 9; i++) {
 			for (int j = 0; j < 9; j++) {
