@@ -67,7 +67,7 @@ public class TablutAIClient extends TablutClient {
 	        System.out.println(
 	        		   "|                                                                    |\n" + 
 		               "|                     t  u  l  b  a  T  e  a  m                      |\n" +
-		               "|                                                                    |\n" );
+		               "|                                                                    |" );
 	        System.out.println(
 	                   "+---------------------- Autori  Ila, Ric, Sof -----------------------+\n");
 		
