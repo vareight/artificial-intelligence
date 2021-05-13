@@ -63,19 +63,13 @@ public class TablutAIClient extends TablutClient {
 		System.out.println("Ashton Tablut game");
 		
 			System.out.println("\n"+
-					   "+----------------------------------- Tablut Challenge 2021  -------------------------------------+");
+					   "+---------------------- Tablut Challenge 2021  ----------------------+");
 	        System.out.println(
-	        		   "|                                                                                                |\n" +
-		               "|   █              ████   █                   █                                                  |\n" +
-		               "|   ██████        █   ██  █                   ██████                                             |\n" +
-		               "|   ██      █   █ █   ██  ██████    ████ █    ██       ████       ████ █     ████ ██ ███         |\n" +
-		               "|   ██    █ █   ████ ██   ██   ██  ██   ██    ██    █ █   ██   █ ██   ██    ██  █   █   █   █    |\n" +
-		               "|   ██    █ █   █  ██     ██    ██ ██   ██   ███    █ █  ██   ██ ██   ██   ██   █   █   █  ██    |\n" +
-		               "|    ██████ █████   █████ ███████   ████ █████ ██████  ████████   ████ █████    █   █   ████     |\n" + 
-		               "|                                                                                                |\n" +
-		               "|                                                                                                |\n" );
+	        		   "|                                                                    |\n" + 
+		               "|                     t  u  l  b  a  T  e  a  m                      |\n" +
+		               "|                                                                    |\n" );
 	        System.out.println(
-	                   "+----------------------------------- Autori  Ila, Ric, Sof --------------------------------------+\n");
+	                   "+---------------------- Autori  Ila, Ric, Sof -----------------------+\n");
 		
 		TurnNumberSingleton turn= TurnNumberSingleton.getIstance();
 		
